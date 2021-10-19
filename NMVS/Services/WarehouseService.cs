@@ -18,6 +18,7 @@ namespace NMVS.Services
         public List<SiteVm> GetSite()
         {
             var siteList = (from site in _db.Sites
+                            where site.Active == true
                             select new SiteVm
                             {
                                 SiCode = site.SiCode,

@@ -1,0 +1,79 @@
+﻿@model NMVS.Models.DbModels.ItemData
+
+@{
+    ViewData["Title"] = "Update item data";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h5 class="mb-0">@ViewData["Title"]</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <form asp-action="UpdateItem">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="ItemNo" />
+                            <div class="form-group">
+                                <label asp-for="ItemName" class="control-label"></label>
+                                <input asp-for="ItemName" class="form-control" />
+                                <span asp-validation-for="ItemName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ItemType" class="control-label"></label>
+                                @Html.DropDownList("ItemType", new SelectList(ViewBag.ItemType, "CodeValue", "CodeDesc", Model.ItemType), new { @class = "form-control" })
+                                <span asp-validation-for="ItemType" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ItemUm" class="control-label"></label>
+                                <input asp-for="ItemUm" class="form-control" />
+                                <span asp-validation-for="ItemUm" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ItemPkg" class="control-label"></label>
+                                <input asp-for="ItemPkg" class="form-control" />
+                                <span asp-validation-for="ItemPkg" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ItemPkgQty" class="control-label"></label>
+                                <input asp-for="ItemPkgQty" class="form-control" type="number" step="0.01" />
+                                <span asp-validation-for="ItemPkgQty" class="text-danger"></span>
+                            </div>
+                            <div class="form-group form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" asp-for="Flammable" /> @Html.DisplayNameFor(model => model.Flammable)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ItemWhUnit" class="control-label"></label>
+                                <input asp-for="ItemWhUnit" class="form-control" type="number" step="0.01" />
+                                <span asp-validation-for="ItemWhUnit" class="text-danger"></span>
+                            </div>
+                            <div class="form-group form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" asp-for="Active" /> @Html.DisplayNameFor(model => model.Active)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Save" class="btn btn-outline-success" />
+
+                                <a asp-action="Browse" class="btn btn-secondary">Back to List</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.nav-item-data').addClass('active');
+    });
+</script>

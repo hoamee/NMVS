@@ -9,7 +9,7 @@ namespace NMVS.Models.DbModels
     public class ItemData
     {
         [Key]
-        [Required(ErrorMessage = "Item Number should be 2 ~ 10 char or digit")]
+        [Required(ErrorMessage = "Item Number should be 2 ~ 50 char or digit")]
         [StringLength(50)]
         [Display(Name = "Item No.")]
         public string ItemNo { get; set; }
@@ -41,6 +41,7 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Flammable")]
         public bool Flammable { set; get; }
 
+        
         [Display(Name = "Warehouse Unit (per 1 pack)")]
         [Required]
         public double ItemWhUnit { set; get; }

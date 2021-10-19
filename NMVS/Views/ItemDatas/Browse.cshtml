@@ -1,0 +1,130 @@
+﻿@model IEnumerable<NMVS.Models.DbModels.ItemData>
+
+@{
+    ViewData["Title"] = "Item data browse";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h5 class="mb-0">@ViewData["Title"]</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-flush" id="datatable-search">
+                    <thead>
+                        <tr>
+                            <th>Item No.</th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ItemName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ItemType)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ItemUm)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ItemPkg)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ItemPkgQty)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Flammable)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ItemWhUnit)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Active)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <a class="text-warning" asp-action="UpdateItem" asp-route-id="@item.ItemNo">@item.ItemNo</a>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ItemName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ItemType)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ItemUm)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ItemPkg)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ItemPkgQty)
+                                </td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.Flammable)
+                                    {
+                                        <span class="badge bg-danger">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Normal</span>
+                                    }
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ItemWhUnit)
+                                </td>
+
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.Active)
+                                    {
+                                        <span class="badge bg-success">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+
+                <div class="row col-12">
+                    <span class="col-auto">
+                        <a asp-action="AddItem" class="btn btn-sm btn-outline-info">
+                            Add item
+                        </a>
+                    </span>
+                    <span class="col-auto">
+                        <button class="btn btn-sm btn-outline-info" id="new-cust">
+                            <span class="fa fa-cloud-upload"></span>
+                            <span>Upload</span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<partial name="FileUploadModal" />
+<script src="~/assets/js/plugins/datatables.js"></script>
+<script type="text/javascript">
+    const dataTableBasic = new simpleDatatables.DataTable("#datatable-search", {
+        searchable: false,
+        fixedHeight: true
+    });
+
+    $(document).ready(function () {
+        $('.nav-item-data').addClass('active');
+        $('#new-cust').click(function () {
+            $('#file-modal').modal('toggle');
+        });
+    });
+</script>

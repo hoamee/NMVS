@@ -30,7 +30,12 @@ namespace NMVS
             services.AddDbContext<ApplicationDbContext>
                 (options => options.UseSqlServer(Configuration.GetConnectionString("NmvsConnection")));
             services.AddControllersWithViews();
-            //services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+            //apply role without log out
+            services.Configure<SecurityStampValidatorOptions>(options =>
+            {
+                options.ValidationInterval = TimeSpan.FromMinutes(1);
+            });
+
             services.AddIdentity<ApplicationUser, ApplicationRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
@@ -38,6 +43,7 @@ namespace NMVS
             services.AddTransient<ICustomerService, CustomerService>();
             services.AddTransient<ISupplierService, SupplierService>();
             services.AddTransient<IWarehouseService, WarehouseService>();
+            services.AddTransient<IItemDataService, ItemDataService>();
             services.AddTransient<ILocService, LocService>();
             services.AddHttpContextAccessor();
         }
@@ -61,6 +67,7 @@ namespace NMVS
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+
 
             app.UseEndpoints(endpoints =>
             {

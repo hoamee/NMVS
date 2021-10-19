@@ -31,6 +31,7 @@ namespace NMVS.Services
         public List<TypeVm> GetWhList()
         {
             var whs = (from wh in _db.Warehouses
+                       where wh.WhStatus == true
                             select new TypeVm
                             {
                                 Code = wh.WhCode,

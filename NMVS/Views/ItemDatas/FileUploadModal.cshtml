@@ -1,0 +1,77 @@
+﻿<!-- Modal -->
+<div class="modal" tabindex="-1" id="file-modal">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload item data<i class="fa fa-cloud-upload"></i></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form" name="form" action="/uploader" enctype="multipart/form-data" method="post">
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Item data list</label>
+                        <input class="form-control" type="file" accept=".xlsx" id="formFile" name="formFile" >
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="uploadFiles('formFile');">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script src="~/assets/js/bootbox/bootbox.locales.min.js"></script>
+<script src="~/assets/js/notify.js"></script>
+<script>
+
+    function uploadFiles(inputId) {
+        var input = document.getElementById(inputId);
+        var files = input.files;
+        var formData = new FormData();
+        var valid = true;
+
+        for (var i = 0; i != files.length; i++) {
+            var fileExtension = ['xlsx'];
+            if ($.inArray($('#' + inputId).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                $('#' + inputId).notify('Error: Only Excel (*.xlsx) file is allowed!');
+                valid = false;
+            }
+            formData.append("files", files[i]);
+        }
+
+        if (valid) {
+            $.ajax(
+                {
+                    url: "/ItemDatas/UploadList",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function () {
+                        $.notify("Uploading...", "warning");
+                    },
+                    type: "POST",
+                    success: function (excelRespose) {
+                        var error = '<span class="text-success"><b> No Error </b></span>';
+                        $.notify("Process completed", "success");
+                        if (excelRespose.error.length > 0)
+                            error = '<span class="text-danger"><b> Error: ' + excelRespose.error + ' </b></span>';
+                        bootbox.alert({
+                            title: "Import finished",
+                            message: 'Finished importing file "<b>' + excelRespose.fileName + '</b>". </br> - '
+                                + excelRespose.processed + ' record(s) processed. </br> - '
+                                + ' <span class="text-success"><b>' + excelRespose.imported + ' added.</b></span> </br> - '
+                                + ' <span class="text-warning"><b>' + excelRespose.updated + ' updated.</b></span> </br>'
+                                + error
+                        })
+                        $('#' + inputId).val('');
+                    }
+
+                }
+            );
+        } else {
+            $('#' + inputId).val('');
+        }
+    }
+</script>
