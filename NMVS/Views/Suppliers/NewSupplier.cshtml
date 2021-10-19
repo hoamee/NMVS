@@ -1,0 +1,94 @@
+﻿@model NMVS.Models.DbModels.Supplier
+
+@{
+    ViewData["Title"] = "New supplier";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h5 class="mb-0">@ViewData["Title"]</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <form asp-action="Newsupplier">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>                            
+                            <div class="form-group">
+                                <label asp-for="SupDesc" class="control-label"></label>
+                                <input asp-for="SupDesc" class="form-control" />
+                                <span asp-validation-for="SupDesc" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Addr" class="control-label"></label>
+                                <input asp-for="Addr" class="form-control" />
+                                <span asp-validation-for="Addr" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="City" class="control-label"></label>
+                                <input asp-for="City" class="form-control" />
+                                <span asp-validation-for="City" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Ctry" class="control-label"></label>
+                                <input asp-for="Ctry" class="form-control" />
+                                <span asp-validation-for="Ctry" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="TaxCode" class="control-label"></label>
+                                <input asp-for="TaxCode" class="form-control" />
+                                <span asp-validation-for="TaxCode" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Email1" class="control-label"></label>
+                                <input asp-for="Email1" class="form-control" />
+                                <span asp-validation-for="Email1" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Email2" class="control-label"></label>
+                                <input asp-for="Email2" class="form-control" />
+                                <span asp-validation-for="Email2" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Phone1" class="control-label"></label>
+                                <input asp-for="Phone1" class="form-control" />
+                                <span asp-validation-for="Phone1" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Phone2" class="control-label"></label>
+                                <input asp-for="Phone2" class="form-control" />
+                                <span asp-validation-for="Phone2" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Note" class="control-label"></label>
+                                <input asp-for="Note" class="form-control" />
+                                <span asp-validation-for="Note" class="text-danger"></span>
+                            </div>
+                            <div class="form-group form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" asp-for="Active" /> @Html.DisplayNameFor(model => model.Active)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Create" class="btn btn-primary" />
+
+                                <a asp-action="Browse" class="btn btn-secondary">Back to List</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<partial name="_ValidationScriptsPartial" />
+<script>
+    $(document).ready(function () {
+        $('.nav-sup').addClass('active');
+    });
+</script>

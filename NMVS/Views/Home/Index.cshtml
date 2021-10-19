@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card bg-gradient-secondary">
+            <img src="~/assets/img/shapes/waves-white.svg" alt="pattern-lines" class="position-absolute opacity-4 start-0 top-0 w-100">
+            <div class="card-body px-5 z-index-1 ">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 my-auto">
+                        <h2 class="text-white opacity-9">Welcome back</h2>
+                        <hr class="horizontal light mt-1 mb-3">
+                        <div class="d-flex">
+                            <div>
+
+                                <h3 class="text-white">@ViewData["User"] </h3>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 text-center">
+                        <div class="col-lg-1">
+                            <img class="w-75 w-lg-auto mt-1  d-none d-md-block" src="~/assets/img/logo/home-nmv.png" alt="car image">
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <h4 class="text-white opacity-7 ms-0 ms-md-auto"></h4>
+                            <h2 class="text-white ms-2 me-auto"></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('.side-home').addClass('active');
+    });
+</script>

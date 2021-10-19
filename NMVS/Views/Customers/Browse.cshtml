@@ -1,0 +1,95 @@
+﻿@model IEnumerable<NMVS.Models.ViewModels.CustomerVm>
+
+@{
+    ViewData["Title"] = "Customers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h5 class="mb-0">@ViewData["Title"]</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-flush" id="datatable-search">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Id</th>
+                            <th>AP code</th>
+                            <th>Agent No.</th>
+                            <th>Name</th>
+                            <th>Tax code</th>
+                            <th>Address</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Active</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-sm font-weight-normal">
+                                    <a href="/Customers/UpdateCustomer?code=@item.CustCode" class="text-warning">@item.CustCode</a>
+                                </td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.ApCode)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.AgentNo)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.CustName)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.TaxCode)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Addr)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Email1)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Phone1)</td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.Active)
+                                    {
+                                        <span class="badge bg-success">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Note)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+
+                <div class="row col-12">
+                    <span class="col-auto">
+                        <a asp-action="NewCustomer" class="btn btn-sm btn-outline-info">
+                            New Customer
+                        </a>
+                    </span>
+
+                    <span class="col-auto">
+                        <button class="btn btn-sm btn-outline-info" id="new-cust">
+                            <span class="fa fa-cloud-upload"></span>
+                            <span>Upload</span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<partial name="FileUploadModal" />
+<script src="~/assets/js/plugins/datatables.js"></script>
+<script type="text/javascript">
+    const dataTableBasic = new simpleDatatables.DataTable("#datatable-search", {
+        searchable: false,
+        fixedHeight: true
+    });
+
+    $(document).ready(function () {
+        $('.nav-cust').addClass('active');
+        $('#new-cust').click(function () {
+            $('#file-modal').modal('toggle');
+        });
+    });
+</script>

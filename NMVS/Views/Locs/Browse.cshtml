@@ -1,0 +1,152 @@
+﻿@model IEnumerable<NMVS.Models.DbModels.Loc>
+
+@{
+    ViewData["Title"] = "Location browse";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h5 class="mb-0">@ViewData["Title"]</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-flush" id="datatable-search">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.LocCode)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.LocDesc)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Flammable)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.LocCmmt)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.LocType)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.LocCap)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.LocRemain)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.LocHolding)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.LocOutgo)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Direct)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.WhCode)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.LocStatus)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                        <tr>
+                            <td>
+                                <a class="text-warning" asp-action="UpdateLoc" asp-route-id="@item.LocCode">@item.LocCode</a>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LocDesc)
+                            </td>
+
+                            <td class="text-sm font-weight-normal">
+                                @if (item.Flammable)
+                                {
+                                    <span class="badge bg-danger">Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Normal</span>
+                                }
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LocCmmt)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LocType)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LocCap)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LocRemain)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LocHolding)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LocOutgo)
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.Direct)
+                                {
+                                    <span class="badge bg-success">Direct Load</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">No</span>
+                                }
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.WhCode)
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.LocStatus)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+
+                <div class="row col-12">
+                    <span class="col-auto">
+                        <a asp-action="AddLoc" class="btn btn-sm btn-outline-info">
+                            <span class="fa fa-plus-circle"></span>
+                            Add new loc
+                        </a>
+                    </span>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/js/plugins/datatables.js"></script>
+<script type="text/javascript">
+    const dataTableBasic = new simpleDatatables.DataTable("#datatable-search", {
+        searchable: false,
+        fixedHeight: true
+    });
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('.nav-loc').addClass('active');
+    });
+</script>

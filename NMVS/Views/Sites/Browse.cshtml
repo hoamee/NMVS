@@ -1,0 +1,91 @@
+﻿@model IEnumerable<NMVS.Models.DbModels.Site>
+
+@{
+    ViewData["Title"] = "Sites";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h5 class="mb-0">@ViewData["Title"]</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-flush" id="datatable-search">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.SiCode)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.SiName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Active)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.SiCmmt)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="btn btn-sm btn-outline-info"><a asp-action="UpdateSite" asp-route-id="@item.SiCode">@item.SiCode</a></span>
+
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.SiName)
+                                </td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.Active)
+                                    {
+                                        <span class="badge bg-success">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.SiCmmt)
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+
+                <div class="row col-12">
+                    <span class="col-auto">
+                        <a asp-action="AddSite" class="btn btn-sm btn-outline-info">
+                            Add site
+                        </a>
+                    </span>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/js/plugins/datatables.js"></script>
+
+<script type="text/javascript">
+    const dataTableBasic = new simpleDatatables.DataTable("#datatable-search", {
+        searchable: false,
+        fixedHeight: true
+    });
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('.nav-site').addClass('active');
+    });
+</script>

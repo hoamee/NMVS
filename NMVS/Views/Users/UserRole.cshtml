@@ -1,0 +1,160 @@
+﻿@model IEnumerable<NMVS.Models.ViewModels.UserRoleVm>
+@{
+    ViewData["Category"] = "User roles";
+    ViewData["Title"] = "User roles";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h5 class="mb-0">@ViewData["Title"]</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-flush" id="datatable-search">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Account</th>
+                            <th>User management</th>
+                            <th>Request Inventory</th>
+                            <th>Handle Request</th>
+                            <th>Receive Inventory</th>
+                            <th>QC</th>
+                            <th>Create SO</th>
+                            <th>Approve SO</th>
+                            <th>Register vehicle</th>
+                            <th>Guard</th>
+                            <th>Active</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-sm font-weight-normal">
+                                    <span class="btn btn-sm btn-outline-primary" onclick="editRole('@item.UserName')">@Html.DisplayFor(x => item.UserName)</span>
+
+                                </td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.UserManagement)
+                                    {
+                                        <p class="badge bg-success">Yes</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="badge bg-secondary">No</p>
+                                    }
+                                </td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.RequestInv)
+                                    {
+                                        <p class="badge bg-success">Yes</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="badge bg-secondary">No</p>
+                                    }
+                                </td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.HandleRequest)
+                                    {
+                                        <p class="badge bg-success">Yes</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="badge bg-secondary">No</p>
+                                    }
+                                </td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.ReceiveInv)
+                                    {
+                                        <p class="badge bg-success">Yes</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="badge bg-secondary">No</p>
+                                    }
+                                </td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.QC)
+                                    {
+                                        <p class="badge bg-success">Yes</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="badge bg-secondary">No</p>
+                                    }
+                                </td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.CreateSO)
+                                    {
+                                        <p class="badge bg-success">Yes</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="badge bg-secondary">No</p>
+                                    }
+                                </td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.AppSO)
+                                    {
+                                        <p class="badge bg-success">Yes</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="badge bg-secondary">No</p>
+                                    }
+                                </td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.RegVehicle)
+                                    {
+                                        <p class="badge bg-success">Yes</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="badge bg-secondary">No</p>
+                                    }
+                                </td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.Guard)
+                                    {
+                                        <p class="badge bg-success">Yes</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="badge bg-secondary">No</p>
+                                    }
+                                </td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.Active)
+                                    {
+                                        <p class="badge bg-success">Active</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="badge bg-secondary">Inactive</p>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<partial name="UserRoleModal" />
+<script src="~/assets/js/plugins/datatables.js"></script>
+<script src="~/assets/js/notify.js"></script>
+<script type="text/javascript">
+    const dataTableBasic = new simpleDatatables.DataTable("#datatable-search", {
+        searchable: false,
+        fixedHeight: true
+    });
+</script>
+<script src="~/assets/js/page/user/usrrl.js"></script>

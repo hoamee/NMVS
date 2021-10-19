@@ -1,0 +1,84 @@
+﻿@model NMVS.Models.DbModels.Loc
+
+@{
+    ViewData["Title"] = "Add new loc";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h5 class="mb-0">@ViewData["Title"]</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <form asp-action="AddLoc">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label asp-for="LocCode" class="control-label"></label>
+                                <input asp-for="LocCode" class="form-control" />
+                                <span asp-validation-for="LocCode" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="LocDesc" class="control-label"></label>
+                                <input asp-for="LocDesc" class="form-control" />
+                                <span asp-validation-for="LocDesc" class="text-danger"></span>
+                            </div>
+                            <div class="form-group form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" asp-for="Flammable" /> @Html.DisplayNameFor(model => model.Flammable) <span class="fa fa-fire-extinguisher"></span>
+                                </label>
+                            </div>
+                            <div class="form-group form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" asp-for="LocStatus" /> @Html.DisplayNameFor(model => model.LocStatus)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="LocCmmt" class="control-label"></label>
+                                <input asp-for="LocCmmt" class="form-control" />
+                                <span asp-validation-for="LocCmmt" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="LocType" class="control-label"></label>
+                                @Html.DropDownList("LocType", new SelectList(ViewBag.LocType, "Code", "Desc"), new { @class = "form-control" })
+                                <span asp-validation-for="LocType" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="LocCap" class="control-label"></label>
+                                <input asp-for="LocCap" class="form-control" type="number" step="0.001" />
+                                <span asp-validation-for="LocCap" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" asp-for="Direct" /> @Html.DisplayNameFor(model => model.Direct)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="WhCode" class="control-label"></label>
+                                @Html.DropDownList("WhCode", new SelectList(ViewBag.Whs, "Code", "Desc"), new { @class = "form-control" })
+                                <span asp-validation-for="WhCode" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Create" class="btn btn-primary" />
+
+                                <a asp-action="Browse" class="btn btn-secondary">Back to List</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.nav-wh').addClass('active');
+    });
+</script>

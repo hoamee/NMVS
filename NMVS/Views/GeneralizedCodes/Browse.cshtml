@@ -1,0 +1,48 @@
+﻿@model IEnumerable<NMVS.Models.DbModels.GeneralizedCode>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CodeFldName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CodeValue)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CodeDesc)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CodeFldName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CodeValue)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CodeDesc)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.CodeNo">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.CodeNo">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.CodeNo">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

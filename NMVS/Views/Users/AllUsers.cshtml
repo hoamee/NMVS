@@ -1,0 +1,63 @@
+﻿@model IEnumerable<NMVS.Models.ViewModels.UserVm>
+@{
+    ViewData["Category"] = "User management";
+    ViewData["Title"] = "All Users";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h5 class="mb-0">@ViewData["Title"]</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-flush" id="datatable-search">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>User account</th>
+                            <th>User name</th>
+                            <th>Email</th>
+                            <th>Active</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.UserName)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.FullName)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.UserEmail)</td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.Active)
+                                    {
+                                        <p class="badge bg-success">Yes</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="badge bg-secondary">Inactive</p>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/js/plugins/datatables.js"></script>
+
+<script type="text/javascript">
+    const dataTableBasic = new simpleDatatables.DataTable("#datatable-search", {
+        searchable: false,
+        fixedHeight: true
+    });
+
+    $(document).ready(function () {
+        $('.nav-user').addClass('active');
+        $('.nav-all-user').addClass('active');
+        $('.user-div').addClass('show');
+    });
+</script>

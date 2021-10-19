@@ -1,0 +1,55 @@
+﻿@model NMVS.Models.DbModels.Site
+
+@{
+    ViewData["Title"] = "Add Site";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h5 class="mb-0">@ViewData["Title"]</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <form asp-action="AddSite">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label asp-for="SiCode" class="control-label"></label>
+                                <input asp-for="SiCode" class="form-control" />
+                                <span asp-validation-for="SiCode" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="SiName" class="control-label"></label>
+                                <input asp-for="SiName" class="form-control" />
+                                <span asp-validation-for="SiName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" asp-for="Active" /> @Html.DisplayNameFor(model => model.Active)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="SiCmmt" class="control-label"></label>
+                                <input asp-for="SiCmmt" class="form-control" />
+                                <span asp-validation-for="SiCmmt" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Create" class="btn btn-primary" />
+                                <a asp-action="Browse" class="btn btn-outline-secondary">Back to List</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('.nav-site').addClass('active');
+    });
+</script>
