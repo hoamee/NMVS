@@ -46,6 +46,8 @@ namespace NMVS.Models
         public DbSet<Loc> Locs { set; get; }
         public DbSet<ItemData> ItemDatas { set; get; }
         public DbSet<GeneralizedCode> GeneralizedCodes { set; get; }
+        public DbSet<ItemMaster> ItemMasters { set; get; }
+        public DbSet<IncomingList> IncomingLists { set; get; }
 
     }
 }

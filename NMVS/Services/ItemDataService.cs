@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.EntityFrameworkCore.Internal;
 using NMVS.Common;
 using NMVS.Models;
 using NMVS.Models.DbModels;
@@ -21,24 +22,39 @@ namespace NMVS.Services
 
         public List<ItemData> GetItemList()
         {
-            var data = _db.ItemDatas
-            .Join(
-             _db.GeneralizedCodes,
-             item => item.ItemType,
-             code => code.CodeValue,
-             (item, code) => new ItemData
-             {
-                 ItemNo = item.ItemNo,
-                 Active = item.Active,
-                 ItemType = code.CodeDesc,
-                 Flammable = item.Flammable,
-                 ItemName = item.ItemName,
-                 ItemPkg = item.ItemPkg,
-                 ItemPkgQty = item.ItemPkgQty,
-                 ItemUm = item.ItemUm,
-                 ItemWhUnit = item.ItemWhUnit
-             });
-            return data.ToList();
+            var model = (from item in _db.ItemDatas
+                         from code in _db.GeneralizedCodes.Where(x => x.CodeFldName == "ItemType" && item.ItemType == x.CodeValue).DefaultIfEmpty()
+                         select new ItemData
+                         {
+                             ItemNo = item.ItemNo,
+                             Active = item.Active,
+                             ItemType = code != null ? code.CodeDesc : "",
+                             Flammable = item.Flammable,
+                             ItemName = item.ItemName,
+                             ItemPkg = item.ItemPkg,
+                             ItemPkgQty = item.ItemPkgQty,
+                             ItemUm = item.ItemUm,
+                             ItemWhUnit = item.ItemWhUnit
+                         });
+
+            //var data = _db.ItemDatas
+            //.Join(
+            // _db.GeneralizedCodes,
+            // item => item.ItemType,
+            // code => code.CodeValue,
+            // (item, code) => new ItemData
+            // {
+            //     ItemNo = item.ItemNo,
+            //     Active = item.Active,
+            //     ItemType = code.CodeDesc,
+            //     Flammable = item.Flammable,
+            //     ItemName = item.ItemName,
+            //     ItemPkg = item.ItemPkg,
+            //     ItemPkgQty = item.ItemPkgQty,
+            //     ItemUm = item.ItemUm,
+            //     ItemWhUnit = item.ItemWhUnit
+            // });
+            return model.ToList();
         }
 
         public async Task<ExcelRespone> ImportItemData(string filepath)
@@ -117,7 +133,7 @@ namespace NMVS.Services
                             item.ItemPkg = pkgType;
                             item.ItemPkgQty = pkgQty;
                             item.ItemWhUnit = whSpace;
-                            
+                            item.Active = true;
                             _db.Update(item);
                             updateted++;
                             await _db.SaveChangesAsync();
@@ -133,7 +149,8 @@ namespace NMVS.Services
                                 ItemUm = um,
                                 ItemPkg = pkgType,
                                 ItemPkgQty = pkgQty,
-                                ItemWhUnit = whSpace
+                                ItemWhUnit = whSpace,
+                                Active = true
                             };
 
                             await _db.AddAsync(item);
