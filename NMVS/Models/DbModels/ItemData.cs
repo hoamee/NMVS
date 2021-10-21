@@ -41,13 +41,14 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Flammable")]
         public bool Flammable { set; get; }
 
-        
+
         [Display(Name = "Warehouse Unit (per 1 pack)")]
         [Required]
         public double ItemWhUnit { set; get; }
 
         [Display(Name = "Active")]
         public bool Active { get; set; }
+
 
     }
 }

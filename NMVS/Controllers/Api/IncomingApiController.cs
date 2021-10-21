@@ -107,26 +107,36 @@ namespace NMVS.Controllers.Api
         public IActionResult QcItem(ItemMaster item)
         {
             var role = _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
+
+            var receiveLoc = _context.Locs.FirstOrDefault(l => l.LocType == "receive");
             CommonResponse<int> common = new();
             if (role)
             {
-                try
+                if (receiveLoc != null)
                 {
-                    
-                    var pt = _context.ItemMasters.Find(item.PtId);
-                    pt.Accepted = pt.RecQty - item.PtQty;
-                    pt.PtQty = pt.Accepted;
-                    pt.Qc = _httpContextAccessor.HttpContext.User.Identity.Name;
+                    try
+                    {
 
-                    var ic = _context.IncomingLists.Find(pt.IcId);
-                    ic.Checked++;
-                    _context.SaveChanges();
-                    common.status = 1;
+                        var pt = _context.ItemMasters.Find(item.PtId);
+                        pt.Accepted = pt.RecQty - item.PtQty;
+                        pt.PtQty = pt.Accepted;
+                        pt.Qc = _httpContextAccessor.HttpContext.User.Identity.Name;
+                        pt.LocCode = receiveLoc.LocCode;
+                        var ic = _context.IncomingLists.Find(pt.IcId);
+                        ic.Checked++;
+                        _context.SaveChanges();
+                        common.status = 1;
+                    }
+                    catch (Exception e)
+                    {
+                        common.status = -1;
+                        common.message = e.ToString();
+                    }
                 }
-                catch (Exception e)
+                else
                 {
                     common.status = -1;
-                    common.message = e.ToString();
+                    common.message = "No receving location found, please create one first";
                 }
             }
             else

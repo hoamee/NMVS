@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NMVS.Models;
 
 namespace NMVS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211021035452_Allocate")]
+    partial class Allocate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,71 +221,6 @@ namespace NMVS.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles");
-                });
-
-            modelBuilder.Entity("NMVS.Models.DbModels.AllocateOrder", b =>
-                {
-                    b.Property<int>("AlcOrdId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("AlcOrdFDesc")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AlcOrdFrom")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("AlcOrdQty")
-                        .HasColumnType("float");
-
-                    b.Property<int?>("AllocateRequestAlcId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CodeValue")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Confirm")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ConfirmedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("GeneralizedCodeCodeNo")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ItemMasterPtId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("LocCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LocCode1")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("MovementTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("OrderBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PtId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RequestID")
-                        .HasColumnType("int");
-
-                    b.HasKey("AlcOrdId");
-
-                    b.HasIndex("AllocateRequestAlcId");
-
-                    b.HasIndex("GeneralizedCodeCodeNo");
-
-                    b.HasIndex("ItemMasterPtId");
-
-                    b.HasIndex("LocCode1");
-
-                    b.ToTable("AllocateOrders");
                 });
 
             modelBuilder.Entity("NMVS.Models.DbModels.AllocateRequest", b =>
@@ -947,33 +884,6 @@ namespace NMVS.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("NMVS.Models.DbModels.AllocateOrder", b =>
-                {
-                    b.HasOne("NMVS.Models.DbModels.AllocateRequest", "AllocateRequest")
-                        .WithMany()
-                        .HasForeignKey("AllocateRequestAlcId");
-
-                    b.HasOne("NMVS.Models.DbModels.GeneralizedCode", "GeneralizedCode")
-                        .WithMany()
-                        .HasForeignKey("GeneralizedCodeCodeNo");
-
-                    b.HasOne("NMVS.Models.DbModels.ItemMaster", "ItemMaster")
-                        .WithMany()
-                        .HasForeignKey("ItemMasterPtId");
-
-                    b.HasOne("NMVS.Models.DbModels.Loc", "Loc")
-                        .WithMany()
-                        .HasForeignKey("LocCode1");
-
-                    b.Navigation("AllocateRequest");
-
-                    b.Navigation("GeneralizedCode");
-
-                    b.Navigation("ItemMaster");
-
-                    b.Navigation("Loc");
                 });
 
             modelBuilder.Entity("NMVS.Models.DbModels.AllocateRequest", b =>

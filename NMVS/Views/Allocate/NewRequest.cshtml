@@ -1,0 +1,76 @@
+﻿
+@model NMVS.Models.DbModels.ItemMaster
+
+@{
+    ViewData["Title"] = "New allocate request";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <form asp-action="SelectLoc">
+
+                            <div class="form-horizontal">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <label asp-for="ItemNo" class="control-label"></label>
+                                    <input asp-for="ItemNo" class="form-control" />
+                                    <span asp-validation-for="ItemNo" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.LocCode, "To Location", htmlAttributes: new { @class = "control-label" })
+
+                                @Html.DropDownList("LocCode", null, htmlAttributes: new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.LocCode, "", new { @class = "text-danger" })
+
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Create" class="btn btn-outline-primary" />
+
+                                <a asp-action="AllocateRequests" class="btn btn-secondary">Back to List</a>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<partial name="ItemModal" />
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+
+
+    function setItemNo(sup) {
+        $('#ItemNo').val(sup);
+        $('#item-modal').modal('toggle');
+    }
+
+
+    $(document).ready(function () {
+        $('#supplier-tb').DataTable();
+        $('.nav-allocate').addClass('active');
+        $('.nav-add-alc').addClass('active');
+
+        $('#ItemNo').click(function () {
+            $('#item-modal').modal('toggle');
+        });
+
+    });
+
+
+</script>

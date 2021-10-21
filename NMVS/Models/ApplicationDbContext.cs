@@ -48,6 +48,11 @@ namespace NMVS.Models
         public DbSet<GeneralizedCode> GeneralizedCodes { set; get; }
         public DbSet<ItemMaster> ItemMasters { set; get; }
         public DbSet<IncomingList> IncomingLists { set; get; }
+        public DbSet<InvRequest> InvRequests { set; get; }
+        public DbSet<RequestDet> RequestDets { set; get; }
+        public DbSet<IssueOrder> IssueOrders { set; get; }
+        public DbSet<AllocateRequest> AllocateRequests { set; get; }
+        public DbSet<AllocateOrder> AllocateOrders { set; get; }
 
     }
 }

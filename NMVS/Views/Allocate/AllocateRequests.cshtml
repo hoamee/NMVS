@@ -1,0 +1,139 @@
+﻿@model IEnumerable<NMVS.Models.ViewModels.AllocateRequestVm>
+
+@{
+    ViewData["Title"] = "History";
+    ViewData["Title"] = "Allocate request";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="table-responsive card-body">
+                <table class="table table-flush" id="datatable-search">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>
+                                Allocate request No.
+                            </th>
+
+                            <th>
+                                Item No.
+                            </th>
+                            <th>
+                                Quantity
+                            </th>
+                            <th>
+                                From
+                            </th>
+                            <th>
+                                To
+                            </th>
+                            <th>
+                                Time
+                            </th>
+                            <th>
+                                Report
+                            </th>
+                            <th>
+                                Quick Action
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr id="confirm-@item.AlcId">
+                                <td>
+                                    @item.AlcId
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Item)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AlcQty)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AlcFrom)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AlcTo)
+                                </td>
+                                <td>
+                                    @item.MovementTime
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Note)
+                                </td>
+
+                                <td class="post-btn">
+                                    <div>
+                                        @if (item.IsClosed == null || item.IsClosed == false)
+                                        {
+
+                                        <div class="p-2">
+                                            <span class="btn btn-outline-primary">Post order</span>
+                                            <span class="btn btn-outline-danger">Decline</span>
+                                            @*@Ajax.ActionLink("Post order", "PostOrder", new { id = item.AlcId }, new AjaxOptions
+                                            {
+                                                Confirm = "Place order now?",
+                                                HttpMethod = "POST"
+
+                                            },
+                                                new { @class = "btn btn-outline-primary" })
+
+                                            @Ajax.ActionLink("Decline", "RemoveAllocateRequest", new { id = item.AlcId }, new AjaxOptions
+                                            {
+                                                Confirm = "Decline request?",
+                                                HttpMethod = "POST"
+
+                                            },
+                                                new { @class = "btn btn-outline-danger" })*@
+                                        </div>
+                                        }
+                                        else if (item.IsClosed == true)
+                                        {
+                                            <p class="badge bg-success">Order posted</p>
+                                        }
+                                       
+
+
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+
+                <div class="row col-12">
+                    <span class="col-auto">
+                        <a asp-action="NewRequest" class="btn btn-sm btn-outline-info">
+                            New allocate request
+                        </a>
+                    </span>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('.nav-sup').addClass('active');
+        $('#new-sup').click(function () {
+            $('#file-modal').modal('toggle');
+        });
+        $('#datatable-search').DataTable();
+    });
+</script>
