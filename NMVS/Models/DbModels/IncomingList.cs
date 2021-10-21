@@ -22,7 +22,7 @@ namespace NMVS.Models.DbModels
 
         [DataType(DataType.Date)]
         [Display(Name = "PO date")]
-        public DateTime PoDate { set; get; }
+        public DateTime? PoDate { set; get; }
 
         [Display(Name = "Vehicle")]
         public string Vehicle { set; get; }
@@ -38,6 +38,12 @@ namespace NMVS.Models.DbModels
         public bool IsWarranty { set; get; }
 
         public bool Closed { set; get; }
+
+        public int ItemCount { set; get; }
+
+        public int Checked { set; get; }
+
+        public string LastModifiedBy { set; get; }
 
         public virtual ICollection<ItemMaster> ItemMasters { set; get; }
 

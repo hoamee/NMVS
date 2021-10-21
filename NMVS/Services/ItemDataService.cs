@@ -95,7 +95,7 @@ namespace NMVS.Services
                     //if can not find supplier code, break
                     if (string.IsNullOrEmpty(itemNo))
                     {
-                        excelRespose.error += "Line " + readingRow + ": Missing item code; ";
+                        excelRespose.error += "Line " + readingRow + ": Missing item code; Import session terminated";
                         break;
                     }
                     itemName = _eHelper.GetCellValue(wsPart, wbPart, "B" + readingRow);

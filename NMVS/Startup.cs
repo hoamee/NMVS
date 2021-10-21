@@ -44,6 +44,7 @@ namespace NMVS
             services.AddTransient<ISupplierService, SupplierService>();
             services.AddTransient<IWarehouseService, WarehouseService>();
             services.AddTransient<IItemDataService, ItemDataService>();
+            services.AddTransient<IIncomingService, IncomingService>();
             services.AddTransient<ILocService, LocService>();
             services.AddHttpContextAccessor();
         }

@@ -10,7 +10,7 @@
         <div class="card">
             <!-- Card header -->
             <div class="card-header">
-                <h5 class="mb-0">@ViewData["Title"]</h5>
+                <h3 class="mb-0">@ViewData["Title"]</h3>
             </div>
             <div class="table-responsive">
                 <table class="table table-flush" id="datatable-search">
@@ -34,7 +34,6 @@
                             <th>
                                 @Html.DisplayNameFor(model => model.Type)
                             </th>
-                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -42,7 +41,7 @@
                         {
                             <tr>
                                 <td>
-                                    <span class="btn btn-sm btn-outline-warning"><a  asp-action="UpdateWH" asp-route-id="@item.WhCode">@item.WhCode</a></span>
+                                    <a class="btn btn-sm btn-outline-primary" asp-action="UpdateWH" asp-route-id="@item.WhCode">@item.WhCode</a>
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.WhDesc)
@@ -86,16 +85,12 @@
     </div>
 </div>
 
-<script src="~/assets/js/plugins/datatables.js"></script>
-<script type="text/javascript">
-    const dataTableBasic = new simpleDatatables.DataTable("#datatable-search", {
-        searchable: false,
-        fixedHeight: true
-    });
-
-</script>
+<script src="~/assets/datatable/datatables.min.js"></script>
 <script>
+
     $(document).ready(function () {
         $('.nav-wh').addClass('active');
+        $('#datatable-search').DataTable();
     });
 </script>
+

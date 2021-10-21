@@ -1,0 +1,128 @@
+﻿@model IEnumerable<NMVS.Models.ViewModels.IncomingListVm>
+
+@{
+    ViewData["Title"] = "Incoming list browse";
+    ViewData["Category"] = "Receive";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-flush" id="datatable-search">
+                        <thead>
+                            <tr>
+                                <th>
+                                    No.
+                                </th>
+                                <th>
+                                    Supplier
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Po)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.PoDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Vehicle)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Driver)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.DeliveryDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.IsWarranty)
+                                </th>
+                                <th>
+                                    QC
+                                </th>
+                                <th>
+                                    Last update by
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-action="Details" asp-route-id="@item.IcId"><span class="btn btn-sm btn-outline-primary">@item.IcId</span></a>
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Supplier)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Po)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.PoDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Vehicle)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Driver)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DeliveryDate)
+                                    </td>
+                                    <td class="text-sm font-weight-normal">
+                                        @if (item.IsWarranty)
+                                        {
+                                            <span class="badge bg-success">Yes</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">No</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Checked)/@Html.DisplayFor(modelItem => item.ItemCount)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.LastModified)
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+
+                <div class="row col-12">
+                    <span class="col-auto">
+                        <a asp-action="CreateListHeader" class="btn btn-sm btn-outline-info">
+                            Add new list
+                        </a>
+                    </span>
+                    <span class="col-auto">
+                        <button class="btn btn-sm btn-outline-info" id="new-list">
+                            <span class="fa fa-cloud-upload"></span>
+                            <span>Upload</span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('.nav-qc').addClass('active');
+        $('#datatable-search').DataTable();
+    });
+</script>

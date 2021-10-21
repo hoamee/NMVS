@@ -1,0 +1,173 @@
+﻿@model NMVS.Models.ViewModels.IcmListVm
+
+@{
+    ViewData["Title"] = "Details";
+    ViewData["Category"] = "Receive / QC";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-2">
+                        Supplier
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Icm.Supplier)
+                    </dd>
+                    <dt class="col-sm-2">
+                        PO No.
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Icm.Po)
+                    </dd>
+                    <dt class="col-sm-2">
+                        PO Date
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Icm.PoDate)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Vehicle
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Icm.Vehicle)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Driver
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Icm.Driver)
+                    </dd>
+                    <dt class="col-sm-2">
+                        DeliveryDate
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Icm.DeliveryDate)
+                    </dd>
+                    @if (Model.Icm.IsWarranty)
+                    {
+                        <dt class="col-sm-2">
+                            Warranty return
+                        </dt>
+                        <dd class="col-sm-10">
+                            Yes
+                        </dd>
+                    }
+
+                    <dt class="col-sm-2">
+                        Status
+                    </dt>
+
+                    <dd class="col-sm-10">
+                        @if (Model.Icm.Closed)
+                        {
+                            <p class="badge bg-secondary">Closed (Passed to QC)</p>
+                        }
+                        else
+                        {
+                            <p class="badge bg-success" id="close-case">Open (Editable)</p>
+                        }
+                    </dd>
+
+
+
+                </dl>
+            </div>
+            <div class="card-footer">
+                @if (!Model.Icm.Closed)
+                {
+                    <a asp-action="UpdateList" class="btn btn-outline-warning" asp-route-id="@Model.Icm.IcId">Update</a>
+                    <a asp-action="Browse" class="btn btn-outline-secondary">Back to browse</a>
+                    <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@Model.Icm.IcId">Remove</a>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">Items</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-flush" id="datatable-search">
+                        <thead>
+                            <tr>
+                                <td>
+                                    Item No.
+                                </td>
+                                <td>
+                                    Item name
+                                </td>
+                                <td>
+                                    Received
+                                </td>
+                                <td>
+                                    Accepted
+                                </td>
+                                <td>
+                                    Checked by
+                                </td>
+                                <td>
+                                    Status
+                                </td>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var t in Model.Pt)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.ItemNo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.ItemName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.RcvQty)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.AcceptQty)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.CheckedBy)
+                                    </td>
+                                    <td>
+                                        @if (t.IsChecked == true)
+                                        {
+                                            <span class="badge bg-success">Checked</span>
+                                        }
+                                        @if (t.IsChecked == false)
+                                        {
+                                            <button class="btn btn-sm btn-outline-warning" onclick="checkItem(@t.PtId,@t.RcvQty);">Pending QC</button>
+                                        }
+                                        @if (t.IsChecked == null)
+                                        {
+                                            <span class="badge bg-secondary">Pending close</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+<partial name="AddItemModal" />
+

@@ -314,6 +314,9 @@ namespace NMVS.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("Checked")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Closed")
                         .HasColumnType("bit");
 
@@ -326,10 +329,16 @@ namespace NMVS.Migrations
                     b.Property<bool>("IsWarranty")
                         .HasColumnType("bit");
 
+                    b.Property<int>("ItemCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Po")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("PoDate")
+                    b.Property<DateTime?>("PoDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("SupCode")
@@ -392,10 +401,10 @@ namespace NMVS.Migrations
 
             modelBuilder.Entity("NMVS.Models.DbModels.ItemMaster", b =>
                 {
-                    b.Property<string>("PtId")
+                    b.Property<int>("PtId")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<double>("Accepted")
                         .HasColumnType("float");

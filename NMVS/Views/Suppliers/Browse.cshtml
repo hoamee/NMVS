@@ -10,7 +10,7 @@
         <div class="card">
             <!-- Card header -->
             <div class="card-header">
-                <h5 class="mb-0">@ViewData["Title"]</h5>
+                <h3 class="mb-0">@ViewData["Title"]</h3>
             </div>
             <div class="table-responsive">
                 <table class="table table-flush" id="datatable-search">
@@ -30,28 +30,28 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                        <tr>
-                            <td class="text-sm  font-weight-normal">
-                                <a class="text-warning" href="/Suppliers/UpdateSupplier?code=@item.SupCode">@item.SupCode</a>
-                            </td>
-                            <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.SupDesc)</td>
-                            <td class="text-sm font-weight-normal">
-                                @if (item.Active)
-                                {
-                                    <span class="badge bg-success">Yes</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Inactive</span>
-                                }
-                            </td>
-                            <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.TaxCode)</td>
-                            <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Addr)</td>
-                            <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Email1)</td>
-                            <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Phone1)</td>
-                            <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Note)</td>
+                            <tr>
+                                <td class="text-sm  font-weight-normal">
+                                    <a class="btn btn-sm btn-outline-primary" href="/Suppliers/UpdateSupplier?code=@item.SupCode">@item.SupCode</a>
+                                </td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.SupDesc)</td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.Active)
+                                    {
+                                        <span class="badge bg-success">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.TaxCode)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Addr)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Email1)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Phone1)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Note)</td>
 
-                        </tr>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -77,19 +77,15 @@
     </div>
 </div>
 <partial name="FileUploadModal" />
-<script src="~/assets/js/plugins/datatables.js"></script>
-<script type="text/javascript">
-    const dataTableBasic = new simpleDatatables.DataTable("#datatable-search", {
-        searchable: false,
-        fixedHeight: true
-    });
-     
-</script>
+
+<script src="~/assets/datatable/datatables.min.js"></script>
 <script>
+
     $(document).ready(function () {
         $('.nav-sup').addClass('active');
         $('#new-sup').click(function () {
             $('#file-modal').modal('toggle');
         });
+        $('#datatable-search').DataTable();
     });
 </script>

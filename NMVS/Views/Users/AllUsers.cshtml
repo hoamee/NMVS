@@ -9,9 +9,9 @@
         <div class="card">
             <!-- Card header -->
             <div class="card-header">
-                <h5 class="mb-0">@ViewData["Title"]</h5>
+                <h3 class="mb-0">@ViewData["Title"]</h3>
             </div>
-            <div class="table-responsive">
+            <div class="table-responsive card-body">
                 <table class="table table-flush" id="datatable-search">
                     <thead class="thead-light">
                         <tr>
@@ -47,17 +47,13 @@
     </div>
 </div>
 
-<script src="~/assets/js/plugins/datatables.js"></script>
-
-<script type="text/javascript">
-    const dataTableBasic = new simpleDatatables.DataTable("#datatable-search", {
-        searchable: false,
-        fixedHeight: true
-    });
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
 
     $(document).ready(function () {
         $('.nav-user').addClass('active');
         $('.nav-all-user').addClass('active');
         $('.user-div').addClass('show');
+        $('#datatable-search').DataTable();
     });
 </script>

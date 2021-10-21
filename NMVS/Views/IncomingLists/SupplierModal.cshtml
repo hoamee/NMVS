@@ -1,0 +1,48 @@
+﻿<!-- Modal -->
+
+<div class="modal" tabindex="-1" id="supplier-modal" >
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" style="height: 100%">
+            <div class="modal-header">
+                <h5 class="modal-title">Suppliers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table " id="supplier-tb">
+                    <thead>
+                        <tr>
+                            <th>
+                                Supplier code
+                            </th>
+                            <th>
+                                Supplier name   
+                            </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in ViewBag.Suppliers)
+                        {
+                            <tr>
+                                <td>
+                                    <button type="button" class="btn btn-outline-primary" onclick="setSupplier('@item.Code')">@item.Code</button>
+                                </td>
+                                <td>
+                                    @item.Desc
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="uploadFiles('formFile');">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+

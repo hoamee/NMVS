@@ -67,6 +67,8 @@ namespace NMVS.Common
                                         break;
                                 }
                                 break;
+
+                            
                         }
                     }
                 }
@@ -76,6 +78,8 @@ namespace NMVS.Common
 
                 value = "";
             }
+            if (!string.IsNullOrEmpty(value))
+                value = value.Trim();
             return value;
         }
     }

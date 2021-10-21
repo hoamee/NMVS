@@ -9,10 +9,11 @@ namespace NMVS.Models.DbModels
 {
     public class ItemMaster
     {
+        
         [Key]
-        [StringLength(30)]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string PtId { set; get; }
+        public int PtId { set; get; }
+
 
         [StringLength(50)]
         [Display(Name = "Item No.")]

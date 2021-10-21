@@ -132,7 +132,7 @@ namespace NMVS.Services
                     //if can not find customer code, breack
                     if (string.IsNullOrEmpty(custCode))
                     {
-                        excelRespose.error += "";
+                        excelRespose.error += "Customer code not found at line " + readingRow + ", Import session terminated!";
                         break;
                     }
                     apCode = _eHelper.GetCellValue(wsPart, wbPart, "B" + readingRow);

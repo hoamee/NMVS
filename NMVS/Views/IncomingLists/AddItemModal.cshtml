@@ -1,0 +1,166 @@
+﻿<!-- Modal -->
+
+<div class="modal" tabindex="-1" id="item-modal">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table " id="supplier-tb">
+                    <thead>
+                        <tr>
+                            <th>
+                                Item code
+                            </th>
+                            <th>
+                                Quantity
+                            </th>
+                            <th>
+                                Supplier ref no.
+                            </th>
+                            <th>
+                                Ref date
+                            </th>
+                            <th>
+                                Note
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>
+                                <input type="text" class="form-control" id="item-code" />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control" step="0.001" id="item-qty" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" id="item-ref" />
+                            </td>
+                            <td>
+                                <input type="date" class="form-control" id="item-ref-date" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" id="item-note" />
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="submit-item">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script src="~/assets/js/bootbox/bootbox.locales.min.js"></script>
+<script src="~/assets/js/notify.js"></script>
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+    var routeURL = location.protocol + "//" + location.host;
+    $(document).ready(function () {
+        $('.nav-list').addClass('active');
+        $('#new-list').click(function () {
+            $('#item-modal').modal('toggle');
+        });
+        $('#datatable-search').DataTable();
+
+        $('#close-case').click(function () {
+            var icId = parseInt(@Html.Raw(Model.Icm.IcId));
+            var pt = {
+                IcId: icId
+            };
+            bootbox.confirm({
+                message: '<h5 class="text-danger"><b>Is all information correct?</b></h5>',
+                closeButton: false,
+                buttons: {
+                    confirm: {
+                        label: 'Yes',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'No',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        $.ajax(
+                            {
+                                url: routeURL + "/api/IncomingList/CloseList",
+                                data: JSON.stringify(pt),
+                                contentType: 'application/json',
+                                type: "POST",
+                                success: function (common) {
+
+                                    if (common.status == 1) {
+                                        $.notify("Process completed", "success");
+                                        setTimeout(
+                                            function () {
+
+                                                window.location.href = window.location.href;
+                                            }, 1000);
+                                    } else {
+                                        $.notify(common.message);
+                                    }
+                                }
+
+                            }
+                        );
+                    }
+                }
+            });
+            
+
+        });
+
+        $('#submit-item').click(function () {
+            var itemCode = $('#item-code').val();
+            var qty = parseFloat($('#item-qty').val());
+            var itemRef = $('#item-ref').val();
+            var refDate = $('#item-ref-date').val();
+            var itemNote = $('#item-note').val();
+            var icId = parseInt(@Html.Raw(Model.Icm.IcId));
+            var pt = {
+                ItemNo : itemCode,
+                RecQty : qty,
+                RefNo : itemRef,
+                RefDate : refDate,
+                IcId: icId,
+                PtCmt: itemNote
+
+            }
+            $.ajax(
+                {
+                    url: routeURL + "/api/IncomingList/AddItem",
+                    data: JSON.stringify(pt),
+                    contentType: 'application/json',
+                    type: "POST",
+                    success: function (common) {
+
+                        if (common.status == 1) {
+                            $.notify("Process completed", "success");
+                            setTimeout(
+                                function () {
+
+                                    window.location.href = window.location.href;
+                                }, 1000);
+                        } else {
+                            $.notify(common.message);
+                        }
+                    }
+
+                }
+            );
+
+        });
+    });
+</script>

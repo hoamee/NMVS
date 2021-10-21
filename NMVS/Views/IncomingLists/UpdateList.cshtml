@@ -1,0 +1,98 @@
+﻿@model NMVS.Models.DbModels.IncomingList
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <form asp-action="UpdateList">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="IcId" />
+                            <div class="form-group">
+                                <label asp-for="SupCode" class="control-label"></label>
+                                <input asp-for="SupCode" class="form-control" />
+                                <span asp-validation-for="SupCode" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Po" class="control-label"></label>
+                                <input asp-for="Po" class="form-control" />
+                                <span asp-validation-for="Po" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="PoDate" class="control-label"></label>
+                                <input asp-for="PoDate" class="form-control" />
+                                <span asp-validation-for="PoDate" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Vehicle" class="control-label"></label>
+                                <input asp-for="Vehicle" class="form-control" />
+                                <span asp-validation-for="Vehicle" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Driver" class="control-label"></label>
+                                <input asp-for="Driver" class="form-control" />
+                                <span asp-validation-for="Driver" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="DeliveryDate" class="control-label"></label>
+                                <input asp-for="DeliveryDate" class="form-control" />
+                                <span asp-validation-for="DeliveryDate" class="text-danger"></span>
+                            </div>
+                            <div class="form-group form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" asp-for="IsWarranty" /> @Html.DisplayNameFor(model => model.IsWarranty)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Save" class="btn btn-outline-primary" />
+
+                                <a asp-action="Browse" class="btn btn-secondary">Back to List</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<link href="~/assets/datatable/datatables.min.css" rel="stylesheet" />
+
+<partial name="SupplierModal" />
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+
+
+    function setSupplier(sup) {
+        $('#SupCode').val(sup);
+        $('#supplier-modal').modal('toggle');
+    }
+
+    //const dataTableBasic = new simpleDatatables.DataTable("#supplier-tb", {
+    //    searchable: false,
+    //    fixedHeight: true
+    //});
+
+    $(document).ready(function () {
+        $('#supplier-tb').DataTable();
+        $('.nav-list').addClass('active');
+
+        $('#SupCode').click(function () {
+            $('#supplier-modal').modal('toggle');
+        });
+
+    });
+
+
+</script>

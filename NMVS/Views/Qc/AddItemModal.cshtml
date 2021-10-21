@@ -1,0 +1,174 @@
+﻿
+
+
+<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script src="~/assets/js/bootbox/bootbox.locales.min.js"></script>
+<script src="~/assets/js/notify.js"></script>
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+    function checkItem(ptId, qty) {
+
+
+        bootbox.confirm({
+            message: 'Please enter the number of <span class="text-danger text-bold">Rejected</span> items. Leave blank or Zero to accept all </br> <input type="number" value="0" min="0" max="' + qty+'" class="bootbox-input form-control" step="0.01" id="acc-qty" />',
+            closeButton: false,
+            callback: function (result) {
+                if (result) {
+                    var inputQty = $('#acc-qty').val();
+                    if (inputQty < 0) {
+                        $.notify("Invalid input, please input value >= 0");
+                    } else if (inputQty > qty) {
+                        $.notify("Invalid input, please input value <= received quantity");
+                    } else {
+                        var accept = qty - inputQty;
+                        bootbox.confirm({
+                            message: '<h5 > Are your sure to <b class="text-danger">reject ' + inputQty + ' item(s)</b> and <b class="text-danger">accept ' + accept + ' item(s)</b>?</h5>',
+                            closeButton: false,
+                            buttons: {
+                                confirm: {
+                                    label: 'Yes',
+                                    className: 'btn-success'
+                                },
+                                cancel: {
+                                    label: 'No',
+                                    className: 'btn-danger'
+                                }
+                            },
+                            callback: function (cf) {
+                                if (cf) {
+                                    var pt = {
+                                        PtId: ptId,
+                                        PtQty: inputQty
+                                    };
+
+                                    $.ajax(
+                                        {
+                                            url: routeURL + "/api/IncomingList/QcItem",
+                                            data: JSON.stringify(pt),
+                                            contentType: 'application/json',
+                                            type: "POST",
+                                            success: function (common) {
+
+                                                if (common.status == 1) {
+                                                    $.notify("Process completed", "success");
+                                                    setTimeout(
+                                                        function () {
+
+                                                            window.location.href = window.location.href;
+                                                        }, 1000);
+                                                } else {
+                                                    $.notify(common.message);
+                                                }
+                                            }
+
+                                        }
+                                    );
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
+
+
+
+    };
+    var routeURL = location.protocol + "//" + location.host;
+    $(document).ready(function () {
+        $('.nav-qc').addClass('active');
+
+        $('#datatable-search').DataTable();
+
+        function checkItem (e) {
+            var icId = e;
+            var pt = {
+                IcId: icId
+            };
+            bootbox.confirm({
+                message: '<h5 class="text-danger"><b>Is all information correct?</b></h5>',
+                closeButton: false,
+                buttons: {
+                    confirm: {
+                        label: 'Yes',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'No',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        $.ajax(
+                            {
+                                url: routeURL + "/api/IncomingList/CloseList",
+                                data: JSON.stringify(pt),
+                                contentType: 'application/json',
+                                type: "POST",
+                                success: function (common) {
+
+                                    if (common.status == 1) {
+                                        $.notify("Process completed", "success");
+                                        setTimeout(
+                                            function () {
+
+                                                window.location.href = window.location.href;
+                                            }, 1000);
+                                    } else {
+                                        $.notify(common.message);
+                                    }
+                                }
+
+                            }
+                        );
+                    }
+                }
+            });
+
+
+        };
+
+        $('#submit-item').click(function () {
+            var itemCode = $('#item-code').val();
+            var qty = parseFloat($('#item-qty').val());
+            var itemRef = $('#item-ref').val();
+            var refDate = $('#item-ref-date').val();
+            var itemNote = $('#item-note').val();
+            var icId = parseInt(@Html.Raw(Model.Icm.IcId));
+            var pt = {
+                ItemNo : itemCode,
+                RecQty : qty,
+                RefNo : itemRef,
+                RefDate : refDate,
+                IcId: icId,
+                PtCmt: itemNote
+
+            }
+            $.ajax(
+                {
+                    url: routeURL + "/api/IncomingList/AddItem",
+                    data: JSON.stringify(pt),
+                    contentType: 'application/json',
+                    type: "POST",
+                    success: function (common) {
+
+                        if (common.status == 1) {
+                            $.notify("Process completed", "success");
+                            setTimeout(
+                                function () {
+
+                                    window.location.href = window.location.href;
+                                }, 1000);
+                        } else {
+                            $.notify(common.message);
+                        }
+                    }
+
+                }
+            );
+
+        });
+    });
+</script>
