@@ -115,6 +115,8 @@ namespace NMVS.Services
                     throw new ArgumentException("sheetName");
                 }
 
+
+
                 // Retrieve a reference to the worksheet part.
                 WorksheetPart wsPart =
                     (WorksheetPart)(wbPart.GetPartById(theSheet.Id));
@@ -123,22 +125,45 @@ namespace NMVS.Services
                 int updateted = 0;
                 int recordCount = 0;
                 int failed = 0;
-                while (true)
+
+                var headerVerify = _eHelper.VefiryHeader(wsPart, wbPart, "A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2", "I2", "J2",
+                    "Customer code", "Customer code AP", "Agent No.", "Customer name", "Address", "City", "Country", "Tax code", "Email 1", "Email 2");
+
+
+                if (!headerVerify)
+                {
+                    excelRespose.error += " **Incorrect header format. Please the header at line 2.";
+                }
+
+                while (headerVerify)
                 {
                     readingRow++;
                     string custCode, apCode, agent, custName, address;
                     custCode = _eHelper.GetCellValue(wsPart, wbPart, "A" + readingRow);
-
-                    //if can not find customer code, breack
-                    if (string.IsNullOrEmpty(custCode))
-                    {
-                        excelRespose.error += "Customer code not found at line " + readingRow + ", Import session terminated!";
-                        break;
-                    }
                     apCode = _eHelper.GetCellValue(wsPart, wbPart, "B" + readingRow);
                     agent = _eHelper.GetCellValue(wsPart, wbPart, "C" + readingRow);
                     custName = _eHelper.GetCellValue(wsPart, wbPart, "D" + readingRow);
                     address = _eHelper.GetCellValue(wsPart, wbPart, "E" + readingRow);
+
+
+
+                    //if can not find customer code, breack
+                    if (string.IsNullOrEmpty(custCode))
+                    {
+                        if (string.IsNullOrEmpty(apCode)
+                        && string.IsNullOrEmpty(agent)
+                        && string.IsNullOrEmpty(custName)
+                        && string.IsNullOrEmpty(address))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            excelRespose.error += " **Data Skipped: Customer code not found at line " + readingRow + "!";
+                            continue;
+                        }
+                    }
+
 
                     if (string.IsNullOrEmpty(apCode)
                         || string.IsNullOrEmpty(agent)
@@ -146,7 +171,7 @@ namespace NMVS.Services
                         || string.IsNullOrEmpty(address))
                     {
                         failed++;
-                        excelRespose.error += "Line " + readingRow + ":"
+                        excelRespose.error += " **Data Skipped at line " + readingRow + ":"
                             + (string.IsNullOrEmpty(apCode) ? " AP code not found;" : "")
                             + (string.IsNullOrEmpty(agent) ? " Agent No. not found;" : "")
                             + (string.IsNullOrEmpty(custName) ? " Customer name not found;" : "")
@@ -210,7 +235,7 @@ namespace NMVS.Services
                     catch (Exception e)
                     {
                         failed++;
-                        excelRespose.error += "Line " + readingRow + ": "
+                        excelRespose.error += " **Line " + readingRow + ": "
                            + e.Message + ";";
                     }
                     recordCount++;
@@ -241,6 +266,6 @@ namespace NMVS.Services
             return common;
         }
 
-        
+
     }
 }

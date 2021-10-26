@@ -34,6 +34,39 @@
                 <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6"> Inventory</h6>
             </li>
 
+            <li class="nav-item">
+                <a data-bs-toggle="collapse" href="#navRequest" class="nav-link nav-request" aria-controls="navRequest" role="button" aria-expanded="false">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <span class="fa fa-thumbs-up"></span>
+                    </div>
+                    <span class="nav-link-text ms-1">Request</span>
+                </a>
+                <div class="collapse nav-request" id="navRequest">
+                    <ul class="nav ms-4 ps-3">
+                        <li class="nav-item ">
+                            <a class="nav-link nav-rq-his" href="/InvRequests/History">
+                                <span class="sidenav-mini-icon"> AR </span>
+                                <span class="sidenav-normal"> Request history</span>
+                            </a>
+                        </li>
+                        <li class="nav-item nav-order">
+                            <a class="nav-link " href="/Allocate/Orders">
+                                <span class="sidenav-mini-icon"> Ord </span>
+                                <span class="sidenav-normal"> Allocate Orders</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item nav-un">
+                            <a class="nav-link " href="/Allocate/Unallocated">
+                                <span class="sidenav-mini-icon"> U </span>
+                                <span class="sidenav-normal"> Uncallocated</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+            </li>
+
 
             <li class="nav-item">
                 <a data-bs-toggle="collapse" href="#navAllocate" class="nav-link nav-allocate" aria-controls="navAllocate" role="button" aria-expanded="false">
@@ -51,14 +84,30 @@
                             </a>
                         </li>
                         <li class="nav-item nav-order">
-                            <a class="nav-link " href="/Users/UserRole">
-                                <span class="sidenav-mini-icon"> Out </span>
-                                <span class="sidenav-normal"> Check out</span>
+                            <a class="nav-link " href="/Allocate/Orders">
+                                <span class="sidenav-mini-icon"> Ord </span>
+                                <span class="sidenav-normal"> Allocate Orders</span>
                             </a>
                         </li>
 
+                        <li class="nav-item nav-un">
+                            <a class="nav-link " href="/Allocate/Unallocated">
+                                <span class="sidenav-mini-icon"> U </span>
+                                <span class="sidenav-normal"> Uncallocated</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
+
+            </li>
+
+            <li class="nav-item side-unq">
+                <a class="nav-link side-unq" href="/Unqualifieds/OverView">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <span class="fa fa-recycle"></span>
+                    </div>
+                    <span class="nav-link-text ms-1">Unqualified items</span>
+                </a>
             </li>
 
             <li class="nav-item mt-3">
@@ -111,6 +160,55 @@
 
                     </ul>
                 </div>
+            </li>
+
+            <li class="nav-item mt-3">
+                <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6"> MFG</h6>
+            </li>
+
+
+            <li class="nav-item">
+                <a data-bs-toggle="collapse" href="#navWo" class="nav-link nav-wo" aria-controls="navWo" role="button" aria-expanded="false">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <span class="fa fa-boxes"></span>
+                    </div>
+                    <span class="nav-link-text ms-1">Work Orders</span>
+                </a>
+                <div class="collapse" id="navWo">
+                    <ul class="nav ms-4 ps-3">
+                        <li class="nav-item ">
+                            <a class="nav-link wo-dash" href="/WorkOrders/WoDashboard/">
+                                <span class="sidenav-mini-icon"> D </span>
+                                <span class="sidenav-normal"> Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item nav-w-ord">
+                            <a class="nav-link " href="/WorkOrders/WoBrowse">
+                                <span class="sidenav-mini-icon"> Br </span>
+                                <span class="sidenav-normal"> Work orders browse</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item ">
+                            <a class="nav-link nav-bill" href="/WoBills/Bills">
+                                <span class="sidenav-mini-icon"> Bi </span>
+                                <span class="sidenav-normal"> Bills</span>
+                            </a>
+                        </li>
+
+
+                    </ul>
+                </div>
+
+            </li>
+
+            <li class="nav-item side-prdln">
+                <a class="nav-link side-prdln" href="/ProductLines/ProdLineBrowse">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <span class="fa fa-syringe"></span>
+                    </div>
+                    <span class="nav-link-text ms-1">Prod line</span>
+                </a>
             </li>
 
             <li class="nav-item mt-3">

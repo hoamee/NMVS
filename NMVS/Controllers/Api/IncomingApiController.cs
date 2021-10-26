@@ -124,6 +124,11 @@ namespace NMVS.Controllers.Api
                         pt.LocCode = receiveLoc.LocCode;
                         var ic = _context.IncomingLists.Find(pt.IcId);
                         ic.Checked++;
+                        receiveLoc.LocRemain -= pt.PtQty;
+
+                        _context.Update(pt);
+                        _context.Update(ic);
+                        _context.Update(receiveLoc);
                         _context.SaveChanges();
                         common.status = 1;
                     }

@@ -1,0 +1,226 @@
+﻿@model IEnumerable<NMVS.Models.DbModels.WorkOrder>
+
+@{
+    ViewData["Title"] = "Work orders dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<script src="~/assets/js/apexcharts/apexcharts.js"></script>
+@if (!Model.Any())
+{
+    <div class="card ">
+        <div class="card-header d-flex justify-content-center">
+            <h2 class="text-danger">
+                No work orders are in progress
+            </h2>
+        </div>
+        <div class="card-body">
+
+        </div>
+    </div>
+}
+<div class="row">
+    @foreach (var wo in Model)
+    {
+        string colr = "";
+        if (DateTime.Now.Date > wo.ExpDate)
+        {
+            colr = "bg-danger";
+        }
+        else if (DateTime.Now.Date == wo.ExpDate)
+        {
+            colr = "bg-warning";
+        }
+        else
+        {
+            colr = "bg-success";
+        }
+        <div class="col-md-6">
+            <div class="card  ">
+                <div class="card-header @colr">
+                </div>
+                <div class="card-body">
+                    <div class="row col-12">
+                        <div class="col-md-6">
+                            <table>
+                                <tr>
+                                    <th>
+                                        Work order
+                                    </th>
+                                    <td>
+                                        :&emsp;@Html.ActionLink(wo.WoNbr, "WoDetails", new { id = wo.WoNbr }, new { @class = "btn btn-sm btn-outline-primary" })
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Item
+                                    </th>
+                                    <td>
+                                        :&emsp;@wo.ItemNo
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Line:
+                                    </th>
+                                    <td>
+                                        :&emsp;@wo.PrLnId
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Target
+                                    </th>
+                                    <td>
+                                        :&emsp;@wo.QtyOrd
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Completed
+                                    </th>
+                                    <td>
+                                        :&emsp;@wo.QtyCom
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Order date
+                                    </th>
+                                    <td>
+                                        :&emsp;@Html.DisplayFor(m => wo.OrdDate)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Due date
+                                    </th>
+                                    <td>
+                                        :&emsp;@Html.DisplayFor(m => wo.ExpDate)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Order by
+                                    </th>
+                                    <td>
+                                        :&emsp;@Html.DisplayFor(m => wo.OrdBy)
+                                    </td>
+                                </tr>
+
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="char-@wo.WoNbr"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @{ var completed = wo.QtyCom / wo.QtyOrd * 100;
+                var remain = 100 - completed;}
+            <script>
+        var @wo.WoNbr = {
+            series: [@completed],
+            chart: {
+                height: 350,
+                type: "radialBar",
+                toolbar: {
+                    show: true,
+                },
+            },
+            plotOptions: {
+                radialBar: {
+                    startAngle: -135,
+                    endAngle: 225,
+                    hollow: {
+                        margin: 0,
+                        size: "70%",
+                        background: "#fff",
+                        image: undefined,
+                        imageOffsetX: 0,
+                        imageOffsetY: 0,
+                        position: "front",
+                        dropShadow: {
+                            enabled: true,
+                            top: 3,
+                            left: 0,
+                            blur: 4,
+                            opacity: 0.24,
+                        },
+                    },
+                    track: {
+                        background: "#fff",
+                        strokeWidth: "67%",
+                        margin: 0, // margin is in pixels
+                        dropShadow: {
+                            enabled: true,
+                            top: -3,
+                            left: 0,
+                            blur: 4,
+                            opacity: 0.35,
+                        },
+                    },
+
+                    dataLabels: {
+                        show: true,
+                        name: {
+                            offsetY: -10,
+                            show: true,
+                            color: "#888",
+                            fontSize: "17px",
+                        },
+                        value: {
+                            formatter: function(val) {
+                                return parseInt(val);
+                            },
+                            color: "#111",
+                            fontSize: "36px",
+                            show: true,
+                        },
+                    },
+                },
+            },
+            fill: {
+                type: "gradient",
+                gradient: {
+                    shade: "dark",
+                    type: "horizontal",
+                    shadeIntensity: 0.5,
+                    gradientToColors: ["#ABE5A1"],
+                    inverseColors: true,
+                    opacityFrom: 1,
+                    opacityTo: 1,
+                    stops: [0, 100],
+                },
+            },
+            stroke: {
+                lineCap: "round",
+            },
+            labels: ["Progress"],
+        };
+
+        var chartVisitorsProfile = new ApexCharts(document.getElementById('char-@wo.WoNbr'), @wo.WoNbr);
+                chartVisitorsProfile.render();
+
+
+            </script>
+        </div>
+    }
+</div>
+
+
+
+<script>
+
+    $(document).ready(function () {
+        $('.nav-wo').addClass('active');
+        $('.wo-dash').addClass('active');
+        $('#navWo').addClass('show');
+        $('#datatable-search').DataTable({
+            "order": [[0, "desc"]]
+        });
+    });
+</script>

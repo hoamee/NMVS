@@ -1,5 +1,102 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<NMVS.Models.ViewModels.InvRequestVm>
+
 @{
+    ViewData["Title"] = "Request history";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-flush" id="datatable-search">
+                        <thead>
+                            <tr>
+                                <th>
+                                    ID
+                                </th>
+                                <th>
+                                    Request type
+                                </th>
+                                <th>
+                                    Batch/SO Number
+                                </th>
+                                <th>
+                                    Created on
+                                </th>
+                                <th>
+                                    By
+                                </th>
+                                <th>
+                                    Note
+                                </th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <a href="/InvRequests/RequestDetail/@item.Id"><div class="btn btn-outline-info">@Html.DisplayFor(modelItem => item.Id)</div></a>
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.RqType)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Ref)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Date)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.RqBy)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Note)
+                                    </td>
+                                   
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+
+                <div class="row col-12">
+                    <span class="col-auto">
+                        <a asp-action="NewRequest" class="btn btn-sm btn-outline-info">
+                            Add new
+                        </a>
+                    </span>
+                    <span class="col-auto">
+                        <button class="btn btn-sm btn-outline-info" id="new-list">
+                            <span class="fa fa-cloud-upload"></span>
+                            <span>Upload</span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('.nav-request').addClass('active');
+        $('.nav-rq-his').addClass('active');
+        $('#navRequest').addClass('show');
+        $('#new-list').click(function () {
+            $('#file-modal').modal('toggle');
+        });
+        $('#datatable-search').DataTable();
+    });
+</script>

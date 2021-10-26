@@ -82,5 +82,175 @@ namespace NMVS.Common
                 value = value.Trim();
             return value;
         }
+
+        public bool VefiryHeader(WorksheetPart wsPart, WorkbookPart wbPart, string columnAddr1, string columnAddr2, string columnAddr3,
+            string columnAddr4, string columnAddr5,
+            string columnAddr6, string columnAddr7, string columnAddr8, string columnAddr9, string columnAddr10,
+            string value1, string value2, string value3, string value4, string value5, string value6, string value7, string value8, string value9, string value10)
+        {
+            bool headerCorrect = false;
+            if (!string.IsNullOrEmpty(columnAddr1))
+            {
+                if (string.Equals(GetCellValue(wsPart, wbPart, columnAddr1), value1, StringComparison.OrdinalIgnoreCase))
+                {
+                    headerCorrect = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(columnAddr2))
+            {
+                if (string.Equals(GetCellValue(wsPart, wbPart, columnAddr2) , value2, StringComparison.OrdinalIgnoreCase))
+                {
+                    headerCorrect = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(columnAddr3))
+            {
+                if (string.Equals(GetCellValue(wsPart, wbPart, columnAddr3) , value3, StringComparison.OrdinalIgnoreCase))
+                {
+                    headerCorrect = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(columnAddr4))
+            {
+                if (string.Equals(GetCellValue(wsPart, wbPart, columnAddr4) , value4, StringComparison.OrdinalIgnoreCase))
+                {
+                    headerCorrect = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(columnAddr5))
+            {
+                if (string.Equals(GetCellValue(wsPart, wbPart, columnAddr5) , value5, StringComparison.OrdinalIgnoreCase))
+                {
+                    headerCorrect = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(columnAddr6))
+            {
+                if (string.Equals(GetCellValue(wsPart, wbPart, columnAddr6) , value6, StringComparison.OrdinalIgnoreCase))
+                {
+                    headerCorrect = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(columnAddr7))
+            {
+                if (string.Equals(GetCellValue(wsPart, wbPart, columnAddr7) , value7, StringComparison.OrdinalIgnoreCase))
+                {
+                    headerCorrect = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(columnAddr8))
+            {
+                if (string.Equals(GetCellValue(wsPart, wbPart, columnAddr8) , value8, StringComparison.OrdinalIgnoreCase))
+                {
+                    headerCorrect = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(columnAddr9))
+            {
+                
+                if (string.Equals(GetCellValue(wsPart, wbPart, columnAddr9) , value9, StringComparison.OrdinalIgnoreCase))
+                {
+                    headerCorrect = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(columnAddr10))
+            {
+                if (string.Equals(GetCellValue(wsPart, wbPart, columnAddr10) , value10, StringComparison.OrdinalIgnoreCase))
+                {
+                    headerCorrect = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            return headerCorrect;
+        }
     }
 }

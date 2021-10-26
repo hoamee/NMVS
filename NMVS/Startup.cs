@@ -46,6 +46,7 @@ namespace NMVS
             services.AddTransient<IItemDataService, ItemDataService>();
             services.AddTransient<IIncomingService, IncomingService>();
             services.AddTransient<IAllocateService, AllocateService>();
+            services.AddTransient<IRequestService, RequestService>();
             services.AddTransient<ILocService, LocService>();
             services.AddHttpContextAccessor();
         }
@@ -69,7 +70,6 @@ namespace NMVS
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.UseEndpoints(endpoints =>
             {

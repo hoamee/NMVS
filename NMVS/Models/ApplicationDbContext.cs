@@ -53,6 +53,10 @@ namespace NMVS.Models
         public DbSet<IssueOrder> IssueOrders { set; get; }
         public DbSet<AllocateRequest> AllocateRequests { set; get; }
         public DbSet<AllocateOrder> AllocateOrders { set; get; }
-
+        public DbSet<Unqualified> Unqualifieds { set; get; }
+        public DbSet<UnqualifiedTransac> UnqualifiedTransacs { set; get; }
+        public DbSet<WorkOrder> WorkOrders { set; get; }
+        public DbSet<ProdLine> ProdLines { set; get; }
+        public DbSet<WoBill> WoBills { set; get; }
     }
 }

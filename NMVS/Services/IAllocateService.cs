@@ -1,4 +1,5 @@
-﻿using NMVS.Models.ViewModels;
+﻿using NMVS.Models.DbModels;
+using NMVS.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,11 @@ namespace NMVS.Services
         public List<TypeVm> GetItemDistinc();
 
         public List<ItemMasterVm> GetAvailItem(string itemNo);
+
+        public List<AllocateOrderVm> GetAllocateOrders();
+
+        public List<AllocateRequestVm> GetItemAllocateHistory(int ptId);
+
+        public List<ItemMasterVm> GetUnAllocated();
     }
 }

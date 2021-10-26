@@ -14,5 +14,11 @@ namespace NMVS.Models.ViewModels
         public string Loc { set; get; }
         public double Qty { set; get; }
         public double Booked { set; get; }
+        public string PackingType { set; get; }
+        public string Sup { set; get; }
+        public string Lot { set; get; }
+        public string RcvBy { set; get; }
+        
+
     }
 }

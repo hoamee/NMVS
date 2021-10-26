@@ -13,41 +13,43 @@
             <div class="card-header">
                 <h3 class="mb-0">@ViewData["Title"]</h3>
             </div>
-            <div class="table-responsive card-body">
-                <table class="table table-flush" id="datatable-search">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>
-                                Allocate request No.
-                            </th>
+            <div class="card-body">
+                <div class="table-responsive col-12">
+                    <table class="table table-bordered table-condensed" id="datatable-search" width="100%">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>
+                                    No.
+                                </th>
 
-                            <th>
-                                Item No.
-                            </th>
-                            <th>
-                                Quantity
-                            </th>
-                            <th>
-                                From
-                            </th>
-                            <th>
-                                To
-                            </th>
-                            <th>
-                                Time
-                            </th>
-                            <th>
-                                Report
-                            </th>
-                            <th>
-                                Quick Action
-                            </th>
+                                <th>
+                                    Item No.
+                                </th>
+                                <th>
+                                    Quantity
+                                </th>
+                                <th>
+                                    From
+                                </th>
+                                <th>
+                                    To
+                                </th>
+                                <th>
+                                    Time
+                                </th>
 
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
+                                <th>
+                                    Quick Action
+                                </th>
+                                <th>
+                                    Report
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
                             <tr id="confirm-@item.AlcId">
                                 <td>
                                     @item.AlcId
@@ -67,48 +69,42 @@
                                 <td>
                                     @item.MovementTime
                                 </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Note)
-                                </td>
-
                                 <td class="post-btn">
                                     <div>
-                                        @if (item.IsClosed == null || item.IsClosed == false)
+                                        @if (item.IsClosed == null)
                                         {
 
-                                        <div class="p-2">
-                                            <span class="btn btn-outline-primary">Post order</span>
-                                            <span class="btn btn-outline-danger">Decline</span>
-                                            @*@Ajax.ActionLink("Post order", "PostOrder", new { id = item.AlcId }, new AjaxOptions
-                                            {
-                                                Confirm = "Place order now?",
-                                                HttpMethod = "POST"
+                                            <div class="p-2">
+                                                <span class="btn btn-outline-primary" id="post-@item.AlcId" onclick="postOrder(@item.AlcId, 'post-@item.AlcId');">Post order</span>
+                                                <span class="btn btn-outline-danger" id="decline-@item.AlcId" onclick="declineRequest(@item.AlcId, 'decline-@item.AlcId');">Decline</span>
 
-                                            },
-                                                new { @class = "btn btn-outline-primary" })
-
-                                            @Ajax.ActionLink("Decline", "RemoveAllocateRequest", new { id = item.AlcId }, new AjaxOptions
-                                            {
-                                                Confirm = "Decline request?",
-                                                HttpMethod = "POST"
-
-                                            },
-                                                new { @class = "btn btn-outline-danger" })*@
-                                        </div>
+                                            </div>
                                         }
                                         else if (item.IsClosed == true)
                                         {
+
+
                                             <p class="badge bg-success">Order posted</p>
                                         }
-                                       
+                                        else
+                                        {
+                                            <p class="badge bg-danger">Declined</p>
+                                        }
+
 
 
                                     </div>
                                 </td>
+                                <td style="white-space: normal;">
+                                    @Html.DisplayFor(modelItem => item.Note)
+                                </td>
+
+
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="card-footer">
 
@@ -124,16 +120,114 @@
         </div>
     </div>
 </div>
-
-
+<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script src="~/assets/js/notify.js"></script>
 <script src="~/assets/datatable/datatables.min.js"></script>
 <script>
+    var routeURL = location.protocol + "//" + location.host;
+    function postOrder(rqId, ts) {
+
+        var rq = parseInt(rqId);
+        var postData = {
+            AlcId: rq
+        };
+
+        bootbox.confirm({
+            message: '<h5>Is all information correct?</h5>',
+            closeButton: false,
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (cf) {
+                if (cf) {
+                    $.ajax(
+                        {
+                            url: routeURL + "/api/Allocate/PostOrder",
+                            data: JSON.stringify(postData),
+                            contentType: 'application/json',
+                            type: "POST",
+                            success: function (common) {
+
+                                if (common.status == 1) {
+                                    $.notify("Order posted!", "success");
+                                    $('#' + ts).closest('.p-2').html('<p class="badge bg-success">Order posted</p>');
+                                } else {
+                                    $.notify(common.message);
+                                }
+                            }
+
+                        }
+                    );
+                }
+            }
+        });
+
+        
+    }
+
+    function declineRequest(rqId, ts) {
+
+        var rq = parseInt(rqId);
+        var postData = {
+            AlcId: rq
+        };
+        bootbox.confirm({
+            message: '<h5 > Are your sure to <b class="text-danger">decline</b> this request</h5>',
+            closeButton: false,
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (cf) {
+                if (cf) {
+                    $.ajax(
+                        {
+                            url: routeURL + "/api/Allocate/DeclineRequest",
+                            data: JSON.stringify(postData),
+                            contentType: 'application/json',
+                            type: "POST",
+                            success: function (common) {
+
+                                if (common.status == 1) {
+                                    $.notify("Request declined!", "success");
+                                    $('#' + ts).closest('.p-2').html('<p class="badge bg-danger">Declined</p>');
+                                } else {
+                                    $.notify(common.message);
+                                }
+                            }
+
+                        }
+                    );
+                }
+            }
+        });
+
+        
+    }
 
     $(document).ready(function () {
-        $('.nav-sup').addClass('active');
+        $('.nav-allocate').addClass('active');
+        $('.nav-add-alc').addClass('active');
+        $('#navAllocate').addClass('show');
         $('#new-sup').click(function () {
             $('#file-modal').modal('toggle');
         });
-        $('#datatable-search').DataTable();
+        $('#datatable-search').DataTable({
+            "order": [[0, "desc"]]
+        } );
+
     });
 </script>

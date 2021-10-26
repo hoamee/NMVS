@@ -16,7 +16,6 @@ namespace NMVS.Models.DbModels
         //Foreign key to item master
         [Display(Name = "Item No.")]
         public int PtId { set; get; }
-        public virtual ItemMaster ItemMaster { set; get; }
 
         [Display(Name = "Quantity")]
         public double AlcOrdQty { set; get; }
@@ -38,14 +37,10 @@ namespace NMVS.Models.DbModels
 
         [Display(Name = "Request ID")]
         public int RequestID { set; get; }
-        public virtual AllocateRequest AllocateRequest { set; get; }
 
         [Display(Name = "Ordered by")]
         public string OrderBy { set; get; }
 
-        [Display(Name = "Order type")]
-        public string CodeValue { get; set; }
-        public virtual GeneralizedCode GeneralizedCode { get; set; }
 
         [Display(Name = "Movement time")]
         public DateTime MovementTime { set; get; }

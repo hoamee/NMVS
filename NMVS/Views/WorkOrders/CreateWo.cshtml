@@ -1,0 +1,100 @@
+﻿@model NMVS.Models.DbModels.WorkOrder
+
+@{
+    ViewData["Title"] = "New WO";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+
+
+                        @using (Html.BeginForm())
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <div class="form-horizontal">
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                                <div class="form-group">
+                                    <label asp-for="WoNbr" class="control-label"></label>
+                                    <input asp-for="WoNbr" class="form-control" />
+                                    <span asp-validation-for="WoNbr" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.PrLnId, "Prod Line", htmlAttributes: new { @class = "control-label " })
+                                    <div class="">
+                                        @Html.DropDownList("PrLnId", new SelectList(ViewBag.PrLnId, "PrLnId", "PrLnId"), new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.PrLnId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ItemNo, "Item", htmlAttributes: new { @class = "control-label " })
+                                    <div class="">
+                                        @Html.DropDownList("ItemNo", new SelectList(ViewBag.ItemNo, "ItemNo", "ItemName"), new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.ItemNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.QtyOrd, htmlAttributes: new { @class = "control-label " })
+                                    <div class="">
+                                        @Html.EditorFor(model => model.QtyOrd, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.QtyOrd, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SoNbr, htmlAttributes: new { @class = "control-label " })
+                                    <div class="">
+                                        @Html.EditorFor(model => model.SoNbr, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.SoNbr, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ExpDate, htmlAttributes: new { @class = "control-label " })
+                                    <div class="">
+                                        @Html.EditorFor(model => model.ExpDate, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.ExpDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-offset-2 ">
+                                        <input type="submit" value="Create" class="btn btn-primary" />
+                                        @Html.ActionLink("Back to List", "WoBrowse")
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        $('.nav-wo').addClass('active');
+        $('.nav-w-ord').addClass('active');
+        $('#navWo').addClass('show');
+        $('#datatable-search').DataTable({
+            "order": [[0, "desc"]]
+        });
+    });
+</script>

@@ -1,0 +1,175 @@
+﻿
+<!-- Modal report -->
+<div class="modal fade modal-dialog-scrollable" id="exampleModal" tabindex="-1" aria-labelledby="exampleModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 class="modal-title" id="reportModalLabel">Report an issue</h3>
+                <hr />
+                <table class="table table-striped" id="table3">
+                    <thead>
+                        <tr>
+                            <th>
+                                Id
+                            </th>
+                            <th>
+                                Item
+                            </th>
+                            <th>
+                                Total Quantity
+                            </th>
+                            <th>
+                                Recycled Quantity
+                            </th>
+                            <th>
+                                Disposed Quantity
+                            </th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="t3-tr">
+                            <td id="t3-id">
+
+                            </td>
+                            <td id="t3-item">
+
+                            </td>
+                            <td id="t3-tt-qty">
+
+                            </td>
+                            <td id="t3-rec-qty">
+
+                            </td>
+                            <td id="t3-dis-qty">
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr />
+                <div class="form-group col-10">
+                    <div class="form-group form-check">
+                        <label class="form-check-label text-danger">
+                            <input type="checkbox" class="form-check-input" id="unqualified" /> Dispose
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-check-label text-danger">
+                            <input type="number" class="form-control" id="input-qty" step="0.01" />
+                        </label>
+                    </div>
+                    <label class="form-label text-danger" for="report-input">Add a note</label>
+                    <textarea aria-multiline="true" cols="40" rows="5" class="form-control" id="report-input"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="send-report" type="button" class="btn btn-danger">Send report</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script src="~/assets/js/notify.js"></script>
+
+<script>
+    function takeAction(unqId) {
+        var tr = $('#tr-' + unqId);
+        $('#t3-id').html(unqId);
+        $('#t3-item').html(tr.children('.pt-no').html());
+        $('#t3-rec-qty').html(tr.children('.rec-qty').html());
+        $('#t3-tt-qty').html(tr.children('.tt-qty').html());
+        $('#t3-dis-qty').html(tr.children('.dis-qty').html());
+
+        $('#exampleModal').modal('toggle');
+
+    };
+
+    var routeURL = location.protocol + "//" + location.host;
+    $(document).ready(function () {
+      
+        $('#send-report').click(function () {
+            var cmmt = $("#report-input");
+            var uId = parseInt($('#t3-id').text().trim());
+            var unq = $('#unqualified').is(":checked");
+            var ttQty = parseFloat($('#t3-tt-qty').html().trim());
+            var recQty = parseFloat($('#t3-rec-qty').html().trim());
+            var disQty = parseFloat($('#t3-dis-qty').html().trim());
+            var inputQty = $('#input-qty').val();
+            var note = cmmt.val().trim();
+            var remainQty = ttQty - recQty - disQty;
+
+
+            if (inputQty > remainQty) {
+                $('#input-qty').notify('Report quantity could\'nt be larger than remain quantity');
+            }
+            else if (inputQty <= 0) {
+                $('#input-qty').notify('Report quantity could\'nt be less than or equal to 0');
+            }
+            else if (note == "") {
+                cmmt.notify('Please describe the reason.');
+            }
+            else {
+                var postData = {
+                    Retrn: unq,
+                    Qty: inputQty,
+                    Note: note,
+                    OrId: uId
+                };
+
+                bootbox.confirm({
+                    message: '<h5 >Is all information correct?</h5>',
+                    closeButton: false,
+                    buttons: {
+                        confirm: {
+                            label: 'Yes',
+                            className: 'btn-success'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-danger'
+                        }
+                    },
+                    callback: function (cf) {
+                        $.ajax({
+                            contentType: 'application/json; charset=utf-8',
+                            dataType: 'json',
+                            type: 'POST',
+                            url: routeURL + '/api/Allocate/ProcessUnqualified',
+                            data: JSON.stringify(postData),
+                            success: function (data) {
+                                if (data.status == 1) {
+                                    $.notify(data.message, 'success');
+                                }
+
+                                if (data.status == 0) {
+                                    $.notify(data.message, 'warning');
+                                }
+
+                                if (data.status == -1) {
+                                    $.notify(data.message, 'error');
+                                }
+
+
+                            },
+                            failure: function (response) {
+                                bootbox.alert(response);
+                            },
+                            complete: function () {
+                                window.location.reload();
+                            }
+
+                        });
+                    }
+
+                });
+
+
+            }
+
+
+
+        });
+    });
+</script>

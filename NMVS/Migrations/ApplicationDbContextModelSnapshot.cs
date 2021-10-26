@@ -237,23 +237,11 @@ namespace NMVS.Migrations
                     b.Property<double>("AlcOrdQty")
                         .HasColumnType("float");
 
-                    b.Property<int?>("AllocateRequestAlcId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CodeValue")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("Confirm")
                         .HasColumnType("bit");
 
                     b.Property<string>("ConfirmedBy")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("GeneralizedCodeCodeNo")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ItemMasterPtId")
-                        .HasColumnType("int");
 
                     b.Property<string>("LocCode")
                         .HasColumnType("nvarchar(max)");
@@ -274,12 +262,6 @@ namespace NMVS.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("AlcOrdId");
-
-                    b.HasIndex("AllocateRequestAlcId");
-
-                    b.HasIndex("GeneralizedCodeCodeNo");
-
-                    b.HasIndex("ItemMasterPtId");
 
                     b.HasIndex("LocCode1");
 
@@ -475,13 +457,8 @@ namespace NMVS.Migrations
                     b.Property<string>("RqID")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("CodeValue")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("GeneralizedCodeCodeNo")
-                        .HasColumnType("int");
-
                     b.Property<string>("Ref")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RqBy")
@@ -493,12 +470,13 @@ namespace NMVS.Migrations
                     b.Property<DateTime>("RqDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("RqType")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("SoConfirm")
                         .HasColumnType("bit");
 
                     b.HasKey("RqID");
-
-                    b.HasIndex("GeneralizedCodeCodeNo");
 
                     b.ToTable("InvRequests");
                 });
@@ -718,6 +696,27 @@ namespace NMVS.Migrations
                     b.ToTable("Locs");
                 });
 
+            modelBuilder.Entity("NMVS.Models.DbModels.ProdLine", b =>
+                {
+                    b.Property<string>("PrLnId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SiCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SiteSiCode")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("PrLnId");
+
+                    b.HasIndex("SiteSiCode");
+
+                    b.ToTable("ProdLines");
+                });
+
             modelBuilder.Entity("NMVS.Models.DbModels.RequestDet", b =>
                 {
                     b.Property<int>("DetId")
@@ -730,9 +729,6 @@ namespace NMVS.Migrations
 
                     b.Property<bool?>("Closed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("InvRequestRqID")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("IssueOn")
                         .HasColumnType("datetime2");
@@ -773,8 +769,6 @@ namespace NMVS.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("DetId");
-
-                    b.HasIndex("InvRequestRqID");
 
                     b.HasIndex("ItemDataItemNo");
 
@@ -860,6 +854,69 @@ namespace NMVS.Migrations
                     b.ToTable("Suppliers");
                 });
 
+            modelBuilder.Entity("NMVS.Models.DbModels.Unqualified", b =>
+                {
+                    b.Property<int>("UqId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("DisposedQty")
+                        .HasColumnType("float");
+
+                    b.Property<string>("ItemNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PtId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Quantity")
+                        .HasColumnType("float");
+
+                    b.Property<double>("RecycleQty")
+                        .HasColumnType("float");
+
+                    b.HasKey("UqId");
+
+                    b.ToTable("Unqualifieds");
+                });
+
+            modelBuilder.Entity("NMVS.Models.DbModels.UnqualifiedTransac", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ByUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDisposed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Qty")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("TransantionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UnqId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UnqualifiedTransacs");
+                });
+
             modelBuilder.Entity("NMVS.Models.DbModels.Warehouse", b =>
                 {
                     b.Property<string>("WhCode")
@@ -892,6 +949,97 @@ namespace NMVS.Migrations
                     b.HasIndex("SiteSiCode");
 
                     b.ToTable("Warehouses");
+                });
+
+            modelBuilder.Entity("NMVS.Models.DbModels.WoBill", b =>
+                {
+                    b.Property<int>("WoBillNbr")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Assignee")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("ComQty")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsClosed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("OrdDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("OrdQty")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Reporter")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WoNbr")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WorkOrderWoNbr")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("WoBillNbr");
+
+                    b.HasIndex("WorkOrderWoNbr");
+
+                    b.ToTable("WoBills");
+                });
+
+            modelBuilder.Entity("NMVS.Models.DbModels.WorkOrder", b =>
+                {
+                    b.Property<string>("WoNbr")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool?>("Closed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ExpDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ItemDataItemNo")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ItemNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrdBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("OrdDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PrLnId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProdLinePrLnId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<double>("QtyCom")
+                        .HasColumnType("float");
+
+                    b.Property<double>("QtyOrd")
+                        .HasColumnType("float");
+
+                    b.Property<string>("SoNbr")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("WoNbr");
+
+                    b.HasIndex("ItemDataItemNo");
+
+                    b.HasIndex("ProdLinePrLnId");
+
+                    b.ToTable("WorkOrders");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -951,27 +1099,9 @@ namespace NMVS.Migrations
 
             modelBuilder.Entity("NMVS.Models.DbModels.AllocateOrder", b =>
                 {
-                    b.HasOne("NMVS.Models.DbModels.AllocateRequest", "AllocateRequest")
-                        .WithMany()
-                        .HasForeignKey("AllocateRequestAlcId");
-
-                    b.HasOne("NMVS.Models.DbModels.GeneralizedCode", "GeneralizedCode")
-                        .WithMany()
-                        .HasForeignKey("GeneralizedCodeCodeNo");
-
-                    b.HasOne("NMVS.Models.DbModels.ItemMaster", "ItemMaster")
-                        .WithMany()
-                        .HasForeignKey("ItemMasterPtId");
-
                     b.HasOne("NMVS.Models.DbModels.Loc", "Loc")
                         .WithMany()
                         .HasForeignKey("LocCode1");
-
-                    b.Navigation("AllocateRequest");
-
-                    b.Navigation("GeneralizedCode");
-
-                    b.Navigation("ItemMaster");
 
                     b.Navigation("Loc");
                 });
@@ -998,15 +1128,6 @@ namespace NMVS.Migrations
                         .HasForeignKey("SupplierSupCode");
 
                     b.Navigation("Supplier");
-                });
-
-            modelBuilder.Entity("NMVS.Models.DbModels.InvRequest", b =>
-                {
-                    b.HasOne("NMVS.Models.DbModels.GeneralizedCode", "GeneralizedCode")
-                        .WithMany()
-                        .HasForeignKey("GeneralizedCodeCodeNo");
-
-                    b.Navigation("GeneralizedCode");
                 });
 
             modelBuilder.Entity("NMVS.Models.DbModels.IssueOrder", b =>
@@ -1050,17 +1171,20 @@ namespace NMVS.Migrations
                     b.Navigation("Warehouse");
                 });
 
+            modelBuilder.Entity("NMVS.Models.DbModels.ProdLine", b =>
+                {
+                    b.HasOne("NMVS.Models.DbModels.Site", "Site")
+                        .WithMany()
+                        .HasForeignKey("SiteSiCode");
+
+                    b.Navigation("Site");
+                });
+
             modelBuilder.Entity("NMVS.Models.DbModels.RequestDet", b =>
                 {
-                    b.HasOne("NMVS.Models.DbModels.InvRequest", "InvRequest")
-                        .WithMany()
-                        .HasForeignKey("InvRequestRqID");
-
                     b.HasOne("NMVS.Models.DbModels.ItemData", "ItemData")
                         .WithMany()
                         .HasForeignKey("ItemDataItemNo");
-
-                    b.Navigation("InvRequest");
 
                     b.Navigation("ItemData");
                 });
@@ -1072,6 +1196,30 @@ namespace NMVS.Migrations
                         .HasForeignKey("SiteSiCode");
 
                     b.Navigation("Site");
+                });
+
+            modelBuilder.Entity("NMVS.Models.DbModels.WoBill", b =>
+                {
+                    b.HasOne("NMVS.Models.DbModels.WorkOrder", "WorkOrder")
+                        .WithMany()
+                        .HasForeignKey("WorkOrderWoNbr");
+
+                    b.Navigation("WorkOrder");
+                });
+
+            modelBuilder.Entity("NMVS.Models.DbModels.WorkOrder", b =>
+                {
+                    b.HasOne("NMVS.Models.DbModels.ItemData", "ItemData")
+                        .WithMany("WorkOrders")
+                        .HasForeignKey("ItemDataItemNo");
+
+                    b.HasOne("NMVS.Models.DbModels.ProdLine", "ProdLine")
+                        .WithMany()
+                        .HasForeignKey("ProdLinePrLnId");
+
+                    b.Navigation("ItemData");
+
+                    b.Navigation("ProdLine");
                 });
 
             modelBuilder.Entity("NMVS.Models.ApplicationRole", b =>
@@ -1087,6 +1235,11 @@ namespace NMVS.Migrations
             modelBuilder.Entity("NMVS.Models.DbModels.IncomingList", b =>
                 {
                     b.Navigation("ItemMasters");
+                });
+
+            modelBuilder.Entity("NMVS.Models.DbModels.ItemData", b =>
+                {
+                    b.Navigation("WorkOrders");
                 });
 
             modelBuilder.Entity("NMVS.Models.DbModels.Site", b =>

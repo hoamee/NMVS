@@ -1,0 +1,213 @@
+﻿@model NMVS.Models.ViewModels.RequestDetailVm
+
+@{
+    ViewData["Title"] = "Request: " + Model.Rq.Id;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-2">
+                        Request No.
+                    </dt>
+
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Rq.Id)
+                    </dd>
+
+                    <dt class="col-sm-2">
+                        Request type
+                    </dt>
+
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Rq.RqType)
+                    </dd>
+
+                    <dt class="col-sm-2">
+                        Ref
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Rq.Ref)
+                    </dd>
+
+                    <dt class="col-sm-2">
+                        Date
+                    </dt>
+
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Rq.Date)
+                    </dd>
+
+                    <dt class="col-sm-2">
+                        Created By
+                    </dt>
+
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Rq.RqBy)
+                    </dd>
+
+
+
+                    @if (Model.Rq.RqType != "MFG")
+                    {
+                        <dt class="col-sm-2">
+                            SO confirmation
+                        </dt>
+
+                        <dd class="col-sm-10">
+                            @if (Model.Rq.SoConfirm == true)
+                            {
+
+
+                                <span class="badge bg-success"> Confirmed </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Not Yet</span>
+                            }
+                        </dd>
+                    }
+
+                    <dt class="col-sm-2">
+                        Note
+                    </dt>
+
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Rq.Note)
+                    </dd>
+
+                </dl>
+            </div>
+            <div class="card-footer">
+                <a asp-action="UpdateList" class="btn btn-outline-warning" asp-route-id="@Model.Rq.Id">Update</a>
+                <a asp-action="History" class="btn btn-outline-secondary">History</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">Items</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-flush" id="datatable-search">
+                        <thead>
+                            <tr>
+                                <th>
+
+                                </th>
+                                <th>
+                                    Item No
+                                </th>
+                                <th>
+                                    Item Description
+                                </th>
+
+                                <th>
+                                    Spec date
+                                </th>
+                                <th>
+                                    Quantity
+                                </th>
+                                <th>
+                                    Picked
+                                </th>
+                                <th>
+                                    Shipped
+                                </th>
+                                <th>
+                                    Required Date
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model.Dets)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (Model.Rq.SoConfirm == true || Model.Rq.RqType == "MFG")
+                                        {
+                                            if (item.Quantity > item.Picked || item.Picked == 0)
+                                            {
+                                                <div class="btn btn-outline-info">Picking list</div>
+                                            }
+                                        }
+                                    </td>
+                                    <td>
+                                        @item.ItemNo
+                                    </td>
+                                    <td>
+                                        @*@item.ItemDesc*@
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.SpecDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.Quantity)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.Picked)
+                                    </td>
+                                    <td>
+                                        @if (item.Shipped == true)
+                                        {
+
+
+                                            <span class="badge bg-gradient-success">Shipped</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-gradient-secondary">Not yet</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.RequireDate)
+                                    </td>
+
+                                </tr>
+
+                            }
+                            <tr>
+                                <td colspan="8" class="text-center col-6">
+                                    <a class="btn btn-primary" href="/InvRequests/RequestDetCreate/@Model.Rq.Id">
+                                        <span><i class="bi bi-plus-circle"></i></span>
+                                        <span>
+                                            Add item
+                                        </span>
+                                    </a>
+
+                                    <a class="btn btn-primary" href="/SaleOrders/SoConfirm/">
+                                        <span><i class="bi bi-check"></i></span>
+                                        <span>
+                                            Close
+                                        </span>
+                                    </a>
+
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>

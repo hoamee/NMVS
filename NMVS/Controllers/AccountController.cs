@@ -59,7 +59,19 @@ namespace NMVS.Controllers
                         }
                         else
                         {
-                            ModelState.AddModelError("", result.ToString());
+                            var err = "";
+                            try
+                            {
+                                var test = _db.Users.First(x => x.UserName == User.Identity.Name);
+                                if (test != null)
+                                {
+                                    err = test.UserName;
+                                }
+                            }catch(Exception e)
+                            {
+                                err = e.ToString();
+                            }
+                            ModelState.AddModelError("", err);
                             return View(model);
                         }
                     }

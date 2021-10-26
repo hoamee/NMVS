@@ -1,0 +1,65 @@
+﻿@model NMVS.Models.DbModels.InvRequest
+
+@{
+    ViewData["Title"] = "Create Request";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <form asp-action="NewRequest">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label asp-for="Ref" class="control-label">Batch No.</label>
+                                <input asp-for="Ref" class="form-control" />
+                                <span asp-validation-for="Ref" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="RqType" class="control-label"></label>
+                                <input asp-for="RqType" class="form-control" value="MFG" readonly="readonly" />
+                                <span asp-validation-for="RqType" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="RqBy" class="control-label"></label>
+                                <input asp-for="RqBy" class="form-control" value="@User.Identity.Name" readonly="readonly"/>
+                                <span asp-validation-for="RqBy" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="RqDate" class="control-label"></label>
+                                <input asp-for="RqDate" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" readonly />
+                                <span asp-validation-for="RqDate" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="RqCmt" class="control-label"></label>
+                                <input asp-for="RqCmt" class="form-control" />
+                                <span asp-validation-for="RqCmt" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Create" class="btn btn-primary" />
+
+                                <a asp-action="History" class="btn btn-secondary">Back to List</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.nav-wh').addClass('active');
+    });
+</script>

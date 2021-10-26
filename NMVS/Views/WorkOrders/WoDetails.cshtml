@@ -1,0 +1,325 @@
+﻿@model NMVS.Models.DbModels.WorkOrder
+
+@{
+    ViewBag.Title = "Work order detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Work order " + Model.WoNbr;
+}
+<script src="~/assets/js/apexcharts/apexcharts.js"></script>
+
+<script>
+    let dataArr = [];
+</script>
+
+<div class="card">
+    <div class="card-header">
+        <h4>Work order detail</h4>
+    </div>
+    <div class="card-body">
+        <div class="row col-12">
+            <div class="col-md-6">
+                <table>
+                    <tr>
+                        <th>
+                            Work order
+                        </th>
+                        <td>
+                            :&emsp;@Model.WoNbr
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Item No.
+                        </th>
+                        <td>
+                            :&emsp;@Model.ItemNo
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Line
+                        </th>
+                        <td>
+                            :&emsp;@Model.PrLnId
+                        </td>
+                    </tr>
+                    @if (Model.SoNbr != null && Model.SoNbr != "")
+                    {
+                        <tr>
+                            <th>Sales order</th>
+
+                            <td>
+                                :&emsp;@Model.SoNbr
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <th>
+                            Quantity ordered
+                        </th>
+                        <td>
+                            :&emsp;@Model.QtyOrd
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Quantity completed
+                        </th>
+                        <td>
+                            :&emsp;@Model.QtyCom
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>
+                            Ordered by
+                        </th>
+                        <td>
+                            :&emsp;@Model.OrdBy
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>
+                            Order date
+                        </th>
+                        <td>
+                            :&emsp;@Html.DisplayFor(m => Model.OrdDate)
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>
+                            Expire date
+                        </th>
+                        <td>
+                            :&emsp;@Html.DisplayFor(m => Model.ExpDate)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <div id="wo-chart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<div class="card">
+    <div class="card-header">
+
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        Bill No.
+                    </th>
+                    <th>
+                        Ordered quantity
+                    </th>
+                    <th>
+                        Completed quantity
+                    </th>
+                    <th>
+                        Assigned to
+                    </th>
+                    <th>
+                        Reporter
+                    </th>
+                    <th>
+                        Pushed date
+                    </th>
+                    <th>
+                        Due date
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in ViewBag.woBills)
+                {
+                <script>
+                        var dataEle = {
+                            x: 'Bill:' + @Html.Raw(item.WoBillNbr),
+                            y: @Html.Raw(item.ComQty),
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: @Html.Raw(item.OrdQty),
+                                    strokeWidth: 5,
+                                    strokeColor: '#775DD0'
+                                }
+                            ]
+                        };
+                        dataArr.push(dataEle);
+                </script>
+
+                    <tr>
+                        <td>
+                            @item.WoBillNbr
+                        </td>
+                        <td>
+                            @item.OrdQty
+                        </td>
+                        <td>
+                            @item.ComQty
+                        </td>
+                        <td>
+                            @item.Assignee
+                        </td>
+                        <td>
+                            @item.Reporter
+                        </td>
+                        <td>
+                            @item.OrdDate.ToShortDateString()
+                        </td>
+                        <td>
+                            @item.DueDate.ToShortDateString()
+                        </td>
+                        <td>
+
+                            @if (item.IsClosed)
+                            {
+                                <div class="badge bg-secondary" onclick="closeBill(@item.WoBillNbr, 're-activate');">Closed</div>
+                            }
+                            else
+                            {
+                                <div class="badge bg-success" onclick="closeBill(@item.WoBillNbr, 'close')">Open</div>
+                            }
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    @if (Model.Closed != true)
+                    {
+                        <td colspan="7" class="text-center">
+                            <a class="btn btn-primary" href="/WoBills/PushBill/@Model.WoNbr">
+                                <span><i class="bi bi-plus-circle"></i></span>
+                                <span>
+                                    Assign
+                                </span>
+                            </a>
+                            <a class="btn btn-primary" href="/WorkOrders/CloseWo/@Model.WoNbr">
+                                <span><i class="bi bi-check"></i></span>
+                                <span>
+                                    Close Order
+                                </span>
+                            </a>
+                        </td>
+                    }
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script>
+    function closeBill(bill, mess) {      
+
+        bootbox.confirm({
+            message: "Are you sure want to " + mess + " this bill?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (res) {
+                if (res) {
+                    var dialog = bootbox.dialog({
+                        message: '<p><i class="fa fa-spin fa-spinner"></i> Loading...</p>'
+                    });
+
+                    $.ajax({
+                        url: "/WoBills/CloseBill/" + bill,
+                        method: "GET",
+                        success: function () {
+                            setTimeout(function () {
+                                bootbox.alert("Done!");
+                            }, 5000);
+                            window.location.href = window.location.href;
+                        },
+
+                    });
+                }
+            }
+        });
+
+        
+
+    };
+
+    
+
+    $(document).ready(function () {
+        $('.nav-wo').addClass('active');
+        $('.nav-w-ord').addClass('active');
+        $('#navWo').addClass('show');
+    });
+</script>
+
+<script>
+
+
+
+    var options = {
+        series: [
+            {
+                name: 'Progress',
+                data: dataArr
+            }
+        ],
+        chart: {
+            height: 350,
+            type: 'bar'
+        },
+        plotOptions: {
+            bar: {
+                horizontal: true,
+            }
+        },
+        colors: ['#00E396'],
+        dataLabels: {
+            formatter: function (val, opt) {
+                const goals =
+                    opt.w.config.series[opt.seriesIndex].data[opt.dataPointIndex]
+                        .goals
+
+                if (goals && goals.length) {
+                    return `${val} / ${goals[0].value}`;
+                }
+                return val;
+            }
+        },
+        legend: {
+            show: true,
+            showForSingleSeries: true,
+            customLegendItems: ['Progress', 'Expected'],
+            markers: {
+                fillColors: ['#00E396', '#775DD0']
+            }
+        }
+    };
+
+    console.log("Arr: " + dataArr.length);
+
+    var chart = new ApexCharts(document.querySelector("#wo-chart"), options);
+    chart.render();
+</script>

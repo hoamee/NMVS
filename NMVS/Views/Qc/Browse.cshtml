@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<NMVS.Models.ViewModels.IncomingListVm>
 
 @{
-    ViewData["Title"] = "Incoming list browse";
+    ViewData["Title"] = "Quality control";
     ViewData["Category"] = "Receive";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -87,7 +87,19 @@
                                         }
                                     </td>
                                     <td>
-                                        @Html.DisplayFor(modelItem => item.Checked)/@Html.DisplayFor(modelItem => item.ItemCount)
+                                        @if (item.Checked < item.ItemCount)
+                                        {
+                                            <span class="badge bg-danger col-10">@Html.DisplayFor(modelItem => item.Checked)/@Html.DisplayFor(modelItem => item.ItemCount)</span>
+                                        }
+
+                                        else if (item.Checked < item.ItemCount)
+                                        {
+                                            <span class="badge bg-success">@Html.DisplayFor(modelItem => item.Checked)/@Html.DisplayFor(modelItem => item.ItemCount)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Completed @Html.DisplayFor(modelItem => item.Checked)/@Html.DisplayFor(modelItem => item.ItemCount)</span>
+                                        }
                                     </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.LastModified)
@@ -99,7 +111,7 @@
                     </table>
                 </div>
             </div>
-           
+
         </div>
     </div>
 </div>

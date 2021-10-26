@@ -1,0 +1,138 @@
+﻿@model IEnumerable<NMVS.Models.ViewModels.ItemMasterVm>
+@{
+    ViewData["Title"] = "History";
+    ViewData["Title"] = "Allocate request";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive col-12">
+                    <table class="table table-flush" id="datatable-search" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Allocate option</th>
+                                <th>
+                                    Item
+                                </th>
+                                <th>
+                                    Packing
+                                </th>
+                                <th>
+                                    Supplier
+                                </th>
+                                <th>
+                                    Location
+                                </th>
+                                <th>
+                                    Lot
+                                </th>
+                                <th>
+                                    Quantity
+                                </th>
+                                <th>
+                                    Locating
+                                </th>
+                                <th>
+                                    Date in
+                                </th>
+                                <th>
+                                    Received by
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td>
+
+                                        @if (item.Booked < item.Qty)
+                                        {
+                                            <a href="/Allocate/ConfirmLoc?id=@item.Ptid"><span class="btn btn-outline-primary">Pick List</span></a>
+                                            @*@Ajax.ActionLink("Split item", "ConfirmLoc", new { id = item.PtId, wl = 0 }, new AjaxOptions
+                                                {
+                                                    UpdateTargetId = "ajax-update",
+                                                    InsertionMode = InsertionMode.Replace
+
+                                                },
+                                                    new { @class = "btn btn-sm btn-outline-info" });*@
+                                        }
+                                        else
+                                        {
+                                            <p class="badge bg-success">Allocated</p>
+                                        }
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(x => item.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.PackingType)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Sup)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Loc)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Lot)
+                                    </td>
+                                    @if (item.Booked == item.Qty)
+                                    {
+                                        <td class="text-danger">
+                                            @Html.DisplayFor(modelItem => item.Qty)
+                                        </td>
+                                        <td class="text-danger">
+                                            @Html.DisplayFor(modelItem => item.Booked)
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td class="text-success">
+                                            @Html.DisplayFor(modelItem => item.Qty)
+                                        </td>
+                                        <td class="text-success">
+                                            @Html.DisplayFor(modelItem => item.Booked)
+                                        </td>
+                                    }
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DateIn)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.RcvBy)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/assets/datatable/datatables.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.nav-allocate').addClass('active');
+        $('.nav-un').addClass('active');
+        $('#navAllocate').addClass('show');
+        $('#new-sup').click(function () {
+            $('#file-modal').modal('toggle');
+        });
+        $('#datatable-search').DataTable({
+            "order": [[0, "desc"]]
+        });
+
+    });
+</script>

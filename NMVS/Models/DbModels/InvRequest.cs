@@ -14,8 +14,7 @@ namespace NMVS.Models.DbModels
         public string RqID { get; set; }
 
         [Display(Name = "Request Type")]
-        public string CodeValue { get; set; }
-        public GeneralizedCode GeneralizedCode { get; set; }
+        public string RqType { get; set; }
 
 
         [Display(Name = "Request by")]
@@ -24,6 +23,7 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Date request")]
         public DateTime RqDate { get; set; }
 
+        [Required]
         public string Ref { set; get; }
 
         public bool SoConfirm { set; get; }
@@ -42,7 +42,6 @@ namespace NMVS.Models.DbModels
         [StringLength(50)]
         [Display(Name = "Item No.")]
         public string ItemNo { get; set; }
-        public ItemData ItemData { get; set; }
 
         [Display(Name = "Quantity")]
         public double Quantity { get; set; }
@@ -78,6 +77,5 @@ namespace NMVS.Models.DbModels
 
         [Display(Name = "Request No.")]
         public string RqID { get; set; }
-        public virtual InvRequest InvRequest { set; get; }
     }
 }

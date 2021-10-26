@@ -1,0 +1,120 @@
+﻿@model IEnumerable<NMVS.Models.DbModels.WorkOrder>
+
+@{
+    ViewData["Title"] = "Prod line browse";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-flush" id="datatable-search">
+                    <thead>
+                        <tr>
+                            <th>
+                                Work Order
+                            </th>
+                            <th>
+                                Item
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.QtyOrd)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.QtyCom)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.SoNbr)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.OrdBy)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.OrdDate)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ExpDate)
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+
+                            <tr>
+                                <td>
+                                    @item.WoNbr
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ItemNo)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.QtyOrd)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.QtyCom)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.SoNbr)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.OrdBy)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.OrdDate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ExpDate)
+                                </td>
+                                <td>
+                                    @if (item.Closed != true)
+                                    {
+                                        @Html.ActionLink("Edit", "EditWo", new { id = item.WoNbr }, new { @class = "btn btn-sm btn-outline-warning" })
+                                        <span></span>
+                                        @Html.ActionLink("Details", "WoDetails", new { id = item.WoNbr }, new { @class = "btn btn-sm btn-outline-info" })
+                                    }
+                                    else
+                                    {
+                                        <p class="badge bg-danger">Closed</p>
+                                    }
+                                </td>
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+
+                <div class="row col-12">
+                    <span class="col-auto">
+                        <a asp-action="CreateWo" class="btn btn-sm btn-outline-info">
+                            <span class="fa fa-plus-circle"></span>
+                            Add new
+                        </a>
+                    </span>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('.nav-wo').addClass('active');
+        $('.nav-w-ord').addClass('active');
+        $('#navWo').addClass('show');
+        $('#datatable-search').DataTable({
+            "order": [[0, "desc"]]
+        });
+    });
+</script>

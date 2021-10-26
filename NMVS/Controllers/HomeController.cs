@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace NMVS.Controllers
 {
-    [Authorize]
+    
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -24,8 +24,13 @@ namespace NMVS.Controllers
         
         public IActionResult Index()
         {
-            ViewData["User"] = _db.Users.FirstOrDefault(x => x.UserName == User.Identity.Name).FullName;
-            return View();
+            if (User.Identity.IsAuthenticated)
+            {
+                ViewData["User"] = _db.Users.FirstOrDefault(x => x.UserName == User.Identity.Name).FullName;
+
+                return View();
+            }
+            return RedirectToAction("Login","Account");
         }
 
         public IActionResult Privacy()

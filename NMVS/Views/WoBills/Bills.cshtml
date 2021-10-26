@@ -1,0 +1,121 @@
+﻿@model IEnumerable<NMVS.Models.ViewModels.BillVM>
+
+@{
+    ViewData["Title"] = "Work order bills";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive col-12">
+                    <table class="table table-flush" id="datatable-search">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Bill No
+                                </th>
+                                <th>
+                                    Work Order No.
+                                </th>
+                                <th>
+                                    Product
+                                </th>
+                                <th>
+                                    Ordered Quantity
+                                </th>
+                                <th>
+                                    Completed Quantity
+                                </th>
+                                <th>
+                                    Assignee
+                                </th>
+                                <th>
+                                    Report by
+                                </th>
+                                <th>
+                                    Last update
+                                </th>
+                                <th>
+                                    Ordered date
+                                </th>
+                                <th>
+                                    Due Date
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.WoBillNbr)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.WoNbr)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Product)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.OrdQty)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ComQty)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Assignee)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Reporter)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.LastUpdate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.OrdDate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DueDate)
+                                </td>
+                                <td>
+                                    @if (item.WoClosed != true & item.IsClosed != true)
+                                    {
+                                        @Html.ActionLink("Update", "UpdateBill", new { id = item.WoBillNbr }, new { @class = "btn btn-outline-primary" })
+                                    }
+                                    else
+                                    {
+                                        <p class="badge bg-danger">Order closed</p>
+                                    }
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/assets/datatable/datatables.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.nav-wo').addClass('active');
+        $('.nav-bill').addClass('active');
+        $('#navWo').addClass('show');
+        $('#datatable-search').DataTable({
+            "order": [[0, "desc"]]
+        });
+
+    });
+</script>

@@ -1,0 +1,131 @@
+﻿@model IEnumerable<NMVS.Models.ViewModels.AllocateOrderVm>
+
+@{
+    ViewData["Title"] = "History";
+    ViewData["Title"] = "Allocate request";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="table-responsive card-body">
+                <table class="table table-flush" id="datatable-search">
+                    <thead>
+                        <tr>
+                            <th>
+                                Order No.
+                            </th>
+                            <th>
+                                Request No.
+                            </th>
+                            <th>
+                                Item No.
+                            </th>
+                            <th>
+                                Quantity
+                            </th>
+                            <th>
+                                From
+                            </th>
+                            <th>
+                                To 
+                            </th>
+                            <th>
+                                Destination Description
+                            </th>
+                            <th>
+                                Time
+                            </th>
+                            <th>
+                                Moved by
+                            </th>
+                            <th>
+                                Confirmation
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr id="tr-@item.OrderId">
+                                <td class="td-id">
+                                    @item.OrderId
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.RequestId)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ItemNo)
+                                </td>
+                                <td class="td-qty">
+                                    @Html.DisplayFor(modelItem => item.Qty)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AlcFrom)
+                                </td>
+                                <td class="to-code">
+                                    @Html.DisplayFor(modelItem => item.AlcToCode)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AlcToDesc)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.MvmTime)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ConfirmBy)
+                                </td>
+                                <td>
+                                    @if (item.Confirmed == true)
+                                    {
+                                        <p class="badge bg-success"> Allocated </p>
+                                    }
+                                    else
+                                    {
+                                        <div class="p-2 bd-highlight">
+                                            <button class="btn btn-info modal-btn">
+                                                Submit
+                                            </button>
+                                            <button class="btn btn-danger report-btn">
+                                                Report
+                                            </button>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+    </div>
+</div>
+<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script src="~/assets/js/notify.js"></script>
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script src="~/assets/js/qr/html5-qrcode.min.js"></script>
+<script>
+    var routeURL = location.protocol + "//" + location.host;
+    
+
+    $(document).ready(function () {
+        $('.nav-allocate').addClass('active');
+        $('.nav-order').addClass('active');
+        $('#navAllocate').addClass('show');
+        $('#new-sup').click(function () {
+            $('#file-modal').modal('toggle');
+        });
+        $('#datatable-search').DataTable({
+            "order": [[9, "asc"]]
+        });
+
+    });
+</script>
+<partial name="OrdersModal" />
