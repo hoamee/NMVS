@@ -231,30 +231,23 @@
             var selectQty = parseFloat($("#selected-qty").html());
             var initQty = parseFloat($('#init-quantity').html());
             var tempInitQty = initQty;
-            var remain = parseFloat($(this).closest('tr').children('.pt-qty').text());
+            var remain = parseFloat($(this).closest('tr').children('.remain-cap').text());
             var input = parseFloat($(this).closest('tr').children('.td-input').children('.val-input').val());
             var vHold = parseFloat($(this).closest('tr').children('.td-hold').text());
             var acceptedInput = remain - vHold;
 
             if (isNaN(input)) {
-                bootbox.alert({
-                    closeButton: false,
-                    message: "Cannot add value NaN to cart"
-                });
+                alert("Cannot add value NaN to cart");
                 $(this).closest('tr').children('.td-input').children('.val-input').val('');
             } else {
                 if (input > acceptedInput || tempInitQty < input) {
 
-                    bootbox.alert({
-                        title: '<div class="text-danger"> Error </div>',
-                        message: '<div class="text-danger"> Your input is to large! </div>',
-                        closeButton: false
-                    });
+                    alert("Your input is to large!");
                     $(this).closest('tr').children('.td-input').children('.val-input').val('');
                 }
                 else {
                     if (input <= 0) {
-                        bootbox.alert("Please input quantity greater than \"0\"");
+                        alert("Please input quantity greater than \"0\"");
                     }
                     else {
                         tempInitQty = tempInitQty - input;
@@ -269,23 +262,20 @@
                         //get loc id & name
                         var fName = $(this).closest('tr').children('.td-name').text().trim();
                         var fid = $(this).closest('tr').children('.td-id').text().trim();
-                        var loc = $(this).closest('tr').children('.td-loccode').text().trim();
 
                         //check if target table exist id
                         if ($('#' + fid).length) {
                             var tarQty = parseFloat($('#' + fid).text());
                             tarQty += input;
-
                             $('#tr-' + fid).remove();
-                            $('#selected-table > tbody:last').append(`<tr class="tr-${fid}"><td class="whl-code">${fid}</td><td>${fName}</td><td class="loc">${loc}</td><td class="qty" id="${fid}">${tarQty}</td><td> <a class="btn btn-sm btn-outline-danger" onclick="removeRow('o-${fid}','tr-${fid}',${tarQty})"><span class="fa fa-trash"></span></a></td></tr>`);
+                            $('#selected-table > tbody:last').append(`<tr id="tr-${fid}"><td class="whl-code">${fid}</td><td>${fName}</td><td class="qty" id="${fid}">${tarQty}</td><td> <a class="btn btn-sm btn-outline-danger" onclick="removeRow('o-${fid}','tr-${fid}',${tarQty})"><span class="fa fa-trash"></span></a></td></tr>`);
                             $('#' + fid).css("background-color", "#FF0000");
                             go2('#' + fid);
                             $('#' + fid).css("background-color", "inherit");
-                            go2('#selected-table > tbody tr:last');
                         }
                         else {
                             //put new record table
-                            $('#selected-table > tbody:last').append(`<tr class="tr-${fid}"><td class="whl-code">${fid}</td><td>${fName}</td><td class="loc">${loc}</td><td class="qty" id="${fid}">${input}</td><td> <a class="btn btn-sm btn-outline-danger" onclick="removeRow('o-${fid}','tr-${fid}',${input})"><span class="fa fa-trash"></span></a></td></tr>`);
+                            $('#selected-table > tbody:last').append(`<tr id="tr-${fid}"><td class="whl-code">${fid}</td><td>${fName}</td><td class="qty" id="${fid}">${input}</td><td> <a class="btn btn-sm btn-outline-danger" onclick="removeRow('o-${fid}','tr-${fid}',${input})"><span class="fa fa-trash"></span></a></td></tr>`);
                             go2('#selected-table > tbody tr:last');
                         }
                     }

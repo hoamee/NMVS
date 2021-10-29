@@ -1,0 +1,59 @@
+﻿<!-- Modal -->
+
+<div class="modal" tabindex="-1" id="customer-modal">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" style="height: 100%">
+            <div class="modal-header">
+                <h5 class="modal-title">Suppliers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table " id="customer-tb">
+                    <thead>
+                        <tr>
+                            <th>
+                                Customer code
+                            </th>
+                            <th>
+                                AP Code
+                            </th>
+                            <th>
+                                Agent No.
+                            </th>
+                            <th>
+                                Customer name
+                            </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in ViewBag.Customers)
+                        {
+                        <tr>
+                            <td>
+                                <button type="button" class="btn btn-outline-primary" onclick="setCustomer('@item.CustCode','@item.CustName')">@item.CustCode</button>
+                            </td>
+                            <td>
+                                @item.ApCode
+                            </td>
+                            <td>
+                                @item.AgentNo
+                            </td>
+                            <td>
+                                @item.CustName
+                            </td>
+                        </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+

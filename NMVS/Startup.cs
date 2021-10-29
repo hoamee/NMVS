@@ -48,6 +48,7 @@ namespace NMVS
             services.AddTransient<IAllocateService, AllocateService>();
             services.AddTransient<IRequestService, RequestService>();
             services.AddTransient<ILocService, LocService>();
+            services.AddTransient<ISoService, SoService>();
             services.AddHttpContextAccessor();
         }
 

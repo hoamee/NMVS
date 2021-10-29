@@ -46,55 +46,55 @@ namespace NMVS.Controllers
         }
 
 
-        public IActionResult ConfirmSelectLoc(JsPickingData jsArr)
-        {
-            CommonResponse<int> common = new();
-            try
-            {
-                //Test response
-                //string s = jsArr[0].id + ", " + jsArr[0].whcd + ", " + jsArr[0].qty;
-                //return Json(s);
-                var arr = jsArr;
-                //   3. Add holding to To-Loc
-                var toLoc = _db.Locs.Find(arr.loc);
+        //public IActionResult ConfirmSelectLoc(JsPickingData jsArr)
+        //{
+        //    CommonResponse<int> common = new();
+        //    try
+        //    {
+        //        //Test response
+        //        //string s = jsArr[0].id + ", " + jsArr[0].whcd + ", " + jsArr[0].qty;
+        //        //return Json(s);
+        //        var arr = jsArr;
+        //        //   3. Add holding to To-Loc
+        //        var toLoc = _db.Locs.Find(arr.loc);
 
-                //Get Item master
-                var pt = _db.ItemMasters.Find(arr.id);
-                var fromLoc = _db.Locs.Find(pt.LocCode);
+        //        //Get Item master
+        //        var pt = _db.ItemMasters.Find(arr.id);
+        //        var fromLoc = _db.Locs.Find(pt.LocCode);
 
-                //   2.Add holding to From-item
-                pt.PtHold += arr.qty;
-
-
-                toLoc.LocHolding += arr.qty;
-
-                //   4. Add Outgo to From-Loc
-                fromLoc.LocOutgo += arr.qty;
+        //        //   2.Add holding to From-item
+        //        pt.PtHold += arr.qty;
 
 
-                _db.AllocateRequests.Add(new AllocateRequest()
-                {
-                    PtId = pt.PtId,
-                    AlcFrom = pt.LocCode,
-                    LocCode = arr.loc,
-                    AlcQty = arr.qty,
-                    AlcFromDesc = fromLoc.LocDesc,
-                    MovementTime = arr.reqTime
-                });
+        //        toLoc.LocHolding += arr.qty;
 
-                _db.SaveChanges();
-                common.status = 1;
-                common.message += "Success";
+        //        //   4. Add Outgo to From-Loc
+        //        fromLoc.LocOutgo += arr.qty;
 
 
-            }
-            catch (Exception e)
-            {
-                common.status = -1;
-                common.message = e.ToString();
-            }
-            return Json(common);
-        }
+        //        _db.AllocateRequests.Add(new AllocateRequest()
+        //        {
+        //            PtId = pt.PtId,
+        //            AlcFrom = pt.LocCode,
+        //            LocCode = arr.loc,
+        //            AlcQty = arr.qty,
+        //            AlcFromDesc = fromLoc.LocDesc,
+        //            MovementTime = arr.reqTime
+        //        });
+
+        //        _db.SaveChanges();
+        //        common.status = 1;
+        //        common.message += "Success";
+
+
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        common.status = -1;
+        //        common.message = e.ToString();
+        //    }
+        //    return Json(common);
+        //}
 
         public IActionResult Orders()
         {

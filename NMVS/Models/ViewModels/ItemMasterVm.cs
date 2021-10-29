@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ namespace NMVS.Models.ViewModels
         public int Ptid { set; get; }
         public string No { set; get; }
         public string Name { set; get; }
+        [DataType(DataType.Date)]
         public DateTime DateIn { set; get; }
         public string Loc { set; get; }
         public double Qty { set; get; }

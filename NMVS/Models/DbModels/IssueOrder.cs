@@ -19,17 +19,28 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Quantity")]
         public double ExpOrdQty { set; get; }
 
+        [Display(Name = "Moved quantity")]
+        public double MovedQty { set; get; }
+
+        [Display(Name = "Item No.")]
+        public string ItemNo { get; set; }
+
         [Display(Name = "Item Location")]
-        public string WhlCode { get; set; }
-        public virtual Loc Loc { get; set; }
+        public string LocCode { get; set; }
+
+        [Display(Name = "Item Location")]
+        public string FromLoc { get; set; }
 
         public int PtId { set; get; }
 
         [Display(Name = "To Location")]
         public string ToLoc { get; set; }
 
-        [Display(Name = "To Location")]
-        public string ToLocDesc { get; set; }
+        [Display(Name = "To vehiclde")]
+        public int? ToVehicle { set; get; }
+
+        [Display(Name = "Issue To")]
+        public string IssueToDesc { get; set; }
 
         [Display(Name = "Issued")]
         public bool? Confirm { set; get; }
@@ -39,7 +50,10 @@ namespace NMVS.Models.DbModels
 
         [Display(Name = "Request ID")]
         public string RqID { set; get; }
-        public virtual InvRequest InvRequest { set; get; }
+
+        [Display(Name = "Request ID")]
+        public int DetId { set; get; }
+
 
         [Display(Name = "Ordered by")]
         public string OrderBy { set; get; }

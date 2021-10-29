@@ -1,0 +1,261 @@
+﻿@model NMVS.Models.ViewModels.SoDetailVm
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    double totalPrice = 0;
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <hr />
+                        <dl class="row">
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.SoVm.CustCode)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoVm.CustCode)
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.SoVm.ShipTo)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoVm.ShipTo)
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.SoVm.OrdDate)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoVm.OrdDate)
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.SoVm.ReqDate)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoVm.ReqDate)
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.SoVm.DueDate)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoVm.DueDate)
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.SoVm.PriceDate)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoVm.PriceDate)
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.SoVm.SoCurr)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoVm.SoCurr)
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.SoVm.ShipVia)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoVm.ShipVia)
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.SoVm.Comment)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoVm.Comment)
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.SoVm.Confirm)
+                            </dt>
+                            <dd class="col-sm-10">
+
+                                @if (Model.SoVm.Confirm)
+                                {
+                                    <span class="badge bg-success">Yes</span>
+                                }
+                                else
+                                {
+                                    if (string.IsNullOrEmpty(Model.SoVm.ConfirmBy))
+                                    {
+
+
+                                        <span class="badge bg-secondary">Not yet</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Dinied</span>
+                                    }
+                                }
+
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.SoVm.ConfirmBy)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoVm.ConfirmBy)
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.SoVm.UpdatedBy)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoVm.UpdatedBy)
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.SoVm.UpdatedOn)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoVm.UpdatedOn)
+                            </dd>
+                        </dl>
+                    </div>
+                    <div>
+
+                        <a asp-action="Browse" class="btn btn-secondary">Back to List</a>
+                        @if (Model.SoVm.Confirm != true)
+                        {
+                            <span>|</span><a asp-action="Update" asp-route-id="@Model.SoVm.SoNbr" class="btn btn-outline-warning">Update</a>
+                            <span>|</span> <span id="btn-approve" class="btn btn-success">Approve</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>
+                            Item No
+                        </th>
+                        <th>
+                            Date in
+                        </th>
+                        <th>
+                            Quantity
+                        </th>
+                        <th>
+                            Discount
+                        </th>
+                        <th>
+                            Net price
+                        </th>
+                        <th>
+                            Tax
+                        </th>
+                        <th>
+                            Total
+                        </th>
+                    </tr>
+
+                    @foreach (var item in Model.SoDets)
+                    {
+                        <tr>
+                            <td>
+                                @item.ItemNo
+                            </td>
+                            <td>
+                                @item.SpecDate
+                            </td>
+                            <td>
+                                @item.Quantity
+                            </td>
+                            <td>
+                                @item.Discount
+                            </td>
+                            <td>
+                                @item.NetPrice
+                            </td>
+                            <td>
+                                @item.Tax
+                            </td>
+                            <td>
+                                
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td colspan="6" class="text-center"><b>Total</b></td>
+                        <td>
+                             @Model.SoVm.SoCurr
+                        </td>
+                    </tr>
+                    @if (!Model.SoVm.Confirm)
+                    {
+                        <tr class="hide-print">
+                            <td colspan="10" class="text-center col-6">
+
+                                <a class="btn btn-primary" href="/SalesOrders/SoDetCreate/@Model.SoVm.SoNbr">
+                                    <span><i class="bi bi-plus-circle"></i></span>
+                                    <span>
+                                        Add line
+                                    </span>
+                                </a>
+
+                                
+                            </td>
+                        </tr>
+                    }
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('.nav-sale').addClass('active');
+        $('#datatable-search').DataTable();
+
+        $('#btn-approve').click(function () {
+            bootbox.confirm({
+                message: "Are you sure approve this SO?",
+                buttons: {
+                    confirm: {
+                        label: 'Yes',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'No',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        $.ajax({
+                            method: 'GET',
+                            url: '/SalesOrders/SoConfirm?id=@Model.SoVm.SoNbr',
+                            success: function () {
+                                window.location.href = window.location.href;
+                            }
+                        });
+
+                    }
+                }
+            });
+
+        });
+    });
+</script>

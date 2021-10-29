@@ -1,0 +1,90 @@
+﻿@model NMVS.Models.DbModels.Shipper
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-5">
+                        <form asp-action="Register" asp-controller="Shippers">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label asp-for="ShpDesc" class="control-label">Vehicle</label>
+                                <input asp-for="ShpDesc" class="form-control" />
+                                <span asp-validation-for="ShpDesc" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ShpVia" class="control-label">Vehicle type</label>
+                                <input asp-for="ShpVia" class="form-control" />
+                                <span asp-validation-for="ShpVia" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Driver" class="control-label"></label>
+                                <input asp-for="Driver" class="form-control" />
+                                <span asp-validation-for="Driver" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="DrContact" class="control-label"></label>
+                                <input asp-for="DrContact" class="form-control" />
+                                <span asp-validation-for="DrContact" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Loc" class="control-label"></label>
+                                <div class="row col-md-12">
+                                    <span class="col-md-4">
+
+                                        <input asp-for="Loc" class="form-control" readonly onclick="$('#loc-modal').modal('toggle')" />
+                                    </span>
+                                    <div class="col-md-6">
+                                        <p id="loc-name"></p>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="Loc" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ShpTo" class="control-label"></label>
+                                <input asp-for="ShpTo" class="form-control" />
+                                <span asp-validation-for="ShpTo" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="DateIn" class="control-label"></label>
+                                <input asp-for="DateIn" class="form-control" />
+                                <span asp-validation-for="DateIn" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="RegisteredBy" class="control-label"></label>
+                                <input asp-for="RegisteredBy" class="form-control" readonly value="@User.Identity.Name" />
+                                <span asp-validation-for="RegisteredBy" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Submit" class="btn btn-primary" />
+
+                                <a asp-action="Browse" class="btn btn-secondary">Back to List</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<partial name="_ValidationScriptsPartial" />
+<partial name="LocModal" />
+
+<script>
+    $(document).ready(function () {
+        $('.nav-ship').addClass('active');
+    });
+</script>

@@ -1,0 +1,312 @@
+﻿<!-- Modal confirm -->
+<div class="modal fade modal-dialog-scrollable" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 class="modal-title" id="exampleModalLabel">Confirm allocate order</h3>
+                <hr />
+                <table class="table table-striped" id="table2">
+                    <thead>
+                        <tr>
+                            <th>
+                                ID
+                            </th>
+                            <th>
+                                Type
+                            </th>
+                            <th>
+                                From location
+                            </th>
+                            <th>
+                                Inventory Id
+                            </th>
+
+                            <th>
+                                To location
+                            </th>
+                            <th>
+                                Issued
+                            </th>
+                            <th>
+                                Movement by
+                            </th>
+                            <th>
+                                Request Id
+                            </th>
+                            <th>
+                                Ordered by
+                            </th>
+                            <th>
+                                Movement time
+                            </th>
+
+                            <th>
+
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="t2-tr">
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="form-group text-xl-center">
+                <label class="form-check-label text-primary ">
+                    Movement Quantity <input type="number" class="form-control" id="moved-qty" step="0.01" />
+                </label>
+            </div>
+            <div id="reader" width="80%">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="confirm-end" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal report -->
+<div class="modal fade modal-dialog-scrollable" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 class="modal-title" id="reportModalLabel">Report an issue</h3>
+                <hr />
+                <table class="table table-striped" id="table3">
+                    <thead>
+                        <tr>
+                            <th>
+                                Order No.
+                            </th>
+                            <th>
+                                Request No.
+                            </th>
+                            <th>
+                                Item No.
+                            </th>
+                            <th>
+                                Quantity
+                            </th>
+                            <th>
+                                Moved
+                            </th>
+                            <th>
+                                From
+                            </th>
+                            <th>
+                                To
+                            </th>
+                            <th>
+                                Destination Description
+                            </th>
+                            <th>
+                                Time
+                            </th>
+
+                            <th>
+
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="t3-tr">
+                        </tr>
+                    </tbody>
+                </table>
+                <hr />
+                <div class="form-group col-10">
+                    <div class="form-group form-check">
+                        <label class="form-check-label text-danger">
+                            <input type="checkbox" class="form-check-input" id="unqualified" /> Unqualified
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-check-label text-danger">
+                            <input type="number" class="form-control" id="input-qty" step="0.01" />
+                        </label>
+                    </div>
+                    <label class="form-label text-danger" for="report-input">Add a note</label>
+                    <textarea aria-multiline="true" cols="40" rows="5" class="form-control" id="report-input"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="send-report" type="button" class="btn btn-danger">Send report</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var routeURL = location.protocol + "//" + location.host;
+    $(document).ready(function () {
+        $('.modal-btn').click(function () {
+            $('#table2 #t2-tr').html($(this).closest('tr').html());
+            $('#table2 #t2-tr').children('td:last').remove();
+            $('#exampleModal').modal('toggle');
+        });
+
+
+        $('#confirm-end').click(function () {
+
+            var desCode = $('#table2 .to-code').text().trim();
+            var qty = $('#moved-qty').val();
+            var oQty = parseFloat($('#table2 #t2-tr').children('.td-qty').text().trim()) - parseFloat($('#table2 #t2-tr').children('.td-moved').text().trim());
+
+            if (qty > oQty) {
+                $('#moved-qty').notify('Report quantity could\'nt be larger than order quantity');
+            }
+            else if (qty <= 0) {
+                $('#moved-qty').notify('Report quantity could\'nt be less than or equal to 0');
+            } else {
+
+
+
+                var html5QrcodeScanner = new Html5QrcodeScanner(
+                    "reader", { fps: 60, qrbox: 500 });
+
+                function onScanSuccess(decodedText, decodedResult) {
+                    // Handle on success condition with the decoded text or result.
+                    console.log(`Scan result: ${decodedText}`, decodedResult);
+                    var desInput = decodedText;
+                    html5QrcodeScanner.clear();
+                    if (desInput !== desCode) {
+                        alert('Incorrect destination! Please check your destination again! ' + desInput);
+                    }
+                    else {
+                        var oId = parseInt($('#table2 .td-id').text().trim());
+                        var alo = {
+                            AlcOrdId: oId,
+                            MovedQty: qty
+                        };
+
+                        $.ajax({
+                            contentType: 'application/json; charset=utf-8',
+                            dataType: 'json',
+                            type: 'POST',
+                            url: routeURL + '/api/Allocate/FinishOrder',
+                            data: JSON.stringify(alo),
+                            onBegin: function () {
+                                $('#confirm-end').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...');
+                            },
+                            success: function (data) {
+                                if (data.status == 1) {
+                                    $("#exampleModal").modal('toggle');
+                                    $(`#table1 tbody #tr-${oId} td:last`).html('<p class="badge bg-success"> Allocated </p>');
+                                    $('#reader').html('');
+                                    $.notify("Success", "success");
+                                    
+
+                                } else {
+                                    $.notify("An error occurred");
+                                }
+
+                            },
+                            failure: function (response) {
+                                alert(response);
+                            },
+                            complete: function () {
+                                $('#confirm-end').html('Save changes');
+                            }
+
+                        });
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                }
+                html5QrcodeScanner.render(onScanSuccess);
+
+            }
+        });
+
+        $('.report-btn').click(function () {
+            $('#table3 #t3-tr').html($(this).closest('tr').html());
+            $('#table3 #t3-tr').children('td:last').remove();
+            $('#reportModal').modal('toggle');
+        });
+
+        $('#send-report').click(function () {
+            var cmmt = $("#report-input");
+            var oId = parseInt($('#table3 .td-id').text().trim());
+            var unq = $('#unqualified').is(":checked");
+            var oQty = parseFloat($('#table3 #t3-tr').children('.td-qty').text().trim());
+            var qty = $('#input-qty').val();
+            var note = cmmt.val().trim();
+
+            alert(unq);
+
+            if (qty > oQty) {
+                $('#input-qty').notify('Report quantity could\'nt be larger than order quantity');
+            }
+            else if (qty <= 0) {
+                $('#input-qty').notify('Report quantity could\'nt be less than or equal to 0');
+            }
+            else if (note == "") {
+                cmmt.notify('Please describe the reason.');
+            }
+            else {
+                var postData = {
+                    Retrn: unq,
+                    Qty: qty,
+                    Note: note,
+                    OrId: oId
+                };
+
+                bootbox.confirm({
+                    message: '<h5 >Is all information correct?</h5>',
+                    closeButton: false,
+                    buttons: {
+                        confirm: {
+                            label: 'Yes',
+                            className: 'btn-success'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-danger'
+                        }
+                    },
+                    callback: function (cf) {
+                        $.ajax({
+                            contentType: 'application/json; charset=utf-8',
+                            dataType: 'json',
+                            type: 'POST',
+                            url: routeURL + '/api/Allocate/ReportOrder',
+                            data: JSON.stringify(postData),
+                            success: function (data) {
+                                if (data.status == 1) {
+                                    $.notify(data.message, 'success');
+                                }
+
+                                if (data.status == 0) {
+                                    $.notify(data.message, 'warning');
+                                }
+
+                                if (data.status == -1) {
+                                    $.notify(data.message, 'error');
+                                }
+
+
+                            },
+                            failure: function (response) {
+                                bootbox.alert(response);
+                            },
+                            complete: function () {
+                                $('#reportModal').modal('toggle');
+                            }
+
+                        });
+                    }
+
+                });
+
+
+            }
+
+
+
+        });
+    });
+</script>

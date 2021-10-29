@@ -1,0 +1,158 @@
+﻿@model NMVS.Models.DbModels.SoDetail
+
+@{
+    ViewData["Title"] = "Sales order lines";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form asp-action="SoDetCreate">
+                            <table class="col-12">
+                                <thead>
+                                    <tr>
+                                        <th>
+
+                                            SO No.
+                                        </th>
+                                        <th class="col-2">
+                                            Item No.
+                                        </th>
+                                        <th>
+                                            Date in
+                                        </th>
+                                        <th>
+                                            Quantity
+                                        </th>
+                                        <th>
+                                            Require Date
+                                        </th>
+                                        <th>
+                                            Discount
+                                        </th>
+                                        <th>
+                                            Net Price
+                                        </th>
+                                        <th>
+                                            Tax
+                                        </th>
+
+                                    </tr>
+                                </thead>
+                                <tr>
+                                    <td>
+                                        <input asp-for="SoNbr" class="form-control" readonly value="@ViewBag.SoNbr" />
+                                        <span asp-validation-for="SoNbr" class="text-danger"></span>
+                                    </td>
+                                    <td>
+                                        <input asp-for="ItemNo" class="form-control" readonly />
+                                        <span asp-validation-for="ItemNo" class="text-danger"></span>
+                                    </td>
+                                    <td>
+                                        <input asp-for="SpecDate" class="form-control" readonly />
+                                        <span asp-validation-for="SpecDate" class="text-danger"></span>
+                                    </td>
+                                    <td>
+                                        <input asp-for="Quantity" class="form-control" />
+                                        <span asp-validation-for="Quantity" class="text-danger"></span>
+                                    </td>
+                                    <td>
+                                        <input asp-for="RequiredDate" class="form-control" />
+                                        <span asp-validation-for="RequiredDate" class="text-danger"></span>
+                                    </td>
+                                    <td>
+                                        <input asp-for="Discount" class="form-control" />
+                                        <span asp-validation-for="Discount" class="text-danger"></span>
+                                    </td>
+                                    <td>
+                                        <input asp-for="NetPrice" class="form-control" />
+                                        <span asp-validation-for="NetPrice" class="text-danger"></span>
+                                    </td>
+                                    <td>
+                                        <input asp-for="Tax" class="form-control" />
+                                        <span asp-validation-for="Tax" class="text-danger"></span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <div class="form-group">
+                                <input type="submit" value="Create" class="btn btn-primary" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<partial name="ItemModal" />
+<partial name="SpecDate" />
+<script src="~/assets/datatable/datatables.min.js"></script>
+<partial name="_ValidationScriptsPartial" />
+<script>
+
+
+    function setItemNo(sup) {
+        $('#ItemNo').val(sup);
+        $('#item-modal').modal('toggle');
+    };
+
+    function setDate(dt) {
+        $('#SpecDate').val(dt);
+        $('#spec-modal').modal('toggle');
+    };
+
+
+    $(document).ready(function () {
+        $('.nav-request').addClass('active');
+        $('.nav-rq-his').addClass('active');
+        $('#navRequest').addClass('show');
+        $('#new-list').click(function () {
+            $('#file-modal').modal('toggle');
+        });
+        $('#item-tb').DataTable();
+
+        $('#ItemNo').click(function () {
+            $('#item-modal').modal('toggle');
+        });
+
+        $('#SpecDate').click(function () {
+
+            var pt = $('#ItemNo').val();
+            var tb = $('#item-tb2 > tbody');
+            $.ajax({
+                url: "/InvRequests/GetItemMaster/?id=" + pt,
+                method: "GET",
+                success: function (res) {
+
+                    if (res.status == 1) {
+                        var i;
+                        for (i = 0; i < res.dataenum.length; ++i) {
+                            tb.append('<tr><td>' + res.dataenum[i].itemNo + '</td>' + '<td>' + res.dataenum[i].desc + '</td>' + '<td> <span class="btn btn-sm btn-outline-primary" onclick="setDate(\'' + res.dataenum[i].sDateIn + '\')">' + res.dataenum[i].sDateIn + '</span></td>' + '<td>' + res.dataenum[i].quantity + '</td></tr>')
+                        }
+                        $('#spec-modal').modal('toggle');
+                    }
+                    if (res.status == -1) {
+                        bootbox.alert({
+                            message: "No item found"
+                        });
+                    }
+                }
+            });
+
+        });
+    });
+</script>

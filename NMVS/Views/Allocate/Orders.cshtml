@@ -1,8 +1,7 @@
 ﻿@model IEnumerable<NMVS.Models.ViewModels.AllocateOrderVm>
 
 @{
-    ViewData["Title"] = "History";
-    ViewData["Title"] = "Allocate request";
+    ViewData["Title"] = "Allocate orders";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -30,6 +29,9 @@
                                 Quantity
                             </th>
                             <th>
+                                Moved
+                            </th>
+                            <th>
                                 From
                             </th>
                             <th>
@@ -52,52 +54,55 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            <tr id="tr-@item.OrderId">
-                                <td class="td-id">
-                                    @item.OrderId
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.RequestId)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.ItemNo)
-                                </td>
-                                <td class="td-qty">
-                                    @Html.DisplayFor(modelItem => item.Qty)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.AlcFrom)
-                                </td>
-                                <td class="to-code">
-                                    @Html.DisplayFor(modelItem => item.AlcToCode)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.AlcToDesc)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.MvmTime)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.ConfirmBy)
-                                </td>
-                                <td>
-                                    @if (item.Confirmed == true)
-                                    {
-                                        <p class="badge bg-success"> Allocated </p>
-                                    }
-                                    else
-                                    {
-                                        <div class="p-2 bd-highlight">
-                                            <button class="btn btn-info modal-btn">
-                                                Submit
-                                            </button>
-                                            <button class="btn btn-danger report-btn">
-                                                Report
-                                            </button>
-                                        </div>
-                                    }
-                                </td>
-                            </tr>
+                        <tr id="tr-@item.OrderId">
+                            <td class="td-id">
+                                @item.OrderId
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.RequestId)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ItemNo)
+                            </td>
+                            <td class="td-qty">
+                                @Html.DisplayFor(modelItem => item.Qty)
+                            </td>
+                            <td class="td-moved">
+                                @Html.DisplayFor(modelItem => item.Moved)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AlcFrom)
+                            </td>
+                            <td class="to-code">
+                                @Html.DisplayFor(modelItem => item.AlcToCode)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AlcToDesc)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.MvmTime)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ConfirmBy)
+                            </td>
+                            <td>
+                                @if (item.Confirmed == true)
+                                {
+                                    <p class="badge bg-success"> Allocated </p>
+                                }
+                                else
+                                {
+                                    <div class="p-2 bd-highlight">
+                                        <button class="btn btn-info modal-btn">
+                                            Submit
+                                        </button>
+                                        <button class="btn btn-danger report-btn">
+                                            Report
+                                        </button>
+                                    </div>
+                                }
+                            </td>
+                        </tr>
                         }
 
                     </tbody>
@@ -116,14 +121,14 @@
     
 
     $(document).ready(function () {
-        $('.nav-allocate').addClass('active');
+        $('.nav-movement').addClass('active');
         $('.nav-order').addClass('active');
-        $('#navAllocate').addClass('show');
+        $('#nav-movement').addClass('show');
         $('#new-sup').click(function () {
             $('#file-modal').modal('toggle');
         });
         $('#datatable-search').DataTable({
-            "order": [[9, "asc"]]
+            "order": [[10, "asc"]]
         });
 
     });

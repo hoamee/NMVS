@@ -58,5 +58,9 @@ namespace NMVS.Models
         public DbSet<WorkOrder> WorkOrders { set; get; }
         public DbSet<ProdLine> ProdLines { set; get; }
         public DbSet<WoBill> WoBills { set; get; }
+        public DbSet<SalesOrder> SalesOrders { set; get; }
+        public DbSet<SoDetail> SoDetails { set; get; }
+        public DbSet<Shipper> Shippers { set; get; }
+        public DbSet<ShipperDet> ShipperDets { set; get; }
     }
 }

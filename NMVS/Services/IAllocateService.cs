@@ -20,5 +20,7 @@ namespace NMVS.Services
         public List<AllocateRequestVm> GetItemAllocateHistory(int ptId);
 
         public List<ItemMasterVm> GetUnAllocated();
+
+        public CommonResponse<int> ConfirmSelectLoc(JsPickingData jsArr);
     }
 }

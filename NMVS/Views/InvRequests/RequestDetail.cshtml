@@ -143,7 +143,7 @@
                                         {
                                             if (item.Quantity > item.Picked || item.Picked == 0)
                                             {
-                                                <div class="btn btn-outline-info">Picking list</div>
+                                                <a class="btn btn-outline-info" href="/InvRequests/PickListSO/?id=@item.DetId">Picking list</a>
                                             }
                                         }
                                     </td>
@@ -181,24 +181,27 @@
                                 </tr>
 
                             }
-                            <tr>
-                                <td colspan="8" class="text-center col-6">
-                                    <a class="btn btn-primary" href="/InvRequests/RequestDetCreate/@Model.Rq.Id">
-                                        <span><i class="bi bi-plus-circle"></i></span>
-                                        <span>
-                                            Add item
-                                        </span>
-                                    </a>
+                            @if (Model.Rq.RqType == "MFG")
+                            {
+                                <tr>
+                                    <td colspan="8" class="text-center col-6">
+                                        <a class="btn btn-primary" href="/InvRequests/RequestDetCreate/@Model.Rq.Id">
+                                            <span><i class="bi bi-plus-circle"></i></span>
+                                            <span>
+                                                Add item
+                                            </span>
+                                        </a>
 
-                                    <a class="btn btn-primary" href="/SaleOrders/SoConfirm/">
-                                        <span><i class="bi bi-check"></i></span>
-                                        <span>
-                                            Close
-                                        </span>
-                                    </a>
+                                        <a class="btn btn-primary" href="/SaleOrders/SoConfirm/">
+                                            <span><i class="bi bi-check"></i></span>
+                                            <span>
+                                                Close
+                                            </span>
+                                        </a>
 
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
 
                     </table>
@@ -211,3 +214,11 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $('.nav-request').addClass('active');
+        $('.nav-rq-his').addClass('active');
+        $('#navRequest').addClass('show');
+    });
+</script>

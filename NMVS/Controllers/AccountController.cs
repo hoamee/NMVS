@@ -105,21 +105,39 @@ namespace NMVS.Controllers
         {
             if (ModelState.IsValid)
             {
-                var newUser = new ApplicationUser
+                var userCount = _userManager.Users.Count();
+                if (userCount >= 20)
                 {
-                    FullName = model.FullName,
-                    UserName = model.Account,
-                    Email = model.Email
-                };
-
-                var result = await _userManager.CreateAsync(newUser, model.Password);
-
-                if (result.Succeeded)
-                {
-                    await _signInManager.SignInAsync(newUser, isPersistent: false);
-
-                    return RedirectToAction("Index", "Home");
+                    ModelState.AddModelError("", "The number of users has reached the limit. Please update the licence!");
                 }
+                else
+                {
+                    try
+                    {
+                        var newUser = new ApplicationUser
+                        {
+                            FullName = model.FullName,
+                            UserName = model.Account,
+                            Email = model.Email,
+                            Active = false
+                        };
+
+                        var result = await _userManager.CreateAsync(newUser, model.Password);
+
+                        if (result.Succeeded)
+                        {
+                            await _signInManager.SignInAsync(newUser, isPersistent: false);
+
+                            return RedirectToAction("Index", "Home");
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        ModelState.AddModelError("", "An error has occurred.");
+                    }
+                }
+
+                
 
             }
             return View();

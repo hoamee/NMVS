@@ -18,6 +18,8 @@ namespace NMVS.Models.ViewModels
         public string whcd { set; get; }
         public double qty { set; get; }
         public int id { set; get; }
+        public int shipper { set; get; }
+        public int det { set; get; }
         public string loc { set; get; }
         public DateTime reqTime { set; get; }
     }

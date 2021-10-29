@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NMVS.Models;
 using NMVS.Models.DbModels;
+using NMVS.Models.ViewModels;
 using NMVS.Services;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace NMVS.Controllers
         {
             //if (User.IsInRole("WH Manager") || User.IsInRole("Sales Manager"))
             //{
-            
+
             return View(_service.GetRequestList());
             //}
             //else
@@ -77,7 +78,7 @@ namespace NMVS.Controllers
             }
 
             var model = _service.GetRequestDetail(id);
-            
+
             if (model == null)
             {
                 return NotFound();
@@ -85,13 +86,135 @@ namespace NMVS.Controllers
             return View(model);
         }
 
-        public ActionResult RequestDetCreate(string id)
+        public IActionResult RequestDetCreate(string id)
         {
-            ViewBag.ItemNo = _db.ItemDatas.ToList();
+            List<ItemAvailVm> ls = new();
+            var ptMstr = _db.ItemMasters.ToList();
+            foreach (var item in _db.ItemDatas.ToList())
+            {
+                var pt = ptMstr.Where(x => x.ItemNo == item.ItemNo);
+                double avail = 0;
+                if (pt.Any())
+                {
+                    var hold = pt.Sum(x => x.PtHold);
+                    var qty = pt.Sum(x => x.PtQty);
+                    avail = qty - hold;
+                }
+
+                ls.Add(new ItemAvailVm
+                {
+                    ItemNo = item.ItemNo,
+                    Quantity = avail,
+                    Desc = item.ItemName
+                });
+            }
+
+            ViewBag.ItemList = ls;
 
             ViewBag.RqId = id;
 
             return View();
         }
+
+        [HttpPost]
+        public IActionResult RequestDetCreate(RequestDet det)
+        {
+            if (ModelState.IsValid)
+            {
+                bool valid = true;
+                if (det.SpecDate != null)
+                {
+                    var pt = _db.ItemMasters.Where(x => x.ItemNo == det.ItemNo && det.SpecDate == x.PtDateIn.Date).Sum(x => x.PtQty - x.PtHold);
+
+                    if (pt < det.Quantity || det.Quantity <= 0)
+                    {
+                        ModelState.AddModelError("", "Quantity should be less or equal to available quantity. And greater than 0");
+                        valid = false;
+                    }
+                }
+
+                if (valid)
+                {
+                    det.Arranged = 0;
+                    det.Issued = 0;
+                    det.Picked = 0;
+                    _db.RequestDets.Add(det);
+                    _db.SaveChanges();
+                    return RedirectToAction("RequestDetail", new { id = det.RqID });
+                }
+            }
+
+            List<ItemAvailVm> ls = new();
+            var ptMstr = _db.ItemMasters.ToList();
+            foreach (var item in _db.ItemDatas.ToList())
+            {
+                var pt = ptMstr.Where(x => x.ItemNo == item.ItemNo);
+                double avail = 0;
+                if (pt.Any())
+                {
+                    var hold = pt.Sum(x => x.PtHold);
+                    var qty = pt.Sum(x => x.PtQty);
+                    avail = qty - hold;
+                }
+
+                ls.Add(new ItemAvailVm
+                {
+                    ItemNo = item.ItemNo,
+                    Quantity = avail,
+                    Desc = item.ItemName
+                });
+            }
+
+            ViewBag.ItemList = ls;
+
+            ViewBag.RqId = det.RqID;
+
+            return View();
+        }
+
+        public IActionResult GetItemMaster(string id)
+        {
+            CommonResponse<List<ItemAvailVm>> commonResponse = new();
+
+            commonResponse.dataenum = _service.GetItemAvails(id);
+            if (commonResponse.dataenum.Any())
+            {
+                commonResponse.status = 1;
+                commonResponse.message = "OK";
+            }
+            else
+            {
+                commonResponse.status = -1;
+                commonResponse.message = "No available items in warehouse";
+            }
+
+            return Ok(commonResponse);
+
+        }
+
+        public IActionResult PickListSO(int id)
+        {
+            var rq = _db.RequestDets.Find(id);
+
+            ViewBag.DetId = id;
+            ViewBag.RqId = rq.RqID;
+            ViewBag.qty = rq.Quantity - rq.Picked;
+            ViewBag.History = _db.IssueOrders.Where(x => x.DetId == id).ToList();
+
+            ViewBag.LocList = new SelectList(_db.Shippers
+                .Where(x => string.IsNullOrEmpty(x.CheckOutBy))
+                .ToList(), "ShpId", "ShpDesc");
+
+            if (rq.SpecDate == null)
+            {
+                return View(_service.GetItemMasterVms(rq));
+            }
+            else
+            {
+                return View(_service.GetItemMasterVms(rq).Where(x => x.DateIn.Date == rq.SpecDate));
+            }
+        }
+
+        
     }
 }

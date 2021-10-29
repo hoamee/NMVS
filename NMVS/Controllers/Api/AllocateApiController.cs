@@ -18,15 +18,16 @@ namespace NMVS.Controllers.Api
     public class AllocateApiController : Controller
     {
         private readonly IIncomingService _service;
+        private readonly IAllocateService _alcService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         ApplicationDbContext _context;
 
-        public AllocateApiController(IIncomingService service, IHttpContextAccessor httpContextAccessor, ApplicationDbContext context)
+        public AllocateApiController(IIncomingService service, IHttpContextAccessor httpContextAccessor, ApplicationDbContext context, IAllocateService allocateService)
         {
             _context = context;
             _service = service;
             _httpContextAccessor = httpContextAccessor;
-
+            _alcService = allocateService;
         }
 
 
@@ -64,6 +65,7 @@ namespace NMVS.Controllers.Api
                     AlcFrom = pt.LocCode,
                     LocCode = t.whcd,
                     AlcQty = t.qty,
+                    AlcFromDesc = fromLoc.LocDesc,
                     MovementTime = t.reqTime
                 });
 
@@ -86,56 +88,7 @@ namespace NMVS.Controllers.Api
         [Route("ConfirmSelectLoc")]
         public IActionResult ConfirmSelectLoc(JsPickingData jsArr)
         {
-            CommonResponse<int> common = new();
-
-            try
-            {
-                //Test response
-                //string s = jsArr[0].id + ", " + jsArr[0].whcd + ", " + jsArr[0].qty;
-                //return Json(s);
-                var arr = jsArr;
-                //   3. Add holding to To-Loc
-                var toLoc = _context.Locs.Find(arr.loc);
-
-
-                //Get Item master
-                var pt = _context.ItemMasters.Find(arr.id);
-                var fromLoc = _context.Locs.Find(pt.LocCode);
-
-                //   2.Add holding to From-item
-                pt.PtHold += arr.qty;
-
-
-                toLoc.LocHolding += arr.qty;
-
-                //   4. Add Outgo to From-Loc
-                fromLoc.LocOutgo += arr.qty;
-
-
-                _context.AllocateRequests.Add(new AllocateRequest()
-                {
-                    PtId = pt.PtId,
-                    AlcFrom = pt.LocCode,
-                    LocCode = arr.loc,
-                    AlcQty = arr.qty,
-                    AlcFromDesc = fromLoc.LocDesc,
-                    MovementTime = arr.reqTime
-                });
-                _context.Update(fromLoc);
-                _context.Update(toLoc);
-                _context.Update(pt);
-                _context.SaveChanges();
-                common.status = 1;
-                common.message += "Success";
-
-
-            }
-            catch (Exception e)
-            {
-                common.status = -1;
-                common.message = e.ToString();
-            }
-            return Json(common);
+            return Ok(_alcService.ConfirmSelectLoc(jsArr));
         }
 
         [HttpPost]
@@ -245,7 +198,11 @@ namespace NMVS.Controllers.Api
                 //   Set confirm = true
                 var order = await _context.AllocateOrders.FindAsync(alo.AlcOrdId);
                 var pt = await _context.ItemMasters.FindAsync(order.PtId);
-                order.Confirm = true;
+                order.MovedQty += alo.MovedQty;
+                if (order.MovedQty >= order.AlcOrdQty)
+                {
+                    order.Confirm = true;
+                }
                 //   Set confirmedBy = logged user
                 var loggedUser = User.Identity.Name;
                 order.ConfirmedBy = loggedUser;
@@ -319,7 +276,7 @@ namespace NMVS.Controllers.Api
 
                         // 1. decrease request qty
                         // 2. add note
-                        request.AlcCmmt += "**Order " + report.OrId + ": report quantity of " + report.Qty + ". Message:" + report.Note + ", By "+ _httpContextAccessor.HttpContext.User.Identity.Name + "; ";
+                        request.AlcCmmt += "**Order " + report.OrId + ": report quantity of " + report.Qty + ". Message:" + report.Note + ", By " + _httpContextAccessor.HttpContext.User.Identity.Name + "; ";
                         request.AlcQty -= report.Qty;
 
                         // decrease item master hold qty
@@ -396,7 +353,7 @@ namespace NMVS.Controllers.Api
                 var uq = await _context.Unqualifieds.FindAsync(report.OrId);
                 if (uq != null)
                 {
-                    var transac =  new UnqualifiedTransac
+                    var transac = new UnqualifiedTransac
                     {
                         ByUser = _httpContextAccessor.HttpContext.User.Identity.Name,
                         IsDisposed = report.Retrn,
@@ -422,7 +379,7 @@ namespace NMVS.Controllers.Api
 
                     _context.Add(transac);
                     _context.Update(uq);
-                     
+
                     _context.SaveChanges();
 
                     common.status = 1;
@@ -441,6 +398,59 @@ namespace NMVS.Controllers.Api
             }
 
             return Ok(common);
+        }
+
+        [HttpPost]
+        [Route("PushPickListSo")]
+        public async Task<IActionResult> PushPickListSo(List<JsPickingData> js)
+        {
+            var message = "";
+            //Test response
+            //string s = jsArr[1].id + ", " + jsArr[1].whcd + ", " + jsArr[1].qty;
+            //return Json(id);
+
+            //2.Get request data
+
+            foreach (var jsArr in js)
+            {
+
+
+                var request = _context.RequestDets.Where(x => x.DetId == jsArr.det).FirstOrDefault();
+                var shp = await _context.Shippers.FindAsync(jsArr.shipper);
+
+
+                var pt = await _context.ItemMasters.FindAsync(jsArr.id);
+                var fromLoc = await _context.Locs.FindAsync(pt.LocCode);
+                //   3. Add holding to From-item
+                pt.PtHold += jsArr.qty;
+
+                request.Picked += jsArr.qty;
+                // 4. Add Outgo to From-Loc
+                fromLoc.LocOutgo += jsArr.qty;
+
+
+                _context.IssueOrders.Add(new IssueOrder()
+                {
+                    ExpOrdQty = jsArr.qty,
+                    IssueType = "Issue",
+                    ItemNo = pt.ItemNo,
+                    LocCode = pt.LocCode,
+                    OrderBy = User.Identity.Name,
+                    ToVehicle = shp.ShpId,
+                    DetId = request.DetId,
+                    RqID = request.RqID,
+                    PtId = pt.PtId,
+                    MovementTime = jsArr.reqTime
+                });
+
+                _context.Update(request);
+                _context.Update(pt);
+                _context.Update(fromLoc);
+                _context.SaveChanges();
+                message = "Success!";
+            }
+
+            return Ok(message);
         }
     }
 }

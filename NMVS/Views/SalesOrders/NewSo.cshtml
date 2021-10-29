@@ -1,0 +1,130 @@
+﻿@model NMVS.Models.DbModels.SalesOrder
+
+@{
+    ViewData["Title"] = "New Sales order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form asp-action="NewSo">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group col-md-4">
+                                <label asp-for="SoNbr" class="control-label"></label>
+                                <input asp-for="SoNbr" class="form-control" />
+                                <span asp-validation-for="SoNbr" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CustCode" class="control-label">Sold-To</label>
+                                <div class="row col-md-12">
+                                    <div class="col-md-4">
+                                        <input asp-for="CustCode" class="form-control" readonly />
+                                    </div>
+                                    <div class="col-md-6 align-center" >
+                                        <div id="cust-name"></div>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="CustCode" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ShipTo" class="control-label"></label>
+                                <div class="row col-md-12">
+                                    <span class="col-md-4">
+                                        <input asp-for="ShipTo" class="form-control" readonly />
+                                    </span>
+                                    <div class="col-md-6">
+                                        <p id="cust-addr"></p>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="ShipTo" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label asp-for="OrdDate" class="control-label"></label>
+                                <input asp-for="OrdDate" class="form-control" />
+                                <span asp-validation-for="OrdDate" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label asp-for="ReqDate" class="control-label"></label>
+                                <input asp-for="ReqDate" class="form-control" />
+                                <span asp-validation-for="ReqDate" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label asp-for="DueDate" class="control-label"></label>
+                                <input asp-for="DueDate" class="form-control" />
+                                <span asp-validation-for="DueDate" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label asp-for="PriceDate" class="control-label"></label>
+                                <input asp-for="PriceDate" class="form-control" />
+                                <span asp-validation-for="PriceDate" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label asp-for="SoCurr" class="control-label"></label>
+                                <input asp-for="SoCurr" class="form-control" />
+                                <span asp-validation-for="SoCurr" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label asp-for="ShipVia" class="control-label"></label>
+                                <input asp-for="ShipVia" class="form-control" />
+                                <span asp-validation-for="ShipVia" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label asp-for="Comment" class="control-label"></label>
+                                <input asp-for="Comment" class="form-control" />
+                                <span asp-validation-for="Comment" class="text-danger"></span>
+                            </div>
+                           
+                            
+                            <div class="form-group">
+                                <input type="submit" value="Submit" class="btn btn-outline-primary" />
+
+                                <a asp-action="Browse" class="btn btn-secondary">Back to List</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<partial name="_ValidationScriptsPartial" />
+<script>
+    function setCustomer(no, name) {
+        $('#CustCode').val(no);
+        $('#cust-name').text(name);
+        $('#customer-modal').modal('toggle');
+    };
+
+    function setAddr(no, addr) {
+        $('#ShipTo').val(no);
+        $('#cust-addr').text(addr);
+        $('#addr-modal').modal('toggle');
+    };
+
+    $(document).ready(function () {
+        $('.nav-sale').addClass('active');
+
+        $('#CustCode').click(function () {
+            $('#customer-modal').modal('toggle');
+
+        });
+
+        $('#ShipTo').click(function () {
+            $('#addr-modal').modal('toggle');
+
+        });
+        
+    });
+</script>
+
+<partial name="CustomerModal" />
+<partial name="AddressModal" />

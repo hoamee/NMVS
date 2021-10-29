@@ -1,0 +1,161 @@
+﻿@model IEnumerable<NMVS.Models.ViewModels.SoVm>
+
+@{
+    ViewData["Title"] = "Sales order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-flush" id="datatable-search">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SO
+                                </th>
+                                <th>
+                                    Sold-To
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.ShipTo)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.OrdDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.ReqDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.DueDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.PriceDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.SoCurr)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.ShipVia)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Comment)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Confirm)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.ConfirmBy)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.UpdatedBy)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.UpdatedOn)
+                                </th>
+                               
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <a class="btn btn-outline-info" href="/SalesOrders/Details/@item.SoNbr">@Html.DisplayFor(modelItem => item.SoNbr)</a>
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.CustCode)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ShipTo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.OrdDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ReqDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DueDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.PriceDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.SoCurr)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ShipVia)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Comment)
+                                    </td>
+                                    <td>
+                                        @if (item.Confirm)
+                                        {
+                                            <span class="badge bg-success">Yes</span>
+                                        }
+                                        else
+                                        {
+                                            if (string.IsNullOrEmpty(item.ConfirmBy))
+                                            {
+
+
+                                                <span class="badge bg-secondary">Not yet</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">Dinied</span>
+                                            }
+                                        }
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ConfirmBy)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.UpdatedBy)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.UpdatedOn)
+                                    </td>
+                                    
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+
+                <div class="row col-12">
+                    <span class="col-auto">
+                        <a asp-action="NewSo" class="btn btn-sm btn-outline-info">
+                            New Sales order
+                        </a>
+                    </span>
+
+                    <span class="col-auto">
+                        <button class="btn btn-sm btn-outline-info" id="new-cust">
+                            <span class="fa fa-cloud-upload"></span>
+                            <span>Upload</span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('.nav-sale').addClass('active');
+        $('#datatable-search').DataTable();
+    });
+</script>

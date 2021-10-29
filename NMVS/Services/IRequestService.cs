@@ -1,4 +1,5 @@
-﻿using NMVS.Models.ViewModels;
+﻿using NMVS.Models.DbModels;
+using NMVS.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,9 @@ namespace NMVS.Services
         public List<InvRequestVm> GetRequestList();
 
         public RequestDetailVm GetRequestDetail(string id);
+
+        public List<ItemAvailVm> GetItemAvails(string id);
+
+        public List<ItemMasterVm> GetItemMasterVms(RequestDet rq);
     }
 }

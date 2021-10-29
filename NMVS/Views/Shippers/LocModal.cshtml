@@ -1,0 +1,72 @@
+﻿<!-- Modal -->
+
+<div class="modal" tabindex="-1" id="loc-modal">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" style="height: 100%">
+            <div class="modal-header">
+                <h5 class="modal-title">Items</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table " id="item-tb">
+                    <thead>
+                        <tr>
+                            <th>
+                                Item no.
+                            </th>
+                            <th>
+                                Item description
+                            </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in ViewBag.Loc)
+                        {
+                            <tr>
+                                <td>
+                                    <button type="button" class="btn btn-outline-primary" onclick="setLoc('@item.LocCode', '@item.LocDesc')">@item.LocCode</button>
+                                </td>
+                                <td>
+                                    @item.LocDesc
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function setLoc(no, name) {
+        $('#Loc').val(no);
+        $('#loc-name').text(name);
+        $('#loc-modal').modal('toggle');
+    };
+
+    
+
+    $(document).ready(function () {
+        $('.nav-sale').addClass('active');
+
+        $('#CustCode').click(function () {
+            $('#customer-modal').modal('toggle');
+
+        });
+
+        $('#ShipTo').click(function () {
+            $('#addr-modal').modal('toggle');
+
+        });
+
+    });
+</script>

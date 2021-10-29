@@ -31,6 +31,19 @@
             </li>
 
             <li class="nav-item mt-3">
+                <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6"> Sales</h6>
+            </li>
+
+            <li class="nav-item nav-sale">
+                <a class="nav-link nav-sale" href="/SalesOrders/Browse">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <span class="fa fa-dollar"></span>
+                    </div>
+                    <span class="nav-link-text ms-1">Sales Order</span>
+                </a>
+            </li>
+
+            <li class="nav-item mt-3">
                 <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6"> Inventory</h6>
             </li>
 
@@ -47,12 +60,6 @@
                             <a class="nav-link nav-rq-his" href="/InvRequests/History">
                                 <span class="sidenav-mini-icon"> AR </span>
                                 <span class="sidenav-normal"> Request history</span>
-                            </a>
-                        </li>
-                        <li class="nav-item nav-order">
-                            <a class="nav-link " href="/Allocate/Orders">
-                                <span class="sidenav-mini-icon"> Ord </span>
-                                <span class="sidenav-normal"> Allocate Orders</span>
                             </a>
                         </li>
 
@@ -83,6 +90,30 @@
                                 <span class="sidenav-normal"> Allocate requests</span>
                             </a>
                         </li>
+                     
+
+                        <li class="nav-item nav-un">
+                            <a class="nav-link " href="/Allocate/Unallocated">
+                                <span class="sidenav-mini-icon"> U </span>
+                                <span class="sidenav-normal"> Uncallocated</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+            </li>
+
+
+            <li class="nav-item">
+                <a data-bs-toggle="collapse" href="#nav-movement" class="nav-link nav-movement" aria-controls="nav-movement" role="button" aria-expanded="false">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <span class="fa fa-luggage-cart"></span>
+                    </div>
+                    <span class="nav-link-text ms-1">Movement</span>
+                </a>
+                <div class="collapse nav-movement" id="nav-movement">
+                    <ul class="nav ms-4 ps-3">
+
                         <li class="nav-item nav-order">
                             <a class="nav-link " href="/Allocate/Orders">
                                 <span class="sidenav-mini-icon"> Ord </span>
@@ -90,10 +121,10 @@
                             </a>
                         </li>
 
-                        <li class="nav-item nav-un">
-                            <a class="nav-link " href="/Allocate/Unallocated">
-                                <span class="sidenav-mini-icon"> U </span>
-                                <span class="sidenav-normal"> Uncallocated</span>
+                        <li class="nav-item nav-iu">
+                            <a class="nav-link " href="/IssueOrders/Browse">
+                                <span class="sidenav-mini-icon"> I </span>
+                                <span class="sidenav-normal"> Issue orders</span>
                             </a>
                         </li>
                     </ul>
@@ -135,6 +166,15 @@
                 <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6"><span class="fa fa-truck"></span> Vehicle</h6>
             </li>
 
+            <li class="nav-item nav-ship">
+                <a class="nav-link nav-ship" href="/Shippers/Browse">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <span class="fa fa-truck-moving"></span>
+                    </div>
+                    <span class="nav-link-text ms-1">Vehicles</span>
+                </a>
+            </li>
+
 
             <li class="nav-item">
                 <a data-bs-toggle="collapse" href="#navGuard" class="nav-link nav-guard" aria-controls="navGuard" role="button" aria-expanded="false">
@@ -143,16 +183,16 @@
                     </div>
                     <span class="nav-link-text ms-1">Guard</span>
                 </a>
-                <div class="collapse nav-chk-in" id="navGuard">
+                <div class="collapse nav-ck-in" id="navGuard">
                     <ul class="nav ms-4 ps-3">
                         <li class="nav-item ">
-                            <a class="nav-link nav-all-user" href="/Users">
+                            <a class="nav-link  nav-ck-in" href="/Shippers/Checkin">
                                 <span class="sidenav-mini-icon"> In </span>
                                 <span class="sidenav-normal"> Check in</span>
                             </a>
                         </li>
                         <li class="nav-item nav-chk-out">
-                            <a class="nav-link " href="/Users/UserRole">
+                            <a class="nav-link " href="/Shippers/CheckOut">
                                 <span class="sidenav-mini-icon"> Out </span>
                                 <span class="sidenav-normal"> Check out</span>
                             </a>

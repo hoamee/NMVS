@@ -1,0 +1,87 @@
+﻿@model NMVS.Models.DbModels.Shipper
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Edit</h1>
+
+<h4>Shipper</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ShpId" />
+            <div class="form-group">
+                <label asp-for="ShpDesc" class="control-label"></label>
+                <input asp-for="ShpDesc" class="form-control" />
+                <span asp-validation-for="ShpDesc" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Driver" class="control-label"></label>
+                <input asp-for="Driver" class="form-control" />
+                <span asp-validation-for="Driver" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DrContact" class="control-label"></label>
+                <input asp-for="DrContact" class="form-control" />
+                <span asp-validation-for="DrContact" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ShpTo" class="control-label"></label>
+                <input asp-for="ShpTo" class="form-control" />
+                <span asp-validation-for="ShpTo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ShpVia" class="control-label"></label>
+                <input asp-for="ShpVia" class="form-control" />
+                <span asp-validation-for="ShpVia" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateIn" class="control-label"></label>
+                <input asp-for="DateIn" class="form-control" />
+                <span asp-validation-for="DateIn" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ActualIn" class="control-label"></label>
+                <input asp-for="ActualIn" class="form-control" />
+                <span asp-validation-for="ActualIn" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ActualOut" class="control-label"></label>
+                <input asp-for="ActualOut" class="form-control" />
+                <span asp-validation-for="ActualOut" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CheckInBy" class="control-label"></label>
+                <input asp-for="CheckInBy" class="form-control" />
+                <span asp-validation-for="CheckInBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CheckOutBy" class="control-label"></label>
+                <input asp-for="CheckOutBy" class="form-control" />
+                <span asp-validation-for="CheckOutBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Loc" class="control-label"></label>
+                <input asp-for="Loc" class="form-control" />
+                <span asp-validation-for="Loc" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RegisteredBy" class="control-label"></label>
+                <input asp-for="RegisteredBy" class="form-control" />
+                <span asp-validation-for="RegisteredBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

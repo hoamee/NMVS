@@ -21,6 +21,9 @@
                                 Quantity
                             </th>
                             <th>
+                                Moved
+                            </th>
+                            <th>
                                 From
                             </th>
                             <th>
@@ -44,7 +47,11 @@
                     </tbody>
                 </table>
             </div>
-
+            <div class="form-group text-xl-center">
+                <label class="form-check-label text-primary ">
+                    Movement Quantity <input type="number" class="form-control" id="moved-qty" step="0.01" />
+                </label>
+            </div>
             <div id="reader" width="80%">
             </div>
             <div class="modal-footer">
@@ -76,6 +83,9 @@
                             </th>
                             <th>
                                 Quantity
+                            </th>
+                            <th>
+                                Moved
                             </th>
                             <th>
                                 From
@@ -137,56 +147,75 @@
         $('#confirm-end').click(function () {
 
             var desCode = $('#table2 .to-code').text().trim();
-            var html5QrcodeScanner = new Html5QrcodeScanner(
-                "reader", { fps: 60, qrbox: 500 });
+            var qty = $('#moved-qty').val();
+            var oQty = parseFloat($('#table2 #t2-tr').children('.td-qty').text().trim()) - parseFloat($('#table2 #t2-tr').children('.td-moved').text().trim());
 
-            function onScanSuccess(decodedText, decodedResult) {
-                // Handle on success condition with the decoded text or result.
-                console.log(`Scan result: ${decodedText}`, decodedResult);
-                var desInput = decodedText;
-                html5QrcodeScanner.clear();
-                if (desInput !== desCode) {
-                    alert('Incorrect destination! Please check your destination again!');
-                }
-                else {
-                    var oId = parseInt($('#table2 .td-id').text().trim());
-                    var alo = {
-                        AlcOrdId: oId
-                    };
+            if (qty > oQty) {
+                $('#moved-qty').notify('Report quantity could\'nt be larger than order quantity');
+            }
+            else if (qty <= 0) {
+                $('#moved-qty').notify('Report quantity could\'nt be less than or equal to 0');
+            } else {
 
-                    $.ajax({
-                        contentType: 'application/json; charset=utf-8',
-                        dataType: 'json',
-                        type: 'POST',
-                        url: routeURL + '/api/Allocate/FinishOrder',
-                        data: JSON.stringify(alo),
-                        onBegin: function () {
-                            $('#confirm-end').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...');
-                        },
-                        success: function (data) {
-                            if (data.status == 1) {
-                                $("#exampleModal").modal('toggle');
-                                $(`#table1 tbody #tr-${oId} td:last`).html('<p class="badge bg-success"> Allocated </p>');
-                                $('#reader').html('');
-                                $.notify("Success", "success");
-                            } else {
-                                $.notify("An error occurred");
+
+
+                var html5QrcodeScanner = new Html5QrcodeScanner(
+                    "reader", { fps: 60, qrbox: 500 });
+
+                function onScanSuccess(decodedText, decodedResult) {
+                    // Handle on success condition with the decoded text or result.
+                    console.log(`Scan result: ${decodedText}`, decodedResult);
+                    var desInput = decodedText;
+                    html5QrcodeScanner.clear();
+                    if (desInput !== desCode) {
+                        alert('Incorrect destination! Please check your destination again! ' + desInput);
+                    }
+                    else {
+                        var oId = parseInt($('#table2 .td-id').text().trim());
+                        var alo = {
+                            AlcOrdId: oId,
+                            MovedQty: qty
+                        };
+
+                        $.ajax({
+                            contentType: 'application/json; charset=utf-8',
+                            dataType: 'json',
+                            type: 'POST',
+                            url: routeURL + '/api/Allocate/FinishOrder',
+                            data: JSON.stringify(alo),
+                            onBegin: function () {
+                                $('#confirm-end').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...');
+                            },
+                            success: function (data) {
+                                if (data.status == 1) {
+                                    $("#exampleModal").modal('toggle');
+                                    $(`#table1 tbody #tr-${oId} td:last`).html('<p class="badge bg-success"> Allocated </p>');
+                                    $('#reader').html('');
+                                    $.notify("Success", "success");
+                                    
+
+                                } else {
+                                    $.notify("An error occurred");
+                                }
+
+                            },
+                            failure: function (response) {
+                                alert(response);
+                            },
+                            complete: function () {
+                                $('#confirm-end').html('Save changes');
                             }
 
-                        },
-                        failure: function (response) {
-                            alert(response);
-                        },
-                        complete: function () {
-                            $('#confirm-end').html('Save changes');
-                        }
+                        });
 
-                    });
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 1000);
+                    }
                 }
+                html5QrcodeScanner.render(onScanSuccess);
+
             }
-            html5QrcodeScanner.render(onScanSuccess);
-
-
         });
 
         $('.report-btn').click(function () {
@@ -255,7 +284,7 @@
                                     $.notify(data.message, 'error');
                                 }
 
-                               
+
                             },
                             failure: function (response) {
                                 bootbox.alert(response);

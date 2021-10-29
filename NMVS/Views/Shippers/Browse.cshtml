@@ -1,0 +1,119 @@
+﻿@model IEnumerable<NMVS.Models.DbModels.Shipper>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-flush" id="datatable-search">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Id
+                                </th>
+                                <th>
+                                    Vehicle
+                                </th>
+                                <th>
+                                    Driver
+                                </th>
+                                <th>
+                                    Loading port
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.ShpTo)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.ShpVia)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.DateIn)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.ActualIn)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.ActualOut)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RegisteredBy)
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ShpId)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ShpDesc)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Driver) (@Html.DisplayFor(modelItem => item.DrContact))
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Loc)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ShpTo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ShpVia)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DateIn)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ActualIn)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ActualOut)
+                                    </td>
+                                   <td>
+                                        @Html.DisplayFor(modelItem => item.RegisteredBy)
+                                    </td>
+                                    <td>
+                                        <a asp-action="Edit" asp-route-id="@item.ShpId">Edit</a> |
+                                        <a asp-action="Details" asp-route-id="@item.ShpId">Details</a> |
+                                        <a asp-action="Delete" asp-route-id="@item.ShpId">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+
+                <div class="row col-12">
+                    <span class="col-auto">
+                        <a asp-action="Register" class="btn btn-sm btn-outline-info">
+                            Register
+                        </a>
+                    </span>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('.nav-ship').addClass('active');
+        $('#datatable-search').DataTable();
+    });
+</script>

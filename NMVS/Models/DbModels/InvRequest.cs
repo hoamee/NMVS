@@ -58,8 +58,8 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Issued")]
         public double? Issued { get; set; }
 
+        [Required]
         [Display(Name = "Date required")]
-        [DataType(DataType.Date)]
         public DateTime? RequireDate { get; set; }
 
         public double Arranged { set; get; }
@@ -71,6 +71,7 @@ namespace NMVS.Models.DbModels
 
         [Display(Name = "Issue Date")] public DateTime? IssueOn { get; set; }
 
+        [DataType(DataType.Date)]
         [Display(Name = "Date in")]
         public DateTime? SpecDate { set; get; }
 

@@ -20,6 +20,9 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Quantity")]
         public double AlcOrdQty { set; get; }
 
+        [Display(Name = "Moved quantity")]
+        public double MovedQty { set; get; }
+
         [Display(Name = "Allocate From")]
         public string AlcOrdFrom { get; set; }
 
