@@ -53,7 +53,7 @@
             </div>
             <div class="form-group text-xl-center">
                 <label class="form-check-label text-primary ">
-                    Movement Quantity <input type="number" class="form-control" id="moved-qty" step="0.01" />
+                    Movement Quantity <input type="number" class="form-control" id="moving-qty" step="0.01" />
                 </label>
             </div>
             <div id="reader" width="80%">
@@ -145,20 +145,27 @@
             $('#table2 #t2-tr').html($(this).closest('tr').html());
             $('#table2 #t2-tr').children('td:last').remove();
             $('#exampleModal').modal('toggle');
+           
         });
 
 
         $('#confirm-end').click(function () {
 
-            var desCode = $('#table2 .to-code').text().trim();
-            var qty = $('#moved-qty').val();
-            var oQty = parseFloat($('#table2 #t2-tr').children('.td-qty').text().trim()) - parseFloat($('#table2 #t2-tr').children('.td-moved').text().trim());
+            var desCode = $('#table2').find('.exp-to-ve').text().trim();
+            if (desCode == "") {
+                detCode = $('#table2').find('.exp-to-loc').text().trim();
+            } 
 
-            if (qty > oQty) {
-                $('#moved-qty').notify('Report quantity could\'nt be larger than order quantity');
+
+            var qty = parseFloat($('#moving-qty').val());
+            var remainQty = parseFloat($('#table2 #t2-tr').find('.exp-qty').text().trim()) - parseFloat($('#table2 #t2-tr').find('.exp-moved').text().trim());
+            
+
+            if (qty > remainQty) {
+                $('#moving-qty').notify('Report quantity could\'nt be larger than order quantity');
             }
             else if (qty <= 0) {
-                $('#moved-qty').notify('Report quantity could\'nt be less than or equal to 0');
+                $('#moving-qty').notify('Report quantity could\'nt be less than or equal to 0');
             } else {
 
 
@@ -175,32 +182,22 @@
                         alert('Incorrect destination! Please check your destination again! ' + desInput);
                     }
                     else {
-                        var oId = parseInt($('#table2 .td-id').text().trim());
+                        var oId = parseInt($('#table2').find('.exp-id').text().trim());
                         var alo = {
                             AlcOrdId: oId,
-                            MovedQty: qty
+                            AlcOrdQty: qty
                         };
+
+                        var mess = ""
 
                         $.ajax({
                             contentType: 'application/json; charset=utf-8',
                             dataType: 'json',
                             type: 'POST',
-                            url: routeURL + '/api/Allocate/FinishOrder',
+                            url: routeURL + '/api/Allocate/FinishIssueOrder',
                             data: JSON.stringify(alo),
-                            onBegin: function () {
-                                $('#confirm-end').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...');
-                            },
                             success: function (data) {
-                                if (data.status == 1) {
-                                    $("#exampleModal").modal('toggle');
-                                    $(`#table1 tbody #tr-${oId} td:last`).html('<p class="badge bg-success"> Allocated </p>');
-                                    $('#reader').html('');
-                                    $.notify("Success", "success");
-                                    
-
-                                } else {
-                                    $.notify("An error occurred");
-                                }
+                                mess = data;
 
                             },
                             failure: function (response) {
@@ -212,9 +209,11 @@
 
                         });
 
-                        setTimeout(function () {
-                            window.location.reload();
-                        }, 1000);
+                        $('#exampleModal').modal('toggle');
+                        bootbox.alert('<h5 class="text-success"><span class="fas fa-check-double" style="color: green;"></span> ' + mess + '</h5>')
+                        //setTimeout(function () {
+                        //    window.location.reload();
+                        //}, 1000);
                     }
                 }
                 html5QrcodeScanner.render(onScanSuccess);

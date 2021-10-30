@@ -23,6 +23,9 @@
                                 @Html.DisplayNameFor(model => model.IssueType)
                             </th>
                             <th>
+                                Item
+                            </th>
+                            <th>
                                 @Html.DisplayNameFor(model => model.LocCode)
                             </th>
                             <th>
@@ -53,11 +56,32 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
+                            string classColor = "";
+
+                            if (item.ExpOrdQty <= item.MovedQty)
+                            {
+                                classColor = "success";
+                            }
+                            else if (item.MovedQty > 0 && item.MovedQty < item.ExpOrdQty)
+                            {
+
+                                classColor = "warning";
+
+
+                            }
+                            else
+                            {
+                                classColor = "secondary";
+                            }
                             <tr>
-                                
+
                                 <th>
                                     @Html.DisplayFor(modelItem => item.ExpOrdId)
-                                    <span class="det-id" hidden> @item.DetId</span>
+                                    <span class="exp-id" hidden> @item.ExpOrdId</span>
+                                    <span class="exp-qty" hidden> @item.ExpOrdQty</span>
+                                    <span class="exp-moved" hidden> @item.MovedQty</span>
+                                    <span class="exp-to-ve" hidden> @item.ToVehicle</span>
+                                    <span class="exp-to-loc" hidden> @item.ToLoc</span>
                                 </th>
                                 <td>
 
@@ -76,6 +100,9 @@
                                     }
                                 </td>
                                 <td>
+                                    @Html.DisplayFor(modelItem => item.ItemNo)
+                                </td>
+                                <td>
                                     @Html.DisplayFor(modelItem => item.FromLoc)
                                 </td>
                                 <td>
@@ -86,14 +113,8 @@
                                     @Html.DisplayFor(modelItem => item.IssueToDesc)
                                 </td>
                                 <td>
-                                    @if (item.ExpOrdQty <= item.MovedQty)
-                                    {
-                                        <span class="badge bg-success">Issued @item.MovedQty/@item.ExpOrdQty</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary">@item.MovedQty/@item.ExpOrdQty</span>
-                                    }
+                                    <span class="badge bg-@classColor">Issued @item.MovedQty/@item.ExpOrdQty</span>
+
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.ConfirmedBy)

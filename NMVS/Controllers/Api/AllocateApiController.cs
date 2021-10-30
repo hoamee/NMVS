@@ -452,5 +452,110 @@ namespace NMVS.Controllers.Api
 
             return Ok(message);
         }
+
+        [HttpPost]
+        [Route("FinishIssueOrder")]
+        public async Task<IActionResult> FinishIssueOrder(AllocateOrder alo)
+        {
+            var message = "Order not found!";
+
+            var issueQty = alo.AlcOrdQty;
+
+            var order = await _context.IssueOrders.FindAsync(alo.AlcOrdId);
+            
+
+            if (order != null)
+            {
+
+                //Check if shipper is checked out
+                message = "Shipper is already checked out!";
+                var shp = await _context.Shippers.FindAsync(order.ToVehicle);
+                if (string.IsNullOrEmpty(shp.CheckOutBy))
+                {
+                    //Check item exist
+                    message = "Item not found";
+                    var pt = await _context.ItemMasters.FindAsync(order.PtId);
+                    if (pt != null)
+                    {
+                        pt.PtHold -= issueQty;
+                        pt.PtQty -= issueQty;
+
+                        if (pt.PtHold < 0 || pt.PtQty <0)
+                        {
+                            message = "Item quantity error";
+                            return Ok(message);
+                        }
+
+                        _context.Update(pt);
+
+
+                        //check location
+                        message = "From loc not found!";
+                        var fromLoc = await _context.Locs.FindAsync(pt.LocCode);
+                        if (fromLoc != null)
+                        {
+                            fromLoc.LocOutgo -= issueQty;
+                            fromLoc.LocRemain += issueQty;
+
+                            if (fromLoc.LocOutgo < 0 || fromLoc.LocRemain < 0)
+                            {
+                                message = "Location capacity error";
+                                return Ok(message);
+                            }
+                            _context.Update(fromLoc);
+
+
+                            //Check request det
+                            var reDet = await _context.RequestDets.FindAsync(order.DetId);
+                            message = "Request loc not found!";
+                            if (reDet != null)
+                            {
+                                reDet.Arranged += issueQty;
+                                _context.Update(reDet);
+                                if (order.IssueType == "Issue")
+                                {
+                                    var shpDet = _context.ShipperDets.FirstOrDefault(x => x.DetId == order.DetId && x.ShpId == order.ToVehicle);
+                                    if (shpDet == null)
+                                    {
+                                        _context.Add(new ShipperDet
+                                        {
+                                            InventoryId = order.PtId,
+                                            DetId = order.DetId,
+                                            ItemNo = pt.ItemNo,
+                                            Quantity = issueQty,
+                                            RqId = order.RqID,
+                                            ShpId = (int)order.ToVehicle
+                                        });
+
+                                    }
+                                    else
+                                    {
+                                        shpDet.Quantity += issueQty;
+                                        _context.Update(shpDet);
+                                    }
+                                }
+
+                                order.ConfirmedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
+                                order.MovedQty += issueQty;
+                                if (order.MovedQty >= order.ExpOrdQty)
+                                {
+                                    order.Confirm = true;
+                                }
+                                _context.Update(order);
+                                _context.SaveChanges();
+                                message = "Success"!;
+                            }
+
+
+
+                        }
+                    }
+                }
+
+                
+            }
+
+            return Ok(message);
+        }
     }
 }
