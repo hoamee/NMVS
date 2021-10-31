@@ -424,6 +424,9 @@ namespace NMVS.Migrations
                     b.Property<string>("Driver")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsRecycle")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsWarranty")
                         .HasColumnType("bit");
 
@@ -438,6 +441,9 @@ namespace NMVS.Migrations
 
                     b.Property<DateTime?>("PoDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("RecycleId")
+                        .HasColumnType("int");
 
                     b.Property<string>("SupCode")
                         .HasColumnType("nvarchar(max)");
@@ -597,8 +603,14 @@ namespace NMVS.Migrations
                     b.Property<double>("Accepted")
                         .HasColumnType("float");
 
+                    b.Property<string>("BatchNo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("IcId")
                         .HasColumnType("int");
+
+                    b.Property<bool?>("IsRecycled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("ItemNo")
                         .HasMaxLength(50)
@@ -632,6 +644,9 @@ namespace NMVS.Migrations
                     b.Property<double>("RecQty")
                         .HasColumnType("float");
 
+                    b.Property<DateTime?>("RecycleDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("RefDate")
                         .HasColumnType("datetime2");
 
@@ -643,6 +658,9 @@ namespace NMVS.Migrations
 
                     b.Property<string>("SupplierSupCode")
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("UnqualifiedId")
+                        .HasColumnType("int");
 
                     b.HasKey("PtId");
 
@@ -702,6 +720,54 @@ namespace NMVS.Migrations
                     b.HasIndex("WarehouseWhCode");
 
                     b.ToTable("Locs");
+                });
+
+            modelBuilder.Entity("NMVS.Models.DbModels.MfgIssueNote", b =>
+                {
+                    b.Property<int>("IsNId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("IssuedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("IssuedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RqId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IsNId");
+
+                    b.ToTable("MfgIssueNotes");
+                });
+
+            modelBuilder.Entity("NMVS.Models.DbModels.MfgIssueNoteDet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("IsNId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ItemName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ItemNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PtId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Quantity")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IssueNoteDets");
                 });
 
             modelBuilder.Entity("NMVS.Models.DbModels.ProdLine", b =>

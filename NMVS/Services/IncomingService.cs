@@ -27,7 +27,8 @@ namespace NMVS.Services
             {
                 var model = (from ic in _db.IncomingLists.Where(x => x.Closed == closed)
                              join sp in _db.Suppliers
-                             on ic.SupCode equals sp.SupCode
+                             on ic.SupCode equals sp.SupCode into all
+                             from a in all.DefaultIfEmpty()
                              select new IncomingListVm
                              {
                                  IcId = ic.IcId,
@@ -37,7 +38,7 @@ namespace NMVS.Services
                                  Vehicle = ic.Vehicle,
                                  Po = ic.Po,
                                  PoDate = ic.PoDate,
-                                 Supplier = sp.SupDesc,
+                                 Supplier = a.SupDesc,
                                  Checked = ic.Checked,
                                  ItemCount = ic.ItemCount,
                                  Closed = ic.Closed,
@@ -79,7 +80,7 @@ namespace NMVS.Services
 
             var icm = (from ic in _db.IncomingLists.Where(x => x.IcId == id)
                        join sp in _db.Suppliers
-                       on ic.SupCode equals sp.SupCode
+                       on ic.SupCode equals sp.SupCode 
                        select new IncomingListVm
                        {
                            IcId = ic.IcId,
@@ -98,14 +99,16 @@ namespace NMVS.Services
 
             var ptMstr = (from pt in _db.ItemMasters.Where(x => x.IcId == id)
                           join data in _db.ItemDatas on pt.ItemNo equals data.ItemNo
+                          into all
+                          from a in all.DefaultIfEmpty()
                           select new PtVm
                           {
                               PtId = pt.PtId,
                               ItemNo = pt.ItemNo,
                               AcceptQty = pt.Accepted,
                               CheckedBy = pt.Qc,
-                              IsChecked = icm.Closed ? (string.IsNullOrEmpty(pt.Qc) ? false : true) : null,
-                              ItemName = data.ItemName,
+                              IsChecked = icm.Closed ? (!string.IsNullOrEmpty(pt.Qc)) : null,
+                              ItemName = a.ItemName,
                               RcvQty = pt.RecQty
                           }).ToList();
             IcmListVm icmList = new()

@@ -1,0 +1,114 @@
+﻿@model IEnumerable<NMVS.Models.DbModels.MfgIssueNote>
+
+@{
+    ViewData["Title"] = "Issue note MFG";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-flush" id="datatable-search">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Id</th>
+                                <th>Request No.</th>
+                                <th>Issued On</th>
+                                <th>By</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.IsNId)</td>
+                                    <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.RqId)</td>
+                                    <td class="text-sm font-weight-normal">
+                                        @if (item.IssuedOn == null)
+                                        {
+                                            <span class="badge bg-gradient-secondary">
+                                                Not yet
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            @Html.DisplayFor(m => item.IssuedOn)
+                                        }
+                                    </td>
+
+                                    @if (string.IsNullOrEmpty(item.IssuedBy))
+                                    {
+
+                                        <td class="text-sm font-weight-normal">
+                                            <span class="badge bg-gradient-secondary">
+                                                Not yet
+                                            </span>
+                                        </td>
+                                        <td class="text-sm font-weight-normal">
+                                            <span class="badge bg-gradient-secondary">
+                                                Pending
+                                            </span>
+
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.IssuedBy)</td>
+                                        <td class="text-sm font-weight-normal">
+                                            <span class="badge bg-gradient-info">
+                                                Issued
+                                            </span>
+                                        </td>
+                                    }
+
+                                    <td>
+                                        <a href="/InvRequests/MfgDetail/?id=@item.IsNId" class="btn btn-outline-info btn-sm">Detail</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+
+                <div class="row col-12">
+                    <span class="col-auto">
+                        <a asp-action="NewCustomer" class="btn btn-sm btn-outline-info">
+                            New Customer
+                        </a>
+                    </span>
+
+                    <span class="col-auto">
+                        <button class="btn btn-sm btn-outline-info" id="new-cust">
+                            <span class="fa fa-cloud-upload"></span>
+                            <span>Upload</span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('.nav-request').addClass('active');
+        $('.nav-rq-in').addClass('active');
+        $('#navRequest').addClass('show');
+        $('#new-list').click(function () {
+            $('#file-modal').modal('toggle');
+        });
+        $('#datatable-search').DataTable();
+    });
+</script>

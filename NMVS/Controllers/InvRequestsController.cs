@@ -215,6 +215,60 @@ namespace NMVS.Controllers
             }
         }
 
-        
+        public IActionResult PickListMFG(int id)
+        {
+            var rq = _db.RequestDets.Find(id);
+
+            ViewBag.DetId = id;
+            ViewBag.RqId = rq.RqID;
+            ViewBag.qty = rq.Quantity - rq.Picked;
+            ViewBag.History = _db.IssueOrders.Where(x => x.DetId == id).ToList();
+
+            ViewBag.LocList = new SelectList(_db.Locs
+                .Where(x => x.LocType == "MFG")
+                .ToList(), "LocCode", "LocDesc");
+
+            if (rq.SpecDate == null)
+            {
+                return View(_service.GetItemMasterVms(rq));
+            }
+            else
+            {
+                return View(_service.GetItemMasterVms(rq).Where(x => x.DateIn.Date == rq.SpecDate));
+            }
+        }
+
+        public IActionResult IssueNoteMfg()
+        {
+            var model = _db.MfgIssueNotes.ToList();
+            return View(model);
+        }
+
+
+        public IActionResult MfgDetail(int id)
+        {
+            var isn = _db.MfgIssueNotes.Find(id);
+
+            var noteDet = (from d in _db.IssueNoteDets
+                           join i in _db.ItemDatas on d.ItemNo equals i.ItemNo into all
+                           from a in all.DefaultIfEmpty()
+                           select new MfgIssueNoteDet
+                           {
+                               ItemNo = d.ItemNo,
+                               Id = d.Id,
+                               ItemName = a.ItemName,
+                               IsNId = d.IsNId,
+                               PtId = d.PtId,
+                               Quantity = d.Quantity
+                           }).ToList();
+
+            var model = new MfgNoteVm
+            {
+                Det = noteDet,
+                MfgIssueNote = isn
+            };
+
+            return View(model);
+        }
     }
 }

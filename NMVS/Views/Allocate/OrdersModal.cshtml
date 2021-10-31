@@ -168,7 +168,7 @@
                     var desInput = decodedText;
                     html5QrcodeScanner.clear();
                     if (desInput !== desCode) {
-                        alert('Incorrect destination! Please check your destination again! ' + desInput);
+                        bootbox.alert('Incorrect destination! Please check your destination again! ' + desInput);
                     }
                     else {
                         var oId = parseInt($('#table2 .td-id').text().trim());
@@ -232,7 +232,6 @@
             var qty = $('#input-qty').val();
             var note = cmmt.val().trim();
 
-            alert(unq);
 
             if (qty > oQty) {
                 $('#input-qty').notify('Report quantity could\'nt be larger than order quantity');

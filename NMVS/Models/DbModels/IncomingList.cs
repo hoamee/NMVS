@@ -37,6 +37,10 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Warranty return")]
         public bool IsWarranty { set; get; }
 
+        public bool IsRecycle { set; get; }
+
+        public int? RecycleId { set; get; }
+
         public bool Closed { set; get; }
 
         public int ItemCount { set; get; }

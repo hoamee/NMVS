@@ -119,12 +119,12 @@ namespace NMVS.Controllers.Api
 
                         var pt = _context.ItemMasters.Find(item.PtId);
                         pt.Accepted = pt.RecQty - item.PtQty;
-                        pt.PtQty = pt.Accepted;
+                        pt.PtQty = pt.RecQty - item.PtQty;
                         pt.Qc = _httpContextAccessor.HttpContext.User.Identity.Name;
                         pt.LocCode = receiveLoc.LocCode;
                         var ic = _context.IncomingLists.Find(pt.IcId);
                         ic.Checked++;
-                        receiveLoc.LocRemain -= pt.PtQty;
+                        receiveLoc.LocRemain -= pt.RecQty - item.PtQty;
 
                         _context.Update(pt);
                         _context.Update(ic);

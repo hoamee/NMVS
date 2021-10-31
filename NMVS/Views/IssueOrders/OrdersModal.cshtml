@@ -15,6 +15,9 @@
                                 Type
                             </th>
                             <th>
+                                Item
+                            </th>
+                            <th>
                                 From location
                             </th>
                             <th>
@@ -152,8 +155,8 @@
         $('#confirm-end').click(function () {
 
             var desCode = $('#table2').find('.exp-to-ve').text().trim();
-            if (desCode == "") {
-                detCode = $('#table2').find('.exp-to-loc').text().trim();
+            if (desCode == '0') {
+                desCode = $('#table2').find('.exp-to-loc').text().trim();
             } 
 
 
@@ -179,7 +182,7 @@
                     var desInput = decodedText;
                     html5QrcodeScanner.clear();
                     if (desInput !== desCode) {
-                        alert('Incorrect destination! Please check your destination again! ' + desInput);
+                        alert('Incorrect destination! Please check your destination again! ' + desInput + ' - ' + desCode);
                     }
                     else {
                         var oId = parseInt($('#table2').find('.exp-id').text().trim());
@@ -194,7 +197,7 @@
                             contentType: 'application/json; charset=utf-8',
                             dataType: 'json',
                             type: 'POST',
-                            url: routeURL + '/api/Allocate/FinishIssueOrder',
+                            url: routeURL + '/api/InvRequest/FinishIssueOrder',
                             data: JSON.stringify(alo),
                             success: function (data) {
                                 mess = data;
@@ -272,7 +275,7 @@
                             contentType: 'application/json; charset=utf-8',
                             dataType: 'json',
                             type: 'POST',
-                            url: routeURL + '/api/Allocate/ReportOrder',
+                            url: routeURL + '/api/InvRequest/ReportOrder',
                             data: JSON.stringify(postData),
                             success: function (data) {
                                 if (data.status == 1) {

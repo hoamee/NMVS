@@ -139,12 +139,16 @@
                             {
                                 <tr>
                                     <td>
-                                        @if (Model.Rq.SoConfirm == true || Model.Rq.RqType == "MFG")
+                                        @if (Model.Rq.SoConfirm == true)
                                         {
                                             if (item.Quantity > item.Picked || item.Picked == 0)
                                             {
                                                 <a class="btn btn-outline-info" href="/InvRequests/PickListSO/?id=@item.DetId">Picking list</a>
                                             }
+                                        }
+                                        @if (Model.Rq.RqType == "MFG")
+                                        {
+                                            <a class="btn btn-outline-info" href="/InvRequests/PickListMFG/?id=@item.DetId">Picking list</a>
                                         }
                                     </td>
                                     <td>

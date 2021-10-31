@@ -2,33 +2,32 @@
 
 namespace NMVS.Migrations
 {
-    public partial class enhanceIncoming : Migration
+    public partial class incomingRecycle : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "Checked",
+            migrationBuilder.AddColumn<bool>(
+                name: "IsRecycle",
                 table: "IncomingLists",
-                type: "int",
+                type: "bit",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: false);
 
             migrationBuilder.AddColumn<int>(
-                name: "ItemCount",
+                name: "RecycleId",
                 table: "IncomingLists",
                 type: "int",
-                nullable: false,
-                defaultValue: 0);
+                nullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Checked",
+                name: "IsRecycle",
                 table: "IncomingLists");
 
             migrationBuilder.DropColumn(
-                name: "ItemCount",
+                name: "RecycleId",
                 table: "IncomingLists");
         }
     }

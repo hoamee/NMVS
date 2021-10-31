@@ -28,7 +28,7 @@ namespace NMVS.Controllers
                          from ol in oloc.DefaultIfEmpty()
                          join ve in _context.Shippers on o.ToVehicle equals ve.ShpId into vo
                          from all in vo.DefaultIfEmpty()
-                         join loc2 in _context.Locs on o.ToLoc equals loc2.LocDesc into oloc2
+                         join loc2 in _context.Locs on o.ToLoc equals loc2.LocCode into oloc2
                          from all2 in oloc2.DefaultIfEmpty()
 
 

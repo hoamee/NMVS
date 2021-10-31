@@ -40,7 +40,7 @@ namespace NMVS.Controllers
 
         public async Task<ActionResult> SelectLoc([Bind("ItemNo,LocCode")] ItemMaster itemMaster)
         {
-            var itemMasters = _service.GetAvailItem(itemMaster.ItemNo);
+            var itemMasters = _service.GetAvailItem(itemMaster.ItemNo, itemMaster.LocCode);
             ViewBag.Loc = await _db.Locs.FindAsync(itemMaster.LocCode);
             return View(itemMasters);
         }
@@ -112,7 +112,7 @@ namespace NMVS.Controllers
         {
             var ptmstr = await _db.ItemMasters.FindAsync(id);
             var locList = new List<LocationCapSelect>();
-            var whl = await _db.Locs.Where(x => x.LocCode != ptmstr.LocCode && x.LocType != "IssueLoc").ToListAsync();
+            var whl = await _db.Locs.Where(x => x.LocCode != ptmstr.LocCode && (x.LocType == "fixed" || x.LocType == "temporary")).ToListAsync();
 
             ViewBag.ptid = id;
 

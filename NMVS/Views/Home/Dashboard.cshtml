@@ -1,0 +1,329 @@
+﻿@inject IJsonHelper Json;
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/assets/js/apexcharts/apexcharts.js"></script>
+<section class="row">
+    <div class="col-12 col-lg-9">
+        <div class="row">
+            @if (ViewBag.Unsolved > 0)
+            {
+                <div class="col-6 col-lg-3 col-md-6">
+                    <a href="/Allocate/AllocateRequests">
+                        <div class="card">
+                            <div class="card-body px-3 py-4-5">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="stats-icon red">
+                                            <i class="iconly-boldDanger"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h6 class="text-muted font-semibold">Allocate Request</h6>
+                                        <h6 class="font-extrabold mb-0">@ViewBag.Unsolved Unsolved</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+
+            @if (ViewBag.UnArranged > 0)
+            {
+                <div class="col-6 col-lg-3 col-md-6">
+                    <a href="/Transport/ShipperBrowse">
+                        <div class="card">
+                            <div class="card-body px-3 py-4-5">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="stats-icon red">
+                                            <i class="iconly-boldDanger"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h6 class="text-muted font-semibold">Transport Arrangement</h6>
+                                        <h6 class="font-extrabold mb-0">@ViewBag.UnArranged Unsolved</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+
+            @if (ViewBag.Unallocated > 0)
+            {
+                <div class="col-6 col-lg-3 col-md-6">
+                    <a href="/Allocate/Unallocated">
+                        <div class="card">
+                            <div class="card-body px-3 py-4-5">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="fa fa-warning fa-5x" style="color: orange">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h6 class="text-muted font-semibold">Receiving</h6>
+                                        <h6 class="font-extrabold mb-0">@ViewBag.Unallocated Unallocated</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+            @if (ViewBag.UnPicked > 0)
+            {
+                <div class="col-6 col-lg-3 col-md-6">
+                    <a href="/Inventory/InventoryIssue">
+                        <div class="card">
+                            <div class="card-body px-3 py-4-5">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="stats-icon red">
+                                            <i class="iconly-boldDanger"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h6 class="text-muted font-semibold">Inventory Issue</h6>
+                                        <h6 class="font-extrabold mb-0">@ViewBag.UnPicked pending requests </h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            }
+
+            @if (ViewBag.FullWH > 0)
+            {
+                <div class="col-6 col-lg-3 col-md-6">
+                    <a href="/Inventory/WarehouseInquiry">
+                        <div class="card">
+                            <div class="card-body px-3 py-4-5">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="stats-icon red">
+                                            <i class="iconly-boldDanger"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h6 class="text-muted font-semibold">Warehouse status</h6>
+                                        <h6 class="font-extrabold mb-0">@ViewBag.FullWH Less than 20%</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+
+            @if (ViewBag.AllocateOrder > 0)
+            {
+                <div class="col-6 col-lg-3 col-md-6">
+                    <a href="/Inventory/AllocateOrders">
+                        <div class="card">
+                            <div class="card-body px-3 py-4-5">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="stats-icon red">
+                                            <i class="iconly-boldDanger"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h6 class="text-muted font-semibold">Inventory Movement</h6>
+                                        <h6 class="font-extrabold mb-0">@ViewBag.AllocateOrder pending order</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+
+            @if (ViewBag.Reported > 0)
+            {
+                <div class="col-6 col-lg-3 col-md-6">
+                    <a href="/Inventory/AllocateRequests">
+                        <div class="card">
+                            <div class="card-body px-3 py-4-5">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="stats-icon red">
+                                            <i class="iconly-boldDanger"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h6 class="text-muted font-semibold">Inventory Allocate</h6>
+                                        <h6 class="font-extrabold mb-0">@ViewBag.Reported order reported</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+
+            @*<div class="col-6 col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body px-3 py-4-5">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="stats-icon red">
+                                    <i class="iconly-boldBookmark"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h6 class="text-muted font-semibold">Saved Post</h6>
+                                <h6 class="font-extrabold mb-0">112</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+
+
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h4>Warehouse capacity</h4>
+            </div>
+            <div class="card-body">
+                <div id="chart-capacity"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-3">
+        <div class="card">
+            <div class="card-header">
+                <h4>Quick Link</h4>
+            </div>
+            <div class="card-content pb-4">
+                <a href="/Inventory/ItemInquiry">
+                    <div class="recent-message d-flex px-4 py-3">
+                        <div class="stats-icon green">
+                            <i class="iconly-boldChart"></i>
+                        </div>
+                        <div class="name ms-4">
+                            <h5 class="mb-1">Item inquiry</h5>
+                            <h6 class="text-muted mb-0">Quick check</h6>
+                        </div>
+                    </div>
+                </a>
+                <a href="/Inventory/WarehouseInquiry">
+                    <div class="recent-message d-flex px-4 py-3">
+                        <div class="stats-icon green">
+                            <i class="iconly-boldActivity"></i>
+                        </div>
+                        <div class="name ms-4">
+                            <h5 class="mb-1">Warehouse check</h5>
+                            <h6 class="text-muted mb-0">Review</h6>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="/WorkOrders/WoDashboard">
+                    <div class="recent-message d-flex px-4 py-3">
+                        <div class="stats-icon blue">
+                            <i class="iconly-boldWork"></i>
+                        </div>
+                        <div class="name ms-4">
+                            <h5 class="mb-1">Work order</h5>
+                            <h6 class="text-muted mb-0">Monitor</h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+        var options = {
+            series: [{
+                        name: 'Used',
+                        data: @Html.Raw(Json.Serialize(ViewBag.Used))
+                    },
+                    {
+                        name: 'Out go',
+                        data: @Html.Raw(Json.Serialize(ViewBag.OutGo))
+                    },
+                    {
+                        name: 'Available',
+                        data: @Html.Raw(Json.Serialize(ViewBag.Remain))
+                    },
+                    {
+                        name: 'Holding',
+                        data: @Html.Raw(Json.Serialize(ViewBag.Hold))
+                    }],
+
+            chart: {
+                type: 'bar',
+                height: 440,
+                stacked: true
+            },
+            colors: ['#FF4560', '#f76363', '#008FFB', '#29b9f2'],
+            plotOptions: {
+                bar: {
+                    horizontal: true,
+                    barHeight: '80%',
+                },
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                width: 1,
+                colors: ["#fff"]
+            },
+
+            grid: {
+                xaxis: {
+                    lines: {
+                        show: false
+                    }
+                }
+            },
+            yaxis: {
+                title: {
+                    // text: 'Age',
+                }
+            },
+            tooltip: {
+                shared: false,
+                x: {
+                    formatter: function (val) {
+                        return val;
+                    }
+                },
+                y: {
+                    formatter: function (val) {
+                        return val;
+                    }
+                }
+            },
+            title: {
+                text: 'Warehouse capacity report (@DateTime.Today.Date.ToString("yyyy/MM/dd"))',
+                align: 'center'
+            },
+            xaxis: {
+                categories:  @Html.Raw(Json.Serialize(ViewBag.WhName)),
+                title: {
+                    text: 'Warehouse capacity'
+                },
+                labels: {
+                    formatter: function (val) {
+                        return val;
+                    }
+                }
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#chart-capacity"), options);
+        chart.render();
+</script>

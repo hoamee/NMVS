@@ -10,8 +10,8 @@ using NMVS.Models;
 namespace NMVS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20211028093342_Shippers2")]
-    partial class Shippers2
+    [Migration("20211031141550_reset")]
+    partial class reset
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -250,6 +250,9 @@ namespace NMVS.Migrations
 
                     b.Property<string>("LocCode1")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<double>("MovedQty")
+                        .HasColumnType("float");
 
                     b.Property<DateTime>("MovementTime")
                         .HasColumnType("datetime2");
@@ -496,17 +499,29 @@ namespace NMVS.Migrations
                     b.Property<string>("ConfirmedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("DetId")
+                        .HasColumnType("int");
+
                     b.Property<double>("ExpOrdQty")
                         .HasColumnType("float");
 
-                    b.Property<string>("InvRequestRqID")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("FromLoc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IssueToDesc")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IssueType")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ItemNo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LocCode")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("MovedQty")
+                        .HasColumnType("float");
 
                     b.Property<DateTime?>("MovementTime")
                         .IsRequired()
@@ -524,17 +539,10 @@ namespace NMVS.Migrations
                     b.Property<string>("ToLoc")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ToLocDesc")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WhlCode")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("ToVehicle")
+                        .HasColumnType("int");
 
                     b.HasKey("ExpOrdId");
-
-                    b.HasIndex("InvRequestRqID");
-
-                    b.HasIndex("LocCode");
 
                     b.ToTable("IssueOrders");
                 });
@@ -591,8 +599,14 @@ namespace NMVS.Migrations
                     b.Property<double>("Accepted")
                         .HasColumnType("float");
 
+                    b.Property<string>("BatchNo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("IcId")
                         .HasColumnType("int");
+
+                    b.Property<bool?>("IsRecycled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("ItemNo")
                         .HasMaxLength(50)
@@ -626,6 +640,9 @@ namespace NMVS.Migrations
                     b.Property<double>("RecQty")
                         .HasColumnType("float");
 
+                    b.Property<DateTime?>("RecycleDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("RefDate")
                         .HasColumnType("datetime2");
 
@@ -637,6 +654,9 @@ namespace NMVS.Migrations
 
                     b.Property<string>("SupplierSupCode")
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("UnqualifiedId")
+                        .HasColumnType("int");
 
                     b.HasKey("PtId");
 
@@ -696,6 +716,54 @@ namespace NMVS.Migrations
                     b.HasIndex("WarehouseWhCode");
 
                     b.ToTable("Locs");
+                });
+
+            modelBuilder.Entity("NMVS.Models.DbModels.MfgIssueNote", b =>
+                {
+                    b.Property<int>("IsNId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("IssuedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("IssuedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RqId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IsNId");
+
+                    b.ToTable("MfgIssueNotes");
+                });
+
+            modelBuilder.Entity("NMVS.Models.DbModels.MfgIssueNoteDet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("IsNId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ItemName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ItemNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PtId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Quantity")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IssueNoteDets");
                 });
 
             modelBuilder.Entity("NMVS.Models.DbModels.ProdLine", b =>
@@ -854,6 +922,13 @@ namespace NMVS.Migrations
                     b.Property<DateTime>("DateIn")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DrContact")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Driver")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Loc")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -862,10 +937,6 @@ namespace NMVS.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ShpDesc")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ShpFrom")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -1314,21 +1385,6 @@ namespace NMVS.Migrations
                         .HasForeignKey("SupplierSupCode");
 
                     b.Navigation("Supplier");
-                });
-
-            modelBuilder.Entity("NMVS.Models.DbModels.IssueOrder", b =>
-                {
-                    b.HasOne("NMVS.Models.DbModels.InvRequest", "InvRequest")
-                        .WithMany()
-                        .HasForeignKey("InvRequestRqID");
-
-                    b.HasOne("NMVS.Models.DbModels.Loc", "Loc")
-                        .WithMany()
-                        .HasForeignKey("LocCode");
-
-                    b.Navigation("InvRequest");
-
-                    b.Navigation("Loc");
                 });
 
             modelBuilder.Entity("NMVS.Models.DbModels.ItemMaster", b =>

@@ -96,9 +96,9 @@ namespace NMVS.Services
             return model;
         }
 
-        public List<ItemMasterVm> GetAvailItem(string itemNo)
+        public List<ItemMasterVm> GetAvailItem(string itemNo, string locCode)
         {
-            var ls = (from item in _db.ItemMasters.Where(x => x.ItemNo == itemNo && !string.IsNullOrEmpty(x.LocCode))
+            var ls = (from item in _db.ItemMasters.Where(x => x.ItemNo == itemNo && !string.IsNullOrEmpty(x.LocCode) && x.LocCode != locCode)
                       join dt in _db.ItemDatas on item.ItemNo equals dt.ItemNo into itemData
 
                       from i in itemData.DefaultIfEmpty()

@@ -47,6 +47,15 @@
                 <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6"> Inventory</h6>
             </li>
 
+            <li class="nav-item nav-sale">
+                <a class="nav-link nav-sale" href="/Home/Dashboard">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <span class="fa fa-chart-area"></span>
+                    </div>
+                    <span class="nav-link-text ms-1">Dashboard</span>
+                </a>
+            </li>
+
             <li class="nav-item">
                 <a data-bs-toggle="collapse" href="#navRequest" class="nav-link nav-request" aria-controls="navRequest" role="button" aria-expanded="false">
                     <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
@@ -63,12 +72,19 @@
                             </a>
                         </li>
 
-                        <li class="nav-item nav-un">
-                            <a class="nav-link " href="/Allocate/Unallocated">
-                                <span class="sidenav-mini-icon"> U </span>
-                                <span class="sidenav-normal"> Uncallocated</span>
+                        <li class="nav-item nav-rq-in-mfg">
+                            <a class="nav-link " href="/InvRequests/IssueNoteMfg">
+                                <span class="sidenav-mini-icon"> I </span>
+                                <span class="sidenav-normal"> Issue note MFG</span>
                             </a>
                         </li>
+                        <li class="nav-item nav-rq-in-so">
+                            <a class="nav-link " href="/InvRequests/IssueNoteSO">
+                                <span class="sidenav-mini-icon"> I </span>
+                                <span class="sidenav-normal"> Issue note SO</span>
+                            </a>
+                        </li>
+
                     </ul>
                 </div>
 
@@ -90,7 +106,7 @@
                                 <span class="sidenav-normal"> Allocate requests</span>
                             </a>
                         </li>
-                     
+
 
                         <li class="nav-item nav-un">
                             <a class="nav-link " href="/Allocate/Unallocated">
@@ -114,15 +130,15 @@
                 <div class="collapse nav-movement" id="nav-movement">
                     <ul class="nav ms-4 ps-3">
 
-                        <li class="nav-item nav-order">
-                            <a class="nav-link " href="/Allocate/Orders">
+                        <li class="nav-item ">
+                            <a class="nav-link nav-order" href="/Allocate/Orders">
                                 <span class="sidenav-mini-icon"> Ord </span>
                                 <span class="sidenav-normal"> Allocate Orders</span>
                             </a>
                         </li>
 
-                        <li class="nav-item nav-iu">
-                            <a class="nav-link " href="/IssueOrders/Browse">
+                        <li class="nav-item ">
+                            <a class="nav-link nav-iu" href="/IssueOrders/Browse">
                                 <span class="sidenav-mini-icon"> I </span>
                                 <span class="sidenav-normal"> Issue orders</span>
                             </a>

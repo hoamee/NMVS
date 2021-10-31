@@ -33,54 +33,59 @@ namespace NMVS.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginVm model)
         {
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.FindByNameAsync(model.UserName);
-                if (user == null)
+            try {
+                if (ModelState.IsValid)
                 {
-                    ModelState.AddModelError("", "User not existed");
-                }
-                else
-                {
-                    if (user.Active)
+                    var user = await _userManager.FindByNameAsync(model.UserName);
+                    if (user == null)
                     {
-
-                        var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, false);
-                        if (result.Succeeded)
-                        {
-                            return RedirectToAction("Index", "Home");
-                        }
-                        else if (result.IsLockedOut)
-                        {
-                            ModelState.AddModelError("", "This account has been locked out");
-                        }
-                        else
-                        {
-                            var err = "";
-                            try
-                            {
-                                var test = _db.Users.First(x => x.UserName == User.Identity.Name);
-                                if (test != null)
-                                {
-                                    err = test.UserName;
-                                }
-                            }catch(Exception e)
-                            {
-                                err = e.ToString();
-                            }
-                            ModelState.AddModelError("", err);
-                            return View(model);
-                        }
+                        ModelState.AddModelError("", "User not existed");
                     }
                     else
                     {
-                        ModelState.AddModelError("", "This account hasn't been activated");
-                    }
-                }
+                        if (user.Active)
+                        {
 
+                            var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, false);
+                            if (result.Succeeded)
+                            {
+                                return RedirectToAction("Index", "Home");
+                            }
+                            else if (result.IsLockedOut)
+                            {
+                                ModelState.AddModelError("", "This account has been locked out");
+                            }
+                            else
+                            {
+                                var err = "";
+                                try
+                                {
+                                    var test = _db.Users.First(x => x.UserName == User.Identity.Name);
+                                    if (test != null)
+                                    {
+                                        err = test.UserName;
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    err = e.ToString();
+                                }
+                                ModelState.AddModelError("", err);
+                                return View(model);
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("", "This account hasn't been activated");
+                        }
+                    }
+
+                }
+            }catch(Exception e)
+            {
+                ModelState.AddModelError("", e.ToString());
             }
             return View();
         }
@@ -100,7 +105,7 @@ namespace NMVS.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)

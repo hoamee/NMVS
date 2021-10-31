@@ -9,7 +9,7 @@ namespace NMVS.Models.DbModels
 {
     public class ItemMaster
     {
-        
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int PtId { set; get; }
@@ -37,7 +37,7 @@ namespace NMVS.Models.DbModels
         public double PtHold { get; set; }
 
         [Display(Name = "Loc.")]
-        public string LocCode { get; set; }        
+        public string LocCode { get; set; }
 
         [DataType(DataType.DateTime)]
         [Display(Name = "Date in")]
@@ -62,9 +62,16 @@ namespace NMVS.Models.DbModels
         public int IcId { set; get; }
         public virtual IncomingList Ic { set; get; }
 
+        public string BatchNo { set; get; }
+
         [Display(Name = "Comment")]
         public string PtCmt { get; set; }
 
+        public bool? IsRecycled { set; get; }
+
+        public DateTime? RecycleDate { set; get; }
+
+        public int? UnqualifiedId { set; get; }
 
     }
 }

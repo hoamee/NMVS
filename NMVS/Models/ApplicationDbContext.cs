@@ -62,5 +62,7 @@ namespace NMVS.Models
         public DbSet<SoDetail> SoDetails { set; get; }
         public DbSet<Shipper> Shippers { set; get; }
         public DbSet<ShipperDet> ShipperDets { set; get; }
+        public DbSet<MfgIssueNote> MfgIssueNotes { set; get; }
+        public DbSet<MfgIssueNoteDet> IssueNoteDets { set; get; }
     }
 }

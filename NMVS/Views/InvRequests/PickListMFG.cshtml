@@ -1,0 +1,433 @@
+﻿@model IEnumerable<NMVS.Models.ViewModels.ItemMasterVm>
+@{
+    ViewData["Title"] = "Issue pick list";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script src="~/assets/js/notify.js"></script>
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row col-12">
+                            <h4 class="col-auto">
+                                Quantity:
+                            </h4>
+                            <h4 class="col-auto" id="init-quantity">
+                                @ViewBag.qty
+                            </h4>
+                            <button class="btn btn-outline-info" onclick="$('#history-modal').modal('toggle')">
+                                Show picking history
+                            </button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        ID
+                                    </th>
+                                    <th>
+                                        Item
+                                    </th>
+                                    <th>
+                                        Description
+                                    </th>
+                                    <th>
+                                        Date in
+                                    </th>
+
+                                    <th>
+                                        Location
+                                    </th>
+                                    <th>
+                                        Quantity
+                                    </th>
+                                    <th>
+                                        Booked
+                                    </th>
+                                    <th>
+
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr id="o-@item.Ptid">
+                                        <td class="td-id">
+                                            @Html.DisplayFor(modelItem => item.Ptid)
+                                        </td>
+                                        <td class="td-name">
+                                            @Html.DisplayFor(modelItem => item.No)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </td>
+                                        <td class="td-date">
+                                            @Html.DisplayFor(modelItem => item.DateIn)
+                                        </td>
+                                        <td class="td-loccode">
+                                            @Html.DisplayFor(modelItem => item.Loc)
+                                        </td>
+                                        <td class="pt-qty">
+                                            @Html.DisplayFor(modelItem => item.Qty)
+                                        </td>
+                                        <td class="td-hold">
+                                            @Html.DisplayFor(modelItem => item.Booked)
+                                        </td>
+                                        <td class="td-input">
+                                            @{ var maxInput = item.Qty - item.Booked;}
+                                            <input type="number" class="form-control val-input" step="0.01" max="@maxInput" min="0" />
+                                        </td>
+                                        <td>
+                                            <input type="button" class="btn btn-sm btn-success add-btn" value="Add" />
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-6">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">Pick list</h3>
+            </div>
+            <div class="card-body">
+                <div class="row col-12">
+                    <h4 class="col-auto">
+                        Quantity:
+                    </h4>
+                    <h4 class="col-auto" id="selected-qty">
+                        0
+                    </h4>
+                </div>
+
+                <div id="inv">
+                    <table class="table" id="selected-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Inventory ID
+                                </th>
+                                <th>
+                                    Item
+                                </th>
+                                <th>
+                                    Location
+                                </th>
+                                <th>
+                                    Quantity
+                                </th>
+                                <th>
+
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <p align="center"><i><b>End of picking list</b></i></p>
+                <hr />
+                <label for="LocList">Issue to location</label>
+                @Html.DropDownList("LocList", null, new { @class = "form-control" })
+
+                <label for="req-time" class="form-label">Time</label>
+                <input type="datetime-local" id="req-time" class="form-control" />
+
+                <div class="d-flex flex-row-reverse bd-highlight">
+                    <div class="p-2 bd-highlight">
+                        <button class="btn btn-info" id="submit-btn">
+                            Submit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function removeRow(loc, tr, qty) {
+        var confirmation = confirm("Are you sure want to remove this row?");
+        if (confirmation) {
+            var vSelectQty = parseFloat($("#selected-qty").html()) - qty;
+            var vInitQty = parseFloat($('#init-quantity').html()) + qty;
+            var vHold = parseFloat($("#" + loc).children(".td-hold").html()) - qty;
+
+            $("#" + loc).closest('tr').children('.td-hold').html(vHold);
+            $('#init-quantity').html(vInitQty);
+            $("#selected-qty").html(vSelectQty);
+            $('#' + tr).remove();
+        }
+
+    }
+
+    function go2(data) { $(data).delay(100).fadeOut().fadeIn('slow') }
+
+    $(document).ready(function () {
+
+        var jsArr = new Array();
+
+
+        $('#submit-btn').click(function () {
+
+            var rqTime = $('#req-time').val();
+            if (rqTime == "") {
+                $("#req-time").notify("Please pick a time for movement");;
+            } else {
+                $('#update-modal').html($('#inv').html());
+                $("#update-modal .btn-outline-danger").remove();
+                $('#to-loc-code').text($("#LocList").val());
+                $('#to-loc-desc').text($("#LocList option:selected").text());
+                $("#exampleModal").modal('toggle');;
+            }
+
+        });
+
+
+        $('.add-btn').click(function () {
+            //get remaining & qty
+            var selectQty = parseFloat($("#selected-qty").html());
+            var initQty = parseFloat($('#init-quantity').html());
+            var tempInitQty = initQty;
+            var remain = parseFloat($(this).closest('tr').children('.pt-qty').text());
+            var input = parseFloat($(this).closest('tr').children('.td-input').children('.val-input').val());
+            var vHold = parseFloat($(this).closest('tr').children('.td-hold').text());
+            var acceptedInput = remain - vHold;
+
+            if (isNaN(input)) {
+                bootbox.alert("Cannot add value NaN to cart");
+                $(this).closest('tr').children('.td-input').children('.val-input').val('');
+            } else {
+                if (input > acceptedInput || tempInitQty < input) {
+
+                    bootbox.alert("Your input is to large!");
+                    $(this).closest('tr').children('.td-input').children('.val-input').val('');
+                } else {
+                    if (input <= 0) {
+                        bootbox.alert("Please input quantity greater than \"0\"");
+                    } else {
+                        tempInitQty = tempInitQty - input;
+                        selectQty += input;
+
+                        //Change value
+                        $('#init-quantity').html(tempInitQty);
+                        $("#selected-qty").html(selectQty);
+                        $(this).closest('tr').children('.td-hold').text(vHold + input);
+                        $(this).closest('tr').children('.td-input').children('.val-input').val('');
+
+                        //get loc id & name
+                        var fName = $(this).closest('tr').children('.td-name').text().trim();
+                        var fid = $(this).closest('tr').children('.td-id').text().trim();
+                        var loc = $(this).closest('tr').children('.td-loccode').text().trim();
+                        //check if target table exist id
+                        if ($('#' + fid).length) {
+                            var tarQty = parseFloat($('#' + fid).text());
+                            tarQty += input;
+
+                            $('#tr-' + fid).remove();
+                            $('#selected-table > tbody:last').append(`<tr id="tr-${fid}"><td class="whl-code">${fid}</td><td>${fName}</td><td class="loc">${loc}</td><td class="qty" id="${fid}">${tarQty}</td><td> <a class="btn btn-sm btn-outline-danger" onclick="removeRow('o-${fid}','tr-${fid}',${tarQty})"><span class="fa fa-trash"></span></a></td></tr>`);
+                            $('#' + fid).css("background-color", "#FF0000");
+                            go2('#' + fid);
+                            $('#' + fid).css("background-color", "inherit");
+                            go2('#selected-table > tbody tr:last');
+                        } else {
+                            //put new record table
+                            $('#selected-table > tbody:last').append(`<tr id="tr-${fid}"><td class="whl-code">${fid}</td><td>${fName}</td><td class="loc">${loc}</td><td class="qty" id="${fid}">${input}</td><td> <a class="btn btn-sm btn-outline-danger" onclick="removeRow('o-${fid}','tr-${fid}',${input})"><span class="fa fa-trash"></span></a></td></tr>`);
+                            go2('#selected-table > tbody tr:last');
+                        }
+                    }
+                }
+            }
+        });
+
+        $('#confirm-end').click(function () {
+            var jsArr = [];
+            var progress = $('#upload-progress');
+            var rowCount = $('.modal-body #selected-table > tbody  > tr').length;
+            eachRow = 100 / rowCount;
+            var wid = 0;
+            var routeURL = location.protocol + "//" + location.host;
+            $('#upload-lb').text("Collecting data...");
+            $('.modal-body #selected-table > tbody  > tr').each(function () {
+                wid += eachRow;
+                var code = $(this).children('.whl-code').text().trim();
+                    var quantity = parseFloat($(this).children('.qty').text());
+                var loc = $("#to-loc-code").text().trim();
+                    var rqTime = $('#req-time').val();
+
+                var record = { id: code, qty: quantity, whcd: loc, shipper: 0, reqTime: rqTime, det: @Html.Raw(ViewBag.DetId) };
+                jsArr.push(record);
+                setTimeout(function () {
+
+
+                }, 1000);
+                progress.text(wid + "%");
+                progress.width(wid+"%")
+
+            });
+            $('#upload-lb').text("Pushing Data...");
+            progress.text("0%");
+            progress.width("0%")
+
+            $.ajax({
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                type: 'POST',
+                url: routeURL + '/api/InvRequest/PushPickListSo',
+                data: JSON.stringify(jsArr),
+                onBegin: $('#confirm-end').prop('disabled', true),
+                success: function (data) {
+
+                    console.log(data);
+                },
+                failure: function (response) {
+                    console.log(response);
+                }
+
+            });
+
+            $('#upload-lb').text("Done!");
+            progress.text("100%");
+            progress.width("100%")
+        });
+    });
+
+</script>
+
+<!-- Modal -->
+<div class="modal fade modal-dialog-scrollable" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 class="modal-title" id="exampleModalLabel">Confirm picking list</h3>
+                <hr />
+                <div id="update-modal"></div>
+                <h5>To location ID: <span id="to-loc-code"></span> - Description: <span id="to-loc-desc"></span></h5>
+                <hr />
+                <div id="end-inv">
+                    <p align="center"><i><b>End of orders</b></i></p>
+                </div>
+                <label class="form-label" for="upload-progress" id="upload-lb"></label>
+                <div class="progress" style="height: 30px;">
+                    <div class="progress-bar"  id="upload-progress" role="progressbar" style="width: 0%; height: 100%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button id="confirm-end" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-dialog-scrollable" id="history-modal" tabindex="-1" aria-labelledby="history-modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 class="modal-title" id="history-modalLabel">Allocate history</h3>
+                <hr />
+                <table class="table table-striped" id="table1">
+                    <thead>
+                        <tr>
+                            <th>
+                                Order ID
+                            </th>
+                            <th>
+                                Item
+                            </th>
+                            <th>
+                                Inventory ID
+                            </th>
+                            <th>
+                                Quantity
+                            </th>
+
+                            <th>
+                                From Loc
+                            </th>
+                            <th>
+                                To Loc
+                            </th>
+                            <th>
+                                Order by
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in ViewBag.History)
+                        {
+                            <tr>
+                                <td>
+                                    @item.ExpOrdId
+                                </td>
+                                <td>
+                                    @item.ItemNo
+                                </td>
+                                <td>
+                                    @item.PtId
+                                </td>
+                                <td>
+                                    @item.ExpOrdQty
+                                </td>
+                                <td>
+                                    @item.LocCode
+                                </td>
+                                <td>
+                                    @if (item.ToVehicle == null)
+                                    {
+                                        <span>@item.ToLoc</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.ToVehicle</span>
+                                    }
+                                </td>
+                                <td>
+                                    @item.OrderBy
+                                </td>
+                                <td>
+                                    @if (item.Confirm == true)
+                                    {
+                                        <p class="text-success"> Completed </p>
+                                    }
+                                    else if (item.Confirm == false)
+                                    {
+                                        <p class="text-danger"> Canceled </p>
+                                    }
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

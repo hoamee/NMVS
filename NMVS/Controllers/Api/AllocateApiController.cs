@@ -211,41 +211,54 @@ namespace NMVS.Controllers.Api
                 //   holding - OrderQuantity
                 //   remain capacity - OrderQuantity
                 var toLoc = await _context.Locs.FindAsync(order.LocCode);
-                toLoc.LocHolding -= order.AlcOrdQty;
-                toLoc.LocRemain -= order.AlcOrdQty;
+                toLoc.LocHolding -= alo.MovedQty;
+                toLoc.LocRemain -= alo.MovedQty;
 
                 //3. update fromLoc:
                 //   outgo           -= OrderQty
                 //   remain capacity += OrderQty
                 var fromLoc = await _context.Locs.FindAsync(order.AlcOrdFrom);
-                fromLoc.LocOutgo -= order.AlcOrdQty;
-                fromLoc.LocRemain += order.AlcOrdQty;
+                fromLoc.LocOutgo -= alo.MovedQty;
+                fromLoc.LocRemain += alo.MovedQty;
 
-                //4. add new item master
-                _context.ItemMasters.Add(new ItemMaster()
+                var toPt = _context.ItemMasters.FirstOrDefault(x => x.LocCode == order.LocCode && x.PtDateIn == pt.PtDateIn && x.SupCode == pt.SupCode && x.RefNo == pt.RefNo && x.ItemNo == pt.ItemNo);
+                if (toPt !=null)
                 {
-                    ItemNo = pt.ItemNo,
-                    PtHold = 0,
-                    PtCmt = pt.PtCmt,
-                    PtDateIn = pt.PtDateIn,
-                    PtLotNo = pt.PtLotNo,
-                    PtQty = order.AlcOrdQty,
-                    SupCode = pt.SupCode,
-                    RecBy = loggedUser,
-                    LocCode = order.LocCode,
-                    Accepted = pt.Accepted,
-                    IcId = pt.IcId,
-                    Qc = pt.Qc,
-                    RecQty = pt.RecQty,
-                    RefDate = pt.RefDate,
-                    RefNo = pt.RefNo
-                });
+                    toPt.PtQty += alo.MovedQty;
+                    _context.Update(toPt);
+                }
+                else
+                {
+                    //4. add new item master
+                    _context.ItemMasters.Add(new ItemMaster()
+                    {
+                        ItemNo = pt.ItemNo,
+                        PtHold = 0,
+                        PtCmt = pt.PtCmt,
+                        PtDateIn = pt.PtDateIn,
+                        PtLotNo = pt.PtLotNo,
+                        PtQty = alo.MovedQty,
+                        SupCode = pt.SupCode,
+                        RecBy = loggedUser,
+                        LocCode = order.LocCode,
+                        Accepted = pt.Accepted,
+                        IcId = pt.IcId,
+                        Qc = pt.Qc,
+                        RecQty = pt.RecQty,
+                        RefDate = pt.RefDate,
+                        RefNo = pt.RefNo
+                    });
+                }
+                
 
                 //5. update from-item master
-                pt.PtHold -= order.AlcOrdQty;
-                pt.PtQty -= order.AlcOrdQty;
+                pt.PtHold -= alo.MovedQty;
+                pt.PtQty -= alo.MovedQty;
                 response.status = 1;
                 _context.Update(pt);
+                _context.Update(fromLoc);
+                _context.Update(toLoc);
+                _context.Update(order);
                 await _context.SaveChangesAsync();
                 return Ok(response);
             }
@@ -288,7 +301,7 @@ namespace NMVS.Controllers.Api
                         loc.LocOutgo -= report.Qty;
 
                         var toLoc = await _context.Locs.FindAsync(order.LocCode);
-                        loc.LocHolding -= report.Qty;
+                        toLoc.LocHolding -= report.Qty;
 
                         //case unqualified: moving item to unqualified location
                         if (report.Retrn)
@@ -311,6 +324,7 @@ namespace NMVS.Controllers.Api
                         }
                         else
                         {
+                            
 
                         }
 
@@ -374,6 +388,60 @@ namespace NMVS.Controllers.Api
                     {
                         uq.RecycleQty += report.Qty;
                         dispose = "recycled ";
+                       
+
+                        var icm = _context.IncomingLists.FirstOrDefault(x=>x.IsRecycle == true && x.RecycleId == uq.UqId && x.Closed != true);
+                        if (icm == null)
+                        {
+                            var pt = _context.ItemMasters.Find(uq.PtId);
+                            var ic = new IncomingList
+                            {
+                                Closed = false,
+                                Checked = 0,
+                                IsRecycle = true,
+                                DeliveryDate = DateTime.Now,
+                                Driver = "MFG",
+                                IsWarranty = false,
+                                ItemCount = 1,
+                                LastModifiedBy = User.Identity.Name,
+                                RecycleId = uq.UqId,
+                                SupCode = "MFG",
+                                Vehicle = "MFG"
+                            };
+                            _context.Add(ic);
+                            _context.SaveChanges();
+
+                            _context.Add(new ItemMaster
+                            {
+                                SupCode = "MFG",
+                                Accepted = 0,
+                                BatchNo = pt.BatchNo,
+                                IcId = ic.IcId,
+                                IsRecycled = true,
+                                ItemNo = pt.ItemNo,
+                                PtCmt = "Recycled item",
+                                PtDateIn = DateTime.Now,
+                                RecBy = User.Identity.Name,
+                                RecQty = report.Qty,
+                                PtHold = 0,
+                                PtLotNo = pt.PtLotNo,
+                                RefNo = pt.RefNo,
+                                RecycleDate = DateTime.Now,
+                                UnqualifiedId = ic.RecycleId,
+                                RefDate = pt.RefDate
+
+                            });
+                            _context.SaveChanges();
+                        }
+                        else
+                        {
+                            var pt = _context.ItemMasters.FirstOrDefault(x => x.IcId == icm.IcId);
+                            if (pt!= null)
+                            {
+                                pt.RecQty++;
+                                _context.Update(pt);
+                            }
+                        }
                     }
                     uq.Note += "**" + transac.TransantionTime.ToString() + ": " + dispose + report.Qty + " item. By " + transac.ByUser + ". Note: " + report.Note;
 
@@ -470,10 +538,17 @@ namespace NMVS.Controllers.Api
                 //Check if shipper is checked out
                 message = "Shipper is already checked out!";
                 var shp = await _context.Shippers.FindAsync(order.ToVehicle);
-                if (string.IsNullOrEmpty(shp.CheckOutBy))
+                if (shp != null && order.IssueType == "Issue")
                 {
-                    //Check item exist
-                    message = "Item not found";
+                    if (string.IsNullOrEmpty(shp.CheckOutBy))
+                    {
+
+                        return Ok(message);
+                    }
+
+                }
+                //Check item exist
+                message = "Item not found";
                     var pt = await _context.ItemMasters.FindAsync(order.PtId);
                     if (pt != null)
                     {
@@ -550,7 +625,7 @@ namespace NMVS.Controllers.Api
 
                         }
                     }
-                }
+                
 
                 
             }

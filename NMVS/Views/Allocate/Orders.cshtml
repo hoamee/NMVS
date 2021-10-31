@@ -86,7 +86,7 @@
                                 @Html.DisplayFor(modelItem => item.ConfirmBy)
                             </td>
                             <td>
-                                @if (item.Confirmed == true)
+                                @if (item.Confirmed == true || item.Moved >= item.Qty)
                                 {
                                     <p class="badge bg-success"> Allocated </p>
                                 }

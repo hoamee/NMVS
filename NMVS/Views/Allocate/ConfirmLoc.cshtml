@@ -255,9 +255,9 @@
             var rowCount = $('.modal-body #selected-table > tbody  > tr').length;
             eachRow = 100 / rowCount;
             var wid = 0;
-
+            var mess = "";
             $('.modal-body #selected-table > tbody  > tr').each(function (index, tr) {
-                wid = wid + eachRow;
+                
                 var code = $(this).children('.whl-code').text().trim();
                 var quantity = parseFloat($(this).children('.qty').text());
                 var reqTime = $('#req-time').val();
@@ -275,24 +275,31 @@
                         data: JSON.stringify(record),
                         onBegin: $('#confirm-end').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...'),
                         success: function (data) {
-                            bootbox.alert(data.message);
+                            mess = data.message;
                         },
                         failure: function (response) {
                             alert(response);
                         }
 
                     });
-
-                    progress.width(wid)
+                    
+                    setTimeout(function () {
+                        wid += eachRow;
+                        progress.width(wid)
+                    }, 100);
                 }
 
                 
-                setTimeout(function () {
-                    window.location.href = "/Allocate/AllocateRequests";
-                }, 3000)
+                
             });
 
-
+            bootbox.alert({
+                message: "Process completed",
+                callback: function () {
+                    window.location.href = "/Allocate/AllocateRequests";
+                }
+            });
+            
 
         });
     });

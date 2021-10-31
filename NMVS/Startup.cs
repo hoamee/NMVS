@@ -36,6 +36,7 @@ namespace NMVS
                 options.ValidationInterval = TimeSpan.FromMinutes(1);
             });
 
+
             services.AddIdentity<ApplicationUser, ApplicationRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
