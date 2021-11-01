@@ -1,0 +1,24 @@
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
+namespace NMVS.Migrations
+{
+    public partial class issueNoteShipper : Migration
+    {
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AddColumn<bool>(
+                name: "IssueConfirmed",
+                table: "Shippers",
+                type: "bit",
+                nullable: false,
+                defaultValue: false);
+        }
+
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropColumn(
+                name: "IssueConfirmed",
+                table: "Shippers");
+        }
+    }
+}

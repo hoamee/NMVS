@@ -77,6 +77,7 @@
 
                                 <th>
                                     @Html.DisplayFor(modelItem => item.ExpOrdId)
+                                    <span class="exp-pt-id" hidden> @item.PtId</span>
                                     <span class="exp-id" hidden> @item.ExpOrdId</span>
                                     <span class="exp-qty" hidden> @item.ExpOrdQty</span>
                                     <span class="exp-moved" hidden> @item.MovedQty</span>

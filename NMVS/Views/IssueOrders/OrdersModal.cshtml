@@ -157,7 +157,11 @@
             var desCode = $('#table2').find('.exp-to-ve').text().trim();
             if (desCode == '0') {
                 desCode = $('#table2').find('.exp-to-loc').text().trim();
-            } 
+            } else {
+                //exp-pt-id
+                var desCode = $('#table2').find('.exp-pt-id').text().trim();
+                alert(desCode);
+            }
 
 
             var qty = parseFloat($('#moving-qty').val());
@@ -180,6 +184,7 @@
                     // Handle on success condition with the decoded text or result.
                     console.log(`Scan result: ${decodedText}`, decodedResult);
                     var desInput = decodedText;
+                    alert(desInput);
                     html5QrcodeScanner.clear();
                     if (desInput !== desCode) {
                         alert('Incorrect destination! Please check your destination again! ' + desInput + ' - ' + desCode);

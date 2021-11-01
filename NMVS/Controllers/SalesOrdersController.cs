@@ -243,72 +243,84 @@ namespace NMVS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> SoDetCreate([Bind("SodId,SoNbr,DateIn,ItemNo,Quantity,Discount,RequiredDate,NetPrice,Tax")] SoDetail soDet)
+        public async Task<ActionResult> SoDetCreate([Bind("SodId,SoNbr,SpecDate,ItemNo,Quantity,Discount,RequiredDate,NetPrice,Tax")] SoDetail soDet)
         {
+            var soId = soDet.SoNbr;
             if (ModelState.IsValid)
             {
-                var soId = soDet.SoNbr;
+                var dataReady = true;
                 if (soDet.SpecDate != null)
                 {
                     soDet.SpecDate = Convert.ToDateTime(soDet.SpecDate);
+                    var availItem = _context.ItemMasters.Where(x => x.ItemNo == soDet.ItemNo && x.PtDateIn.Date == soDet.SpecDate).Sum(x=>x.PtQty - x.PtHold);
+                    if (availItem < soDet.Quantity)
+                    {
+                        ModelState.AddModelError("", "Input quantity couldn't be greater than available! (" + availItem + ")");
+                        dataReady = false;
+                    }
                 }
-                var so = await _context.SoDetails.Where(x => x.ItemNo == soDet.ItemNo
+                if (dataReady)
+                {
+                    var so = await _context.SoDetails.Where(x => x.ItemNo == soDet.ItemNo
                                                                                  && x.Discount == soDet.Discount &&
                                                                                  soDet.NetPrice == x.NetPrice &&
                                                                                  x.Tax == soDet.Tax
                                                                                  && x.SpecDate == soDet.SpecDate).FirstOrDefaultAsync();
-                if (so != null)
-                {
-                    so.Quantity += soDet.Quantity;
-                    await _context.SaveChangesAsync();
-                }
-                else
-                {
-                    _context.SoDetails.Add(soDet);
-                    await _context.SaveChangesAsync();
-                }
 
-                var invRq = await _context.InvRequests.FindAsync(soId);
-                if (invRq == null)
-                {
-                    _context.InvRequests.Add(new InvRequest
+
+                    if (so != null)
                     {
-                        RqType = "Issue",
-                        Ref = soId,
-                        RqBy = User.Identity.Name,
-                        RqDate = DateTime.Now,
-                        RqID = soId
-                        
-                    });
-                    await _context.SaveChangesAsync();
-                }
-
-                foreach (var rq in _context.RequestDets.Where(x => x.RqID == soId))
-                {
-                    _context.RequestDets.Remove(rq);
-                }
-
-                foreach (var det in _context.SoDetails.Where(x => x.SoNbr == soDet.SoNbr))
-                {
-                    _context.RequestDets.Add(new RequestDet
+                        so.Quantity += soDet.Quantity;
+                        await _context.SaveChangesAsync();
+                    }
+                    else
                     {
-                        RqID = det.SoNbr,
-                        ItemNo = det.ItemNo,
-                        SpecDate = det.SpecDate,
-                        Arranged = 0,
-                        Picked = 0,
-                        Issued = 0,
-                        Ready = 0,
-                        RequireDate = det.RequiredDate,
-                        Shipped = null,
-                        Quantity = det.Quantity
-                    });
+                        _context.SoDetails.Add(soDet);
+                        await _context.SaveChangesAsync();
+                    }
+
+                    var invRq = await _context.InvRequests.FindAsync(soId);
+                    if (invRq == null)
+                    {
+                        _context.InvRequests.Add(new InvRequest
+                        {
+                            RqType = "Issue",
+                            Ref = soId,
+                            RqBy = User.Identity.Name,
+                            RqDate = DateTime.Now,
+                            RqID = soId
+
+                        });
+                        await _context.SaveChangesAsync();
+                    }
+
+                    foreach (var rq in _context.RequestDets.Where(x => x.RqID == soId))
+                    {
+                        _context.RequestDets.Remove(rq);
+                    }
+
+                    foreach (var det in _context.SoDetails.Where(x => x.SoNbr == soDet.SoNbr))
+                    {
+                        _context.RequestDets.Add(new RequestDet
+                        {
+                            RqID = soId,
+                            ItemNo = det.ItemNo,
+                            SpecDate = det.SpecDate,
+                            Arranged = 0,
+                            Picked = 0,
+                            Issued = 0,
+                            Ready = 0,
+                            RequireDate = det.RequiredDate,
+                            Shipped = null,
+                            Quantity = det.Quantity
+                        });
+                    }
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Details", new { id = soId });
                 }
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Details", new { id = soId });
             }
 
-            ViewBag.SoNbr = soDet.SodId;
+            ViewBag.SoNbr = soId;
             ViewBag.ItemList = _soService.GetItemNAvail();
             return View(soDet);
         }

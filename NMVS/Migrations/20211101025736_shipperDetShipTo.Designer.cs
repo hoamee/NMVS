@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NMVS.Models;
 
 namespace NMVS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211101025736_shipperDetShipTo")]
+    partial class shipperDetShipTo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -985,23 +987,14 @@ namespace NMVS.Migrations
                     b.Property<string>("RqId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ShipTo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ShipToAddr")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ShipToId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ShipToName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ShpId")
                         .HasColumnType("int");
-
-                    b.Property<string>("SoldTo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SoldToName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("SpDetId");
 

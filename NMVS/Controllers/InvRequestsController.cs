@@ -244,7 +244,6 @@ namespace NMVS.Controllers
             return View(model);
         }
 
-
         public IActionResult MfgDetail(int id)
         {
             var isn = _db.MfgIssueNotes.Find(id);
@@ -268,6 +267,47 @@ namespace NMVS.Controllers
                 MfgIssueNote = isn
             };
 
+            return View(model);
+        }
+
+
+        public IActionResult IssueNoteSo() => View(_db.Shippers.ToList());
+
+        public IActionResult SoNoteDetails(int id)
+        {
+
+            var shp = _db.Shippers.Find(id);
+
+            var noteDet = (from d in _db.ShipperDets
+                           join i in _db.ItemDatas on d.ItemNo equals i.ItemNo into all
+                           from a in all.DefaultIfEmpty()                           
+                           join s in _db.SalesOrders on d.RqId equals s.SoNbr into sOrder
+                           from so in sOrder.DefaultIfEmpty()
+                           join c in _db.Customers on so.CustCode equals c.CustCode into soldTo
+                           from soto in soldTo.DefaultIfEmpty()
+                           join c2 in _db.Customers on so.ShipTo equals c2.CustCode into shipTo
+                           from shto in shipTo.DefaultIfEmpty()
+                           select new ShipperDet
+                           {
+                               InventoryId = d.InventoryId,
+                               DetId = d.DetId,
+                               ItemName = a.ItemName,
+                               ItemNo = a.ItemNo,
+                               Quantity = d.Quantity,
+                               RqId = d.RqId,
+                               ShpId = d.ShpId,
+                               SoldTo = soto.CustCode,
+                               SoldToName = soto.CustName,
+                               ShipToId = shto.CustCode,
+                               ShipToAddr = shto.Addr,
+                               ShipToName = shto.CustName
+                           }).ToList();
+
+            var model = new IssueNoteShipperVm
+            {
+                Det = noteDet,
+                Shp = shp
+            };
             return View(model);
         }
     }

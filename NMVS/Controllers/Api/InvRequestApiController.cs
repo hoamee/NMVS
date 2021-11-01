@@ -108,7 +108,7 @@ namespace NMVS.Controllers.Api
                 var shp = await _context.Shippers.FindAsync(order.ToVehicle);
                 if (shp != null && order.IssueType == "Issue")
                 {
-                    if (string.IsNullOrEmpty(shp.CheckOutBy))
+                    if (!string.IsNullOrEmpty(shp.CheckOutBy))
                     {
 
                         return Ok(message);
@@ -246,5 +246,77 @@ namespace NMVS.Controllers.Api
 
             return Ok(message);
         }
+
+        [HttpPost]
+        [Route("CloseNote")]
+        public async Task<IActionResult> CloseNote(MfgIssueNote issueNote)
+        {
+            string message = "Success";
+            try
+            {
+                var note = await _context.MfgIssueNotes.FindAsync(issueNote.IsNId);
+                if (note != null)
+                {
+                    note.IssuedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
+                    note.IssuedOn = DateTime.Now;
+                    _context.Update(note);
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    message = "Not found!";
+                }
+            }
+            catch(Exception e)
+            {
+                message = e.ToString();
+            }
+
+            return Ok(message);
+        }
+
+        [HttpPost]
+        [Route("CloseSoNote")]
+        public async Task<IActionResult> CloseSoNote(MfgIssueNote issueNote)
+        {
+
+            CommonResponse<int> common = new();
+            try
+            {
+
+                var note = await _context.Shippers.FindAsync(issueNote.IsNId);
+                if (note != null)
+                {
+                    int orderCount = _context.IssueOrders.Where(x => x.ToVehicle == note.ShpId && x.Confirm != true).Count();
+                    if (orderCount > 0)
+                    {
+                        var many = orderCount > 1 ? "Unable to finish. There are " + orderCount + " unfinished movements to this vehicle"
+                            : "Unable to finish. There is an unfinished movement to this vehicle";
+                        common.message = many;
+                        common.status = -1;
+                        return Ok(common);
+                    }
+
+                    note.IssueConfirmed = true;
+                    _context.Update(note);
+                    _context.SaveChanges();
+                    common.message = "Success!";
+                    common.status = 1;
+                }
+                else
+                {
+                    common.status = 0;
+                    common.message = "Not found!";
+                }
+            }
+            catch (Exception e)
+            {
+                common.status = -1;
+                common.message = e.ToString();
+            }
+
+            return Ok(common);
+        }
+
     }
 }

@@ -57,6 +57,8 @@ namespace NMVS.Models.DbModels
 
         [Display(Name = "Registered by")]
         public string RegisteredBy { set; get; }
+
+        public bool IssueConfirmed { set; get; }
     }
 
     public class ShipperDet
@@ -72,6 +74,15 @@ namespace NMVS.Models.DbModels
 
         public string RqId { set; get; }
 
+        public string ShipToId { set; get; }
+
+        public string ShipToName { set; get; }
+
+        public string ShipToAddr { set; get; }
+
+        public string SoldTo { set; get; }
+        public string SoldToName { set; get; }
+
         [Display(Name = "Item No.")]
         public string ItemNo { set; get; }
 
@@ -82,5 +93,6 @@ namespace NMVS.Models.DbModels
         public double Quantity { set; get; }
 
         public int InventoryId { set; get; }
+
     }
 }
