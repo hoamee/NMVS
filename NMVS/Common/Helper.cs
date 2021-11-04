@@ -24,5 +24,11 @@ namespace NMVS.Common
         public const string RegVehicle = "Register vehicle";
 
         public const string Guard = "Guard";
+
+        public const string MoveInventory = "Move inventory";
+
+        public const string ArrangeInventory = "Arrange inventory";
+
+        public const string SupperUser = "SupperUser";
     }
 }

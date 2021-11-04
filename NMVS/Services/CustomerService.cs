@@ -94,13 +94,24 @@ namespace NMVS.Services
             return customerList;
         }
 
-        public async Task<ExcelRespone> ImportCustomer(string fileName)
+        public async Task<CommonResponse<UploadReport>> ImportCustomer(string filepath, string fileName, string user)
         {
-            ExcelRespone excelRespose = new();
+
+            CommonResponse<UploadReport> common = new();
+            common.dataenum = new()
+            {
+                FileName = fileName,
+                UploadBy = user,
+                UploadTime = DateTime.Now,
+                UploadId = user + DateTime.Now.ToString("yyyyMMddHHmmss"),
+                UploadFunction = "Upload supplier"
+
+            };
+
             ExcelDataHelper _eHelper = new();
             // Open the spreadsheet document for read-only access.
             using (SpreadsheetDocument document =
-                SpreadsheetDocument.Open(fileName, false))
+                SpreadsheetDocument.Open(filepath, false))
             {
                 // Retrieve a reference to the workbook part.
                 WorkbookPart wbPart = document.WorkbookPart;
@@ -121,10 +132,6 @@ namespace NMVS.Services
                 WorksheetPart wsPart =
                     (WorksheetPart)(wbPart.GetPartById(theSheet.Id));
                 int readingRow = 2;
-                int imported = 0;
-                int updateted = 0;
-                int recordCount = 0;
-                int failed = 0;
 
                 var headerVerify = _eHelper.VefiryHeader(wsPart, wbPart, "A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2", "I2", "J2",
                     "Customer code", "Customer code AP", "Agent No.", "Customer name", "Address", "City", "Country", "Tax code", "Email 1", "Email 2");
@@ -132,11 +139,29 @@ namespace NMVS.Services
 
                 if (!headerVerify)
                 {
-                    excelRespose.error += " **Incorrect header format. Please the header at line 2.";
+                    common.dataenum.TotalRecord = 0;
+                    common.dataenum.Updated = 0;
+                    common.dataenum.Errors = 1;
+                    common.dataenum.Inserted = 0;
+
+                    common.status = -1;
+                    common.message = "File header is in correct!";
+
+                    _db.Add(new UploadError
+                    {
+                        UploadId = common.dataenum.UploadId,
+                        Error = common.message
+                    });
+
+                    _db.Add(common.dataenum);
+                    await _db.SaveChangesAsync();
+                    return common;
                 }
 
                 while (headerVerify)
                 {
+
+                    common.dataenum.TotalRecord++;
                     readingRow++;
                     string custCode, apCode, agent, custName, address;
                     custCode = _eHelper.GetCellValue(wsPart, wbPart, "A" + readingRow);
@@ -155,11 +180,18 @@ namespace NMVS.Services
                         && string.IsNullOrEmpty(custName)
                         && string.IsNullOrEmpty(address))
                         {
+                            common.dataenum.TotalRecord--;
                             break;
                         }
                         else
                         {
-                            excelRespose.error += " **Data Skipped: Customer code not found at line " + readingRow + "!";
+
+                            common.dataenum.Errors++;
+                            _db.Add(new UploadError
+                            {
+                                Error = "Line " + readingRow + ": Missing item code",
+                                UploadId = common.dataenum.UploadId
+                            });
                             continue;
                         }
                     }
@@ -170,13 +202,15 @@ namespace NMVS.Services
                         || string.IsNullOrEmpty(custName)
                         || string.IsNullOrEmpty(address))
                     {
-                        failed++;
-                        excelRespose.error += " **Data Skipped at line " + readingRow + ":"
+                        common.dataenum.Errors++; _db.Add(new UploadError
+                        {
+                            UploadId = common.dataenum.UploadId,
+                            Error = " Data Skipped at line " + readingRow + ":"
                             + (string.IsNullOrEmpty(apCode) ? " AP code not found;" : "")
                             + (string.IsNullOrEmpty(agent) ? " Agent No. not found;" : "")
                             + (string.IsNullOrEmpty(custName) ? " Customer name not found;" : "")
                             + (string.IsNullOrEmpty(address) ? " Address not found;" : "")
-                            ;
+                        });
                         continue;
                     }
 
@@ -202,7 +236,7 @@ namespace NMVS.Services
                             customer.Note = _eHelper.GetCellValue(wsPart, wbPart, "M" + readingRow);
                             customer.Active = true;
                             _db.Update(customer);
-                            updateted++;
+                            common.dataenum.Updated++;
                             await _db.SaveChangesAsync();
 
                         }
@@ -229,24 +263,26 @@ namespace NMVS.Services
 
                             await _db.AddAsync(customer);
                             await _db.SaveChangesAsync();
-                            imported++;
+                            common.dataenum.Inserted++;
+                            common.status = 1;
                         }
                     }
                     catch (Exception e)
                     {
-                        failed++;
-                        excelRespose.error += " **Line " + readingRow + ": "
+                        common.dataenum.Errors++;
+                        var error = "Line " + readingRow + ": "
                            + e.Message + ";";
+                        _db.Add(new UploadError
+                        {
+                            UploadId = common.dataenum.UploadId,
+                            Error = error
+                        });
                     }
-                    recordCount++;
                 }
-                excelRespose.processed = recordCount;
-                excelRespose.updated = updateted;
-                excelRespose.imported = imported;
             }
-
-
-            return excelRespose;
+            _db.Add(common.dataenum);
+            await _db.SaveChangesAsync();
+            return common;
         }
 
         public async Task<CommonResponse<Customer>> UpdateCustomer(Customer customer)

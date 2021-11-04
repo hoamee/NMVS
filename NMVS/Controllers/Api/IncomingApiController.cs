@@ -109,7 +109,7 @@ namespace NMVS.Controllers.Api
             var role = _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
 
             var receiveLoc = _context.Locs.FirstOrDefault(l => l.LocType == "receive");
-            CommonResponse<int> common = new();
+            CommonResponse<string> common = new();
             if (role)
             {
                 if (receiveLoc != null)
@@ -122,15 +122,17 @@ namespace NMVS.Controllers.Api
                         pt.PtQty = pt.RecQty - item.PtQty;
                         pt.Qc = _httpContextAccessor.HttpContext.User.Identity.Name;
                         pt.LocCode = receiveLoc.LocCode;
+                        pt.PtCmt += string.IsNullOrEmpty(pt.PtCmt)?  item.PtCmt : " | " + item.PtCmt ;
                         var ic = _context.IncomingLists.Find(pt.IcId);
                         ic.Checked++;
-                        receiveLoc.LocRemain -= pt.RecQty - item.PtQty;
+                        receiveLoc.LocRemain -= pt.PtQty;
 
                         _context.Update(pt);
                         _context.Update(ic);
                         _context.Update(receiveLoc);
                         _context.SaveChanges();
                         common.status = 1;
+                        common.dataenum = _httpContextAccessor.HttpContext.User.Identity.Name;
                     }
                     catch (Exception e)
                     {

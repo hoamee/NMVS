@@ -49,6 +49,8 @@ namespace NMVS.Models.DbModels
 
         public string LastModifiedBy { set; get; }
 
+        public string PtNote { set; get; }
+
         public virtual ICollection<ItemMaster> ItemMasters { set; get; }
 
     }

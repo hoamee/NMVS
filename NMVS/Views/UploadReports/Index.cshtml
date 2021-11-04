@@ -1,0 +1,99 @@
+﻿@model IEnumerable<NMVS.Models.DbModels.UploadReport>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-flush" id="datatable-search">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>
+                                    Time
+                                </th>
+                                <th>
+                                    Account
+                                </th>
+                                <th>
+                                    File name
+                                </th>
+                                <th>
+                                    Function
+                                </th>
+                                <th>
+                                    Total records
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Inserted)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Updated)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Errors)
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.UploadTime)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.UploadBy)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.FileName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.UploadFunction)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.TotalRecord)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Inserted)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Updated)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Errors)
+                                    </td>
+                                    <td>
+                                        <a asp-action="Details" class="btn btn-outline-info btn-sm" asp-route-id="@item.UploadId">Details</a> |
+                                        <a asp-action="Delete" class="btn btn-outline-danger btn-sm" asp-route-id="@item.UploadId">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('.nav-up-rp').addClass('active');
+        $('#datatable-search').DataTable({
+            "order": [[0, "desc"]]
+        });
+    });
+</script>

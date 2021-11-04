@@ -17,11 +17,13 @@ namespace NMVS.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly IRequestService _service;
+        private readonly IExcelService _excelService;
 
-        public InvRequestsController(ApplicationDbContext db, IRequestService service)
+        public InvRequestsController(ApplicationDbContext db, IRequestService service, IExcelService excelService)
         {
             _service = service;
             _db = db;
+            _excelService = excelService;
         }
 
 
@@ -202,7 +204,7 @@ namespace NMVS.Controllers
             ViewBag.History = _db.IssueOrders.Where(x => x.DetId == id).ToList();
 
             ViewBag.LocList = new SelectList(_db.Shippers
-                .Where(x => string.IsNullOrEmpty(x.CheckOutBy))
+                .Where(x => string.IsNullOrEmpty(x.CheckOutBy) && x.IssueConfirmed != true)
                 .ToList(), "ShpId", "ShpDesc");
 
             if (rq.SpecDate == null)
@@ -278,7 +280,7 @@ namespace NMVS.Controllers
 
             var shp = _db.Shippers.Find(id);
 
-            var noteDet = (from d in _db.ShipperDets
+            var noteDet = (from d in _db.ShipperDets.Where(x=>x.ShpId == id)
                            join i in _db.ItemDatas on d.ItemNo equals i.ItemNo into all
                            from a in all.DefaultIfEmpty()                           
                            join s in _db.SalesOrders on d.RqId equals s.SoNbr into sOrder
@@ -295,7 +297,7 @@ namespace NMVS.Controllers
                                ItemNo = a.ItemNo,
                                Quantity = d.Quantity,
                                RqId = d.RqId,
-                               ShpId = d.ShpId,
+                               ShpId = id,
                                SoldTo = soto.CustCode,
                                SoldToName = soto.CustName,
                                ShipToId = shto.CustCode,
@@ -310,5 +312,39 @@ namespace NMVS.Controllers
             };
             return View(model);
         }
+
+        public async Task<IActionResult> DownloadShipperNote(int id)
+        {
+
+            var common = await _excelService.GetshipperNote(id, User.Identity.Name);
+            if (common.status == 1)
+            {
+                var filePath = common.dataenum;
+                var fs = System.IO.File.OpenRead(filePath);
+                return File(fs, "application /vnd.ms-excel", common.message);
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home", new { common.message });
+            }
+        }
+
+        public async Task<IActionResult> DownloadIssueNoteSo(int id)
+        {
+
+            var common = await _excelService.GetIssueNoteSo(id, User.Identity.Name);
+            if (common.status == 1)
+            {
+                var filePath = common.dataenum;
+                var fs = System.IO.File.OpenRead(filePath);
+                return File(fs, "application /vnd.ms-excel", common.message);
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home", new { common.message });
+            }
+        }
+
+       
     }
 }

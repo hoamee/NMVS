@@ -45,32 +45,64 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                        <tr id="tr-@item.UqId">
-                            <td>
-                                <span class="btn btn-outline-primary" onclick="takeAction(@item.UqId);">@item.UqId</span>
-                            </td>
-                            <td class="text-sm font-weight-normal pt-no">
-                                @Html.DisplayFor(modelItem => item.ItemNo)
-                            </td>
-                            <td class="pt-id">
-                                @Html.DisplayFor(modelItem => item.PtId)
-                            </td>
-                            <td class="tt-qty">
-                                @Html.DisplayFor(modelItem => item.Quantity)
-                            </td>
-                            <td style="white-space: normal;">
-                                <span >@Html.DisplayFor(modelItem => item.Description)</span>
-                            </td>
-                            <td class="rec-qty">
-                                @Html.DisplayFor(modelItem => item.RecycleQty)
-                            </td>
-                            <td class="dis-qty">
-                                @Html.DisplayFor(modelItem => item.DisposedQty)
-                            </td>
-                            <td style="white-space: normal;">
-                                @Html.DisplayFor(modelItem => item.Note)
-                            </td>
-                        </tr>
+                            bool done = false;
+                            var color = "";
+                            @if (item.DisposedQty + item.RecycleQty >= item.Quantity)
+                            {
+                                done = true;
+                            }
+                            if (done)
+                            {
+                                color = "";
+                            }
+                            <tr id="tr-@item.UqId" class="@color">
+
+
+                                <td>
+                                    @if (done)
+                                    {
+                                    <button class="btn btn-outline-secondary" disabled >@item.UqId</button>
+                                    }
+                                    else
+                                    {
+                                        <span class="btn btn-outline-primary" onclick="takeAction(@item.UqId);">@item.UqId</span>
+                                    }
+
+                                </td>
+                                <td class="text-sm font-weight-normal pt-no">
+                                    
+                                    @Html.DisplayFor(modelItem => item.ItemNo)
+                                </td>
+                                <td class="pt-id">
+                                    @Html.DisplayFor(modelItem => item.PtId)
+                                </td>
+                                <td class="tt-qty">
+                                    @Html.DisplayFor(modelItem => item.Quantity)
+                                </td>
+                                <td style="white-space: normal;">
+                                    <span>@Html.DisplayFor(modelItem => item.Description)</span>
+                                </td>
+                                <td class="rec-qty">
+                                    @Html.DisplayFor(modelItem => item.RecycleQty)
+                                </td>
+                                <td class="dis-qty">
+                                    @Html.DisplayFor(modelItem => item.DisposedQty)
+                                </td>
+                                <td style="white-space: normal;">
+                                    @{
+                                        string[] words = item.Note.Split("**");
+                                        foreach (var w in words)
+                                        {
+                                            if (!string.IsNullOrEmpty(w))
+                                            {
+                                                <span>@w</span><br />
+                                            }
+
+                                        }
+
+                                    }
+                                </td>
+                            </tr>
                         }
                     </tbody>
                 </table>

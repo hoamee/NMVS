@@ -75,18 +75,16 @@
                         </dd>
                     }
 
-                    <dt class="col-sm-2">
-                        Note
-                    </dt>
 
-                    <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.Rq.Note)
-                    </dd>
 
                 </dl>
             </div>
             <div class="card-footer">
-                <a asp-action="UpdateList" class="btn btn-outline-warning" asp-route-id="@Model.Rq.Id">Update</a>
+                @if (Model.Rq.RqType == "MFG" && Model.Rq.SoConfirm != true)
+                {
+                    <a asp-action="UpdateList" class="btn btn-outline-warning" asp-route-id="@Model.Rq.Id">Update</a>
+                }
+
                 <a asp-action="History" class="btn btn-outline-secondary">History</a>
             </div>
         </div>
@@ -126,7 +124,10 @@
                                     Picked
                                 </th>
                                 <th>
-                                    Shipped
+                                    Arranged
+                                </th>
+                                <th>
+                                    Movement note
                                 </th>
                                 <th>
                                     Required Date
@@ -143,13 +144,23 @@
                                         {
                                             if (item.Quantity > item.Picked || item.Picked == 0)
                                             {
-                                                <a class="btn btn-outline-info" href="/InvRequests/PickListSO/?id=@item.DetId">Picking list</a>
+                                                @if (Model.Rq.RqType == "MFG")
+                                                {
+                                                    <a class="btn btn-outline-info" href="/InvRequests/PickListMFG/?id=@item.DetId">Picking list</a>
+                                                }
+
+                                                else
+                                                {
+                                                    <a class="btn btn-outline-info" href="/InvRequests/PickListSO/?id=@item.DetId">Picking list</a>
+
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success">Picked</span>
                                             }
                                         }
-                                        @if (Model.Rq.RqType == "MFG")
-                                        {
-                                            <a class="btn btn-outline-info" href="/InvRequests/PickListMFG/?id=@item.DetId">Picking list</a>
-                                        }
+
                                     </td>
                                     <td>
                                         @item.ItemNo
@@ -167,16 +178,10 @@
                                         @Html.DisplayFor(m => item.Picked)
                                     </td>
                                     <td>
-                                        @if (item.Shipped == true)
-                                        {
-
-
-                                            <span class="badge bg-gradient-success">Shipped</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-gradient-secondary">Not yet</span>
-                                        }
+                                        @Html.DisplayFor(m => item.Arranged)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.MovementNote)
                                     </td>
                                     <td>
                                         @Html.DisplayFor(m => item.RequireDate)
@@ -185,7 +190,7 @@
                                 </tr>
 
                             }
-                            @if (Model.Rq.RqType == "MFG")
+                            @if (Model.Rq.RqType == "MFG" && Model.Rq.SoConfirm != true)
                             {
                                 <tr>
                                     <td colspan="8" class="text-center col-6">
@@ -196,12 +201,12 @@
                                             </span>
                                         </a>
 
-                                        <a class="btn btn-primary" href="/SaleOrders/SoConfirm/">
-                                            <span><i class="bi bi-check"></i></span>
+                                        <div class="btn btn-primary" id="close-btn">
+                                            <span><i class="fa fa-check" style="color: green"></i></span>
                                             <span>
                                                 Close
                                             </span>
-                                        </a>
+                                        </div>
 
                                     </td>
                                 </tr>
@@ -218,11 +223,53 @@
         </div>
     </div>
 </div>
-
+<script src="~/assets/js/bootbox/bootbox.min.js"></script>
 <script>
     $(document).ready(function () {
         $('.nav-request').addClass('active');
         $('.nav-rq-his').addClass('active');
         $('#navRequest').addClass('show');
+        var routeURL = location.protocol + "//" + location.host;
+
+        $('#close-btn').click(function () {
+            bootbox.confirm({
+                message: "Are you sure want to close this request",
+                callback: function (e) {
+                    if (e) {
+                        var shpr = {
+                            whcd: '@Html.Raw(Model.Rq.Id)',
+                            qty: 0,
+                            id: 0,
+                            shipper: 0,
+                            det: 0
+                        };
+                        var postData = JSON.stringify(shpr);
+                        $.ajax({
+                            url: routeURL + '/api/InvRequest/CloseRequest',
+                            method: "POST",
+                            contentType: "application/json; charset=utf8",
+                            data: postData,
+                            success: function (dt) {
+                                if (dt.status == 1) {
+                                    bootbox.alert({
+                                        message: "Completed!",
+                                        data: postData,
+                                        callback: function () {
+                                            window.location.href = window.location.href;
+                                        }
+                                    });
+                                } else {
+                                    bootbox.alert('<span class="text-center text-danger"> Failed! </span>');
+                                }
+
+                            }
+
+                        });
+                    }
+                }
+            });
+
+        })
+
     });
 </script>

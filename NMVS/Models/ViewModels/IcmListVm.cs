@@ -22,5 +22,6 @@ namespace NMVS.Models.ViewModels
         public double AcceptQty { set; get; }
         public bool? IsChecked { set; get; }
         public string CheckedBy { set; get; }
+        public string Note { set; get; }
     }
 }

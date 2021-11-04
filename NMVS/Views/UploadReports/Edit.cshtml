@@ -1,0 +1,67 @@
+﻿@model NMVS.Models.DbModels.UploadReport
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Edit</h1>
+
+<h4>UploadReport</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="UploadId" />
+            <div class="form-group">
+                <label asp-for="UploadTime" class="control-label"></label>
+                <input asp-for="UploadTime" class="form-control" />
+                <span asp-validation-for="UploadTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UploadBy" class="control-label"></label>
+                <input asp-for="UploadBy" class="form-control" />
+                <span asp-validation-for="UploadBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FileName" class="control-label"></label>
+                <input asp-for="FileName" class="form-control" />
+                <span asp-validation-for="FileName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UploadFunction" class="control-label"></label>
+                <input asp-for="UploadFunction" class="form-control" />
+                <span asp-validation-for="UploadFunction" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TotalRecord" class="control-label"></label>
+                <input asp-for="TotalRecord" class="form-control" />
+                <span asp-validation-for="TotalRecord" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Inserted" class="control-label"></label>
+                <input asp-for="Inserted" class="form-control" />
+                <span asp-validation-for="Inserted" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Updated" class="control-label"></label>
+                <input asp-for="Updated" class="form-control" />
+                <span asp-validation-for="Updated" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Errors" class="control-label"></label>
+                <input asp-for="Errors" class="form-control" />
+                <span asp-validation-for="Errors" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

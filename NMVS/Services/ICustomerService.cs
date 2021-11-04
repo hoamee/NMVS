@@ -17,7 +17,7 @@ namespace NMVS.Services
 
         public Customer GetCustomer(string customer);
 
-        public Task<ExcelRespone> ImportCustomer(string fileName);
+        public Task<CommonResponse<UploadReport>> ImportCustomer(string filepath, string fileName, string user);
 
     }
 }

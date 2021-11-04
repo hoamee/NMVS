@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -15,24 +16,28 @@ using NMVS.Services;
 
 namespace NMVS.Controllers
 {
+    [Authorize(Roles = "Receive inventory")]
     public class IncomingListsController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IIncomingService _service;
-
-        public IncomingListsController(ApplicationDbContext context, IIncomingService service)
+        private readonly IExcelService _excelService;
+        public IncomingListsController(ApplicationDbContext context, IIncomingService service, IExcelService excelService)
         {
             _service = service;
             _context = context;
+            _excelService = excelService;
         }
+
 
         // GET: IncomingLists
         public IActionResult Browse()
         {
-            
+
             return View(_service.BrowseIncomingList(false));
         }
 
+        [Authorize(Roles = "Receive inventory")]
         // GET: IncomingLists/Details/5
         public IActionResult Details(int? id)
         {
@@ -62,20 +67,30 @@ namespace NMVS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Receive inventory")]
         public async Task<IActionResult> CreateListHeader([Bind("IcId,SupCode,Po,PoDate,Vehicle,Driver,DeliveryDate,IsWarranty,Closed")] IncomingList incomingList)
         {
-            if (ModelState.IsValid)
+            try
             {
-                incomingList.LastModifiedBy = User.Identity.Name;
-                _context.Add(incomingList);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                if (ModelState.IsValid)
+                {
+                    incomingList.LastModifiedBy = User.Identity.Name;
+                    _context.Add(incomingList);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError("", "An error occured. Please check whether the ID is null or used before" );
             }
             ViewBag.Suppliers = _service.GetSupplier();
             return View(incomingList);
         }
 
         // GET: IncomingLists/Edit/5
+        [Authorize(Roles = "Receive inventory")]
         public async Task<IActionResult> UpdateList(int? id)
         {
             if (id == null)
@@ -97,6 +112,7 @@ namespace NMVS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Receive inventory")]
         public async Task<IActionResult> UpdateList(int id, [Bind("IcId,SupCode,Po,PoDate,Vehicle,Driver,DeliveryDate,IsWarranty,Closed")] IncomingList incomingList)
         {
             if (id != incomingList.IcId)
@@ -130,6 +146,7 @@ namespace NMVS.Controllers
         }
 
         // GET: IncomingLists/Delete/5
+        [Authorize(Roles = "Receive inventory")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -150,6 +167,7 @@ namespace NMVS.Controllers
         // POST: IncomingLists/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Receive inventory")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var incomingList = await _context.IncomingLists.FindAsync(id);
@@ -163,49 +181,26 @@ namespace NMVS.Controllers
             return _context.IncomingLists.Any(e => e.IcId == id);
         }
 
-        public JsonResult AddItem(ItemMaster item)
-        {
-            ItemMaster iItem = item;
-            CommonResponse<int> common = new();
-            try
-            {
-                _context.Add(new ItemMaster
-                {
-                    ItemNo = iItem.ItemNo,
-                    IcId = iItem.IcId,
-                    RecQty = iItem.RecQty,
-                    RefNo = iItem.RefNo,
-                    RefDate = iItem.RefDate,
-                    PtCmt = iItem.PtCmt
-                });
-                _context.SaveChanges();
-                common.status = 1;
-            }
-            catch(Exception e)
-            {
-                common.status = -1;
-                common.message = e.ToString();
-            }
-            return Json(common);
-        }
 
+        [Authorize(Roles = "Receive inventory")]
         public async Task<JsonResult> UploadList(IList<IFormFile> files)
         {
-            ExcelRespone excelRespose = new();
+            var common = new CommonResponse<UploadReport>();
             foreach (IFormFile source in files)
             {
                 string filename = ContentDispositionHeaderValue.Parse(source.ContentDisposition).FileName.Trim('"');
 
-                filename = this.EnsureCorrectFilename(filename);
+                filename = EnsureCorrectFilename(filename);
 
                 using (FileStream output = System.IO.File.Create("uploads/" + filename))
                     await source.CopyToAsync(output);
 
-                excelRespose = await _service.ImportList("uploads/" + filename, User.Identity.Name);
-                excelRespose.fileName = filename;
+                common = await _service.ImportList("uploads/" + filename, filename, User.Identity.Name);
 
             }
-            return Json(excelRespose);
+
+
+            return Json(common);
         }
 
         private string EnsureCorrectFilename(string filename)
@@ -214,6 +209,25 @@ namespace NMVS.Controllers
                 filename = filename.Substring(filename.LastIndexOf("\\") + 1);
 
             return filename;
+        }
+
+
+        [Authorize(Roles = "Receive inventory")]
+        public async Task<IActionResult> DownloadList(int id)
+        {
+            var common = await _excelService.GetReceiptNote(id, User.Identity.Name);
+            if (common.status == 1)
+            {
+                var filePath = common.dataenum;
+                var fileExists = System.IO.File.Exists(filePath);
+                var fs = System.IO.File.OpenRead(filePath);
+                return File(fs, "application /vnd.ms-excel", common.message);
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home", new { common.message });
+            }
+
         }
     }
 }

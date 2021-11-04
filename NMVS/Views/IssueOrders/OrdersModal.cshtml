@@ -143,13 +143,14 @@
 
 <script>
     var routeURL = location.protocol + "//" + location.host;
+    $('.modal-btn').click(function () {
+        $('#table2 #t2-tr').html($(this).closest('tr').html());
+        $('#table2 #t2-tr').children('td:last').remove();
+        $('#exampleModal').modal('toggle');
+
+    });
     $(document).ready(function () {
-        $('.modal-btn').click(function () {
-            $('#table2 #t2-tr').html($(this).closest('tr').html());
-            $('#table2 #t2-tr').children('td:last').remove();
-            $('#exampleModal').modal('toggle');
-           
-        });
+        
 
 
         $('#confirm-end').click(function () {
@@ -160,7 +161,7 @@
             } else {
                 //exp-pt-id
                 var desCode = $('#table2').find('.exp-pt-id').text().trim();
-                alert(desCode);
+
             }
 
 
@@ -184,10 +185,9 @@
                     // Handle on success condition with the decoded text or result.
                     console.log(`Scan result: ${decodedText}`, decodedResult);
                     var desInput = decodedText;
-                    alert(desInput);
                     html5QrcodeScanner.clear();
                     if (desInput !== desCode) {
-                        alert('Incorrect destination! Please check your destination again! ' + desInput + ' - ' + desCode);
+                        bootbox.alert('Incorrect destination! Please check your destination again! ' + desInput + ' - ' + desCode);
                     }
                     else {
                         var oId = parseInt($('#table2').find('.exp-id').text().trim());
@@ -204,9 +204,13 @@
                             type: 'POST',
                             url: routeURL + '/api/InvRequest/FinishIssueOrder',
                             data: JSON.stringify(alo),
-                            success: function (data) {
-                                mess = data;
-
+                            success: function (common) {
+                                bootbox.alert({
+                                    message: '<h6> <span class="fa fa-check 3x" style="color: green"> </span> ' + common.message + ' </h6>',
+                                    callback: function () {
+                                        window.location.href = window.location.href;
+                                    }
+                                });
                             },
                             failure: function (response) {
                                 alert(response);
@@ -218,7 +222,6 @@
                         });
 
                         $('#exampleModal').modal('toggle');
-                        bootbox.alert('<h5 class="text-success"><span class="fas fa-check-double" style="color: green;"></span> ' + mess + '</h5>')
                         //setTimeout(function () {
                         //    window.location.reload();
                         //}, 1000);
@@ -237,13 +240,12 @@
 
         $('#send-report').click(function () {
             var cmmt = $("#report-input");
-            var oId = parseInt($('#table3 .td-id').text().trim());
+            var oId = parseInt($('#table3').find('.exp-id').text().trim());
             var unq = $('#unqualified').is(":checked");
-            var oQty = parseFloat($('#table3 #t3-tr').children('.td-qty').text().trim());
+            var oQty = parseFloat($('#table3 #t3-tr').find('.exp-qty').text().trim());
             var qty = $('#input-qty').val();
             var note = cmmt.val().trim();
 
-            alert(unq);
 
             if (qty > oQty) {
                 $('#input-qty').notify('Report quantity could\'nt be larger than order quantity');
@@ -302,6 +304,7 @@
                             },
                             complete: function () {
                                 $('#reportModal').modal('toggle');
+                                window.location.href = window.location.href;
                             }
 
                         });

@@ -25,7 +25,7 @@ namespace NMVS.Services
 
         public List<UserVm> GetUserList()
         {
-            List<UserVm> userList = (from user in _db.Users
+            List<UserVm> userList = (from user in _db.Users.Where(x => x.UserName != "nmvadmin")
                                      select new UserVm
                                      {
                                          UserEmail = user.Email,
@@ -40,32 +40,34 @@ namespace NMVS.Services
 
         public List<UserRoleVm> GetUserRoleList()
         {
-            var users = _userManager.Users
+            var users = _userManager.Users.Where(x => x.UserName != "nmvadmin")
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role).AsNoTracking();
 
             var userRolesList2 = (from user in users
                                   select new
-                                 {
-                                     Username = user.UserName,
+                                  {
+                                      Username = user.UserName,
                                       UserLock = user.Active,
                                       RoleNames = (from userRole in user.UserRoles
-                                                  select userRole.Role.Name).ToList()
-                                 }).ToList().Select(p => new UserRoleVm()
+                                                   select userRole.Role.Name).ToList()
+                                  }).ToList().Select(p => new UserRoleVm()
 
-                                 {
-                                     UserName = p.Username,
-                                     Guard = p.RoleNames.Contains(Helper.Guard),
-                                     QC = p.RoleNames.Contains(Helper.QC),
-                                     AppSO = p.RoleNames.Contains(Helper.AppSO),
-                                     CreateSO = p.RoleNames.Contains(Helper.CreateSO),
-                                     RequestInv = p.RoleNames.Contains(Helper.RequestInv),
-                                     HandleRequest = p.RoleNames.Contains(Helper.HandleRequest),
-                                     ReceiveInv = p.RoleNames.Contains(Helper.ReceiveInv),
-                                     RegVehicle = p.RoleNames.Contains(Helper.RegVehicle),
-                                     UserManagement = p.RoleNames.Contains(Helper.UserManagement),
-                                     Active = p.UserLock
-                                 }).ToList();
+                                  {
+                                      UserName = p.Username,
+                                      Guard = p.RoleNames.Contains(Helper.Guard),
+                                      QC = p.RoleNames.Contains(Helper.QC),
+                                      AppSO = p.RoleNames.Contains(Helper.AppSO),
+                                      CreateSO = p.RoleNames.Contains(Helper.CreateSO),
+                                      RequestInv = p.RoleNames.Contains(Helper.RequestInv),
+                                      HandleRequest = p.RoleNames.Contains(Helper.HandleRequest),
+                                      ReceiveInv = p.RoleNames.Contains(Helper.ReceiveInv),
+                                      RegVehicle = p.RoleNames.Contains(Helper.RegVehicle),
+                                      UserManagement = p.RoleNames.Contains(Helper.UserManagement),
+                                      ArrangeInventory = p.RoleNames.Contains(Helper.ArrangeInventory),
+                                      MoveInv = p.RoleNames.Contains(Helper.MoveInventory),
+                                      Active = p.UserLock
+                                  }).ToList();
 
             //var userRolesList = (from user in _db.Users
             //                     select new
@@ -98,7 +100,7 @@ namespace NMVS.Services
         {
             var users = _userManager.Users
             .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role).AsNoTracking().Where(x=>x.UserName == userName);
+                .ThenInclude(ur => ur.Role).AsNoTracking().Where(x => x.UserName == userName);
 
             var userRolesList2 = (from user in users
                                   select new
@@ -120,6 +122,8 @@ namespace NMVS.Services
                                       ReceiveInv = p.RoleNames.Contains(Helper.ReceiveInv),
                                       RegVehicle = p.RoleNames.Contains(Helper.RegVehicle),
                                       UserManagement = p.RoleNames.Contains(Helper.UserManagement),
+                                      ArrangeInventory = p.RoleNames.Contains(Helper.ArrangeInventory),
+                                      MoveInv = p.RoleNames.Contains(Helper.MoveInventory),
                                       Active = p.UserLock
                                   }).FirstOrDefault();
 
@@ -131,6 +135,16 @@ namespace NMVS.Services
             if (!_roleManager.RoleExistsAsync(Helper.UserManagement).GetAwaiter().GetResult())
             {
                 await _roleManager.CreateAsync(new ApplicationRole(Helper.UserManagement));
+            }
+
+            if (!_roleManager.RoleExistsAsync(Helper.MoveInventory).GetAwaiter().GetResult())
+            {
+                await _roleManager.CreateAsync(new ApplicationRole(Helper.MoveInventory));
+            }
+
+            if (!_roleManager.RoleExistsAsync(Helper.ArrangeInventory).GetAwaiter().GetResult())
+            {
+                await _roleManager.CreateAsync(new ApplicationRole(Helper.ArrangeInventory));
             }
 
             if (!_roleManager.RoleExistsAsync(Helper.Guard).GetAwaiter().GetResult())
@@ -173,12 +187,18 @@ namespace NMVS.Services
             {
                 await _roleManager.CreateAsync(new ApplicationRole(Helper.RegVehicle));
             }
+
+            if (!_roleManager.RoleExistsAsync("SuperUser").GetAwaiter().GetResult())
+            {
+                await _roleManager.CreateAsync(new ApplicationRole("SuperUser"));
+            }
         }
 
         public async Task SeedingRole(UserRoleVm usr)
         {
 
             ApplicationUser user = await _userManager.FindByNameAsync(usr.UserName);
+
             //1. Guard
             if (usr.Guard)
             {
@@ -323,6 +343,38 @@ namespace NMVS.Services
                 }
             }
 
+            //10. Arrange inventory
+            if (usr.ArrangeInventory)
+            {
+                if (!await _userManager.IsInRoleAsync(user, Helper.ArrangeInventory))
+                {
+                    await _userManager.AddToRoleAsync(user, Helper.ArrangeInventory);
+                }
+            }
+            else
+            {
+                if (await _userManager.IsInRoleAsync(user, Helper.ArrangeInventory))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, Helper.ArrangeInventory);
+                }
+            }
+
+            //11. Arrange inventory
+            if (usr.MoveInv)
+            {
+                if (!await _userManager.IsInRoleAsync(user, Helper.MoveInventory))
+                {
+                    await _userManager.AddToRoleAsync(user, Helper.MoveInventory);
+                }
+            }
+            else
+            {
+                if (await _userManager.IsInRoleAsync(user, Helper.MoveInventory))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, Helper.MoveInventory);
+                }
+            }
+
             //10. Active
             if (usr.Active)
             {
@@ -340,6 +392,16 @@ namespace NMVS.Services
                     await _userManager.UpdateAsync(user);
                 }
             }
+
+
+            //admin
+            ApplicationUser admin = await _userManager.FindByNameAsync("nmvadmin");
+
+            if (!await _userManager.IsInRoleAsync(admin, "SuperUser"))
+            {
+                await _userManager.AddToRoleAsync(user, "SuperUser");
+            }
+
         }
     }
 }

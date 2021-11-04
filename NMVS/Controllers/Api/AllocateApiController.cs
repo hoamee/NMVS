@@ -328,6 +328,12 @@ namespace NMVS.Controllers.Api
 
                         }
 
+                        if(order.AlcOrdQty <= order.MovedQty)
+                        {
+                            order.Confirm = true;
+                            order.ConfirmedBy = User.Identity.Name;
+                        }
+
                         _context.AllocateOrders.Update(order);
                         _context.Update(pt);
                         _context.Update(request);

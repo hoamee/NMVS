@@ -8,18 +8,27 @@
 <script>
     function checkItem(ptId, qty) {
 
-
         bootbox.confirm({
-            message: 'Please enter the number of <span class="text-danger text-bold">Rejected</span> items. Leave blank or Zero to accept all </br> <input type="number" value="0" min="0" max="' + qty+'" class="bootbox-input form-control" step="0.01" id="acc-qty" />',
+            message: 'Please enter the number of <span class="text-danger text-bold">Rejected</span> items.'
+                + ' Leave blank or Zero to accept all </br> <input type="number" value="0" min="0" max="' + qty + '" class="bootbox-input form-control" step="0.01" id="acc-qty" />'
+                + '</br> <textarea aria-multiline="true"  rows="5" placeholder="Add some note for rejected item. (leave blank if no item rejected)" class="form-control" id="report-input" ></textarea>'
+            ,
             closeButton: false,
             callback: function (result) {
                 if (result) {
                     var inputQty = $('#acc-qty').val();
+                    var inputReport = $('#report-input').val().trim();
                     if (inputQty < 0) {
-                        $.notify("Invalid input, please input value >= 0");
-                    } else if (inputQty > qty) {
-                        $.notify("Invalid input, please input value <= received quantity");
-                    } else {
+                        $.notify("Invalid input, please input value >= 0", { position: "right middle" });
+                    }
+                    else if (inputQty > qty) {
+                        $.notify("Invalid input, please input value <= received quantity",{ position: "right middle" });
+                    }
+                    else if (inputQty > 0 && inputReport == "") {
+                        $.notify("Please describe the reason.", { position: "right middle" });
+                    }
+                    else {
+
                         var accept = qty - inputQty;
                         bootbox.confirm({
                             message: '<h5 > Are your sure to <b class="text-danger">reject ' + inputQty + ' item(s)</b> and <b class="text-danger">accept ' + accept + ' item(s)</b>?</h5>',
@@ -36,9 +45,11 @@
                             },
                             callback: function (cf) {
                                 if (cf) {
+
                                     var pt = {
                                         PtId: ptId,
-                                        PtQty: inputQty
+                                        PtQty: inputQty,
+                                        PtCmt: inputReport
                                     };
 
                                     $.ajax(
@@ -50,14 +61,12 @@
                                             success: function (common) {
 
                                                 if (common.status == 1) {
-                                                    $.notify("Process completed", "success");
-                                                    setTimeout(
-                                                        function () {
-
-                                                            window.location.href = window.location.href;
-                                                        }, 1000);
+                                                    $.notify("Process completed", { position: "right middle", className:"success" });
+                                                    $('#td-' + ptId).html('<span class="badge bg-success">Checked</span>');
+                                                    $('#qty-' + ptId).html(accept);
+                                                    $('#user-' + ptId).html(common.dataenum);
                                                 } else {
-                                                    $.notify(common.message);
+                                                    $.notify(common.message, { position: "right middle" });
                                                 }
                                             }
 

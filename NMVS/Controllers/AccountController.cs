@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NMVS.Common;
 using NMVS.Models;
 using NMVS.Models.ViewModels;
+using NMVS.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,18 +17,52 @@ namespace NMVS.Controllers
         UserManager<ApplicationUser> _userManager;
         SignInManager<ApplicationUser> _signInManager;
         RoleManager<ApplicationRole> _roleManager;
+        private readonly IUserDataService _userData;
 
         public AccountController(ApplicationDbContext db, UserManager<ApplicationUser> userManager,
-            RoleManager<ApplicationRole> roleManager, SignInManager<ApplicationUser> signInManager)
+            RoleManager<ApplicationRole> roleManager, SignInManager<ApplicationUser> signInManager, IUserDataService userDataService)
         {
             _db = db;
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _userData = userDataService;
         }
 
-        public IActionResult Login()
+        public async Task<IActionResult> Login()
         {
+            if (await _userManager.FindByNameAsync("nmvadmin") == null)
+            {
+                var newUser = new ApplicationUser
+                {
+                    FullName = "NMV Admin",
+                    UserName = "nmvadmin",
+                    Email = "le.thanh.hieu@netmarks.com.vn",
+                    Active = false
+                };
+
+                var result = await _userManager.CreateAsync(newUser, "NetmarksHN#2021");
+                ModelState.AddModelError("", "Not existed");
+
+                var usr = new UserRoleVm
+                {
+                    Active = true,
+                    AppSO = true,
+                    ArrangeInventory = true,
+                    CreateSO = true,
+                    Guard = true,
+                    HandleRequest = true,
+                    MoveInv = true,
+                    QC = true,
+                    ReceiveInv = true,
+                    RegVehicle = true,
+                    RequestInv = true,
+                    UserManagement = true,
+                    UserName = "nmvadmin"
+                };
+
+                await _userData.SeedingRole(usr);
+            }
 
             return View();
         }
@@ -131,9 +166,9 @@ namespace NMVS.Controllers
 
                         if (result.Succeeded)
                         {
-                            await _signInManager.SignInAsync(newUser, isPersistent: false);
+                            ModelState.AddModelError("", "Your registration information has been saved. Please inform your administrator to activate your account!");
 
-                            return RedirectToAction("Index", "Home");
+                            return View();
                         }
                     }
                     catch (Exception)

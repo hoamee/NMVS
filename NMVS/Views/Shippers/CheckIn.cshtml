@@ -98,7 +98,7 @@
                                         }
                                         else if (string.IsNullOrEmpty(item.CheckOutBy))
                                         {
-                                            <span class="btn btn-outline-danger" onclick="approve(@item.ShpId)"> Check out</span>
+                                            <a class="btn btn-outline-danger" asp-action="CheckOut" asp-route-id="@item.ShpId" > Check out</a>
                                         }
                                         else
                                         {
@@ -141,8 +141,6 @@
     };
 
     $(document).ready(function () {
-        $('.nav-ck-in').addClass('active');
-        $('#navGuard').addClass('show');
         $('.nav-guard').addClass("active");
         $('#datatable-search').DataTable();
     });

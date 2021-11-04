@@ -9,7 +9,7 @@ namespace NMVS.Services
 {
     public interface IItemDataService
     {
-        public Task<ExcelRespone> ImportItemData(string filepath);
+        public Task<CommonResponse<UploadReport>> ImportItemData(string filepath, string fileName, string user);
 
         public List<ItemData> GetItemList();
     }

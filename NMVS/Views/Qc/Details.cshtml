@@ -121,6 +121,9 @@
                                     Checked by
                                 </th>
                                 <th>
+                                    Note
+                                </th>
+                                <th>
                                     Status
                                 </th>
                             </tr>
@@ -129,37 +132,41 @@
                         <tbody>
                             @foreach (var t in Model.Pt)
                             {
-                                <tr>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.ItemNo)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.ItemName)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.RcvQty)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.AcceptQty)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.CheckedBy)
-                                    </td>
-                                    <td>
-                                        @if (t.IsChecked == true)
-                                        {
-                                            <span class="badge bg-success">Checked</span>
-                                        }
-                                        @if (t.IsChecked == false)
-                                        {
-                                            <button class="btn btn-sm btn-outline-warning" onclick="checkItem(@t.PtId,@t.RcvQty);">Pending QC</button>
-                                        }
-                                        @if (t.IsChecked == null)
-                                        {
-                                            <span class="badge bg-secondary">Pending close</span>
-                                        }
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.ItemNo)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.ItemName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.RcvQty)
+                                </td>
+                                <td id="qty-@t.PtId">
+                                    @Html.DisplayFor(modelItem => t.AcceptQty)
+                                </td>
+                                <td id="user-@t.PtId">
+                                    @Html.DisplayFor(modelItem => t.CheckedBy)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.Note)
+                                </td>
+                                <td id="td-@t.PtId">
+                                    <div id="btn-@t.PtId"></div>
+                                    @if (t.IsChecked == true)
+                                    {
+                                        <span class="badge bg-success">Checked</span>
+                                    }
+                                    @if (t.IsChecked == false)
+                                    {
+                                        <button class="btn btn-sm btn-outline-warning"  onclick="checkItem(@t.PtId,@t.RcvQty);">Pending QC</button>
+                                    }
+                                    @if (t.IsChecked == null)
+                                    {
+                                        <span class="badge bg-secondary">Pending close</span>
+                                    }
+                                </td>
+                            </tr>
                             }
                         </tbody>
                     </table>

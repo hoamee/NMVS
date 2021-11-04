@@ -59,6 +59,8 @@ namespace NMVS.Models.DbModels
         public string RegisteredBy { set; get; }
 
         public bool IssueConfirmed { set; get; }
+
+        public DateTime? IssueConfirmedTime { set; get; }
     }
 
     public class ShipperDet

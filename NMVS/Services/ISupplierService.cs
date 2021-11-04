@@ -17,7 +17,7 @@ namespace NMVS.Services
 
         public Supplier GetSupplier(string supplier);
 
-        public Task<ExcelRespone> ImportSupplier(string fileName);
+        public Task<CommonResponse<UploadReport>> ImportSupplier(string filepath, string fileName, string user);
 
     }
 }

@@ -75,6 +75,7 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Date in")]
         public DateTime? SpecDate { set; get; }
 
+        public string MovementNote { set; get; }
 
         [Display(Name = "Request No.")]
         public string RqID { get; set; }

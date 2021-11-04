@@ -67,11 +67,18 @@
                     <dd class="col-sm-10">
                         @if (Model.Icm.Closed)
                         {
-                            <p class="badge bg-secondary">Closed (Passed to QC)</p>
+                            if (Model.Icm.Checked >= Model.Icm.ItemCount)
+                            {
+                                <p class="badge bg-success" id="close-case">Completed!</p>
+                            }
+                            else
+                            {
+                                <p class="badge bg-secondary">Closed (Passed to QC)</p>
+                            }
                         }
                         else
                         {
-                            <p class="badge bg-success" id="close-case">Open (Editable)</p> 
+                            <p class="badge bg-success" id="close-case">Open (Editable)</p>
                         }
                     </dd>
 
@@ -85,6 +92,14 @@
                     <a asp-action="UpdateList" class="btn btn-outline-warning" asp-route-id="@Model.Icm.IcId">Update</a>
                     <a asp-action="Browse" class="btn btn-outline-secondary">Back to browse</a>
                     <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@Model.Icm.IcId">Remove</a>
+
+                }
+
+                @if (Model.Icm.Checked >= Model.Icm.ItemCount)
+                {
+                    <a class="btn btn-outline-primary" asp-action="DownloadList" asp-route-id="@Model.Icm.IcId">
+                        <span class="fa fa-cloud-download">Download receipt note</span>
+                    </a>
                 }
 
             </div>
@@ -104,61 +119,67 @@
                     <table class="table table-flush" id="datatable-search">
                         <thead>
                             <tr>
-                                <td>
+                                <th>
                                     Item No.
-                                </td>
-                                <td>
+                                </th>
+                                <th>
                                     Item name
-                                </td>
-                                <td>
+                                </th>
+                                <th>
                                     Received
-                                </td>
-                                <td>
+                                </th>
+                                <th>
                                     Accepted
-                                </td>
-                                <td>
+                                </th>
+                                <th>
                                     Checked by
-                                </td>
-                                <td>
+                                </th>
+                                <th>
+                                    Note
+                                </th>
+                                <th>
                                     Status
-                                </td>
+                                </th>
                             </tr>
                         </thead>
 
                         <tbody>
                             @foreach (var t in Model.Pt)
                             {
-                                <tr>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.ItemNo)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.ItemName)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.RcvQty)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.AcceptQty)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.CheckedBy)
-                                    </td>
-                                    <td>
-                                        @if (t.IsChecked == true)
-                                        {
-                                            <span class="badge bg-success">Checked</span>
-                                        }
-                                        @if (t.IsChecked == false)
-                                        {
-                                            <span class="badge bg-warning">Pending QC</span>
-                                        }
-                                        @if (t.IsChecked == null)
-                                        {
-                                            <span class="badge bg-secondary">Pending close</span>
-                                        }
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.ItemNo)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.ItemName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.RcvQty)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.AcceptQty)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.CheckedBy)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.Note)
+                                </td>
+                                <td>
+                                    @if (t.IsChecked == true)
+                                    {
+                                        <span class="badge bg-success">Checked</span>
+                                    }
+                                    @if (t.IsChecked == false)
+                                    {
+                                        <span class="badge bg-warning">Pending QC</span>
+                                    }
+                                    @if (t.IsChecked == null)
+                                    {
+                                        <span class="badge bg-secondary">Pending close</span>
+                                    }
+                                </td>
+                            </tr>
                             }
                         </tbody>
                     </table>
@@ -167,7 +188,7 @@
             <div class="card-footer">
 
                 <div class="row col-12">
-                    
+
                     <span class="col-auto">
                         <button class="btn btn-sm btn-outline-info" id="new-list">
                             <span class="fa fa-add"></span>

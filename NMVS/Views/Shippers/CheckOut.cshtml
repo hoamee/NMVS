@@ -1,0 +1,218 @@
+﻿@model NMVS.Models.ViewModels.IssueNoteShipperVm
+
+@{
+    ViewData["Title"] = "Check out";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Category = "Guard";
+}
+
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-2">
+                        ID
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Shp.ShpId)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Vehicle
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Shp.ShpDesc)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Driver
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Shp.Driver)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Driver Contact
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Shp.DrContact)
+                    </dd>
+
+                </dl>
+            </div>
+           
+        </div>
+    </div>
+</div>
+
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">Items</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-flush table-bordered" id="datatable-search">
+                        <thead>
+                            <tr>
+
+                                <th>
+                                    Inventory Id
+                                </th>
+                                <th>
+                                    Item No.
+                                </th>
+                                <th>
+                                    Item name
+                                </th>
+                                <th>
+                                    Quantity
+                                </th>
+                                <th>
+                                    Ship-to
+                                </th>
+                                <th>
+
+                                </th>
+
+                            </tr>
+                        </thead>
+
+
+
+                        <tbody>
+                            @foreach (var t in Model.Det)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.InventoryId)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.ItemNo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.ItemName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.Quantity)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.ShipToName)
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" class="btn-check btn-set" id="btn-check-@t.DetId" autocomplete="off">
+                                        <label class="btn btn-outline-warning" for="btn-check-@t.DetId">Mark as correct</label>
+                                    </td>
+                                </tr>
+                            }
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <b><i>End of list</i></b>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+
+                    <div class="text-center">
+                        <input type="button" value="Finish" id="finish-btn" onclick="checkOutVehiclde(@Model.Shp.ShpId)" class="btn btn-outline-success col-6" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script>
+
+    var routeURL = location.protocol + "//" + location.host;
+
+    function checkOutVehiclde(ve) {
+        var isNId = parseInt(ve);
+        bootbox.confirm({
+            title: "Confirmation",
+            message: "Is all information correct?",
+            buttons: {
+                cancel: {
+                    label: '<i class="fa fa-times"></i> Cancel'
+                },
+                confirm: {
+                    label: '<i class="fa fa-check"></i> Confirm'
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    var postData = {
+                        id: ve
+                    };
+                    $.ajax({
+                        method: "POST",
+                        url: routeURL + '/api/InvRequest/ConfirmCheckOut',
+                        contentType: "application/json; charset=utf8",
+                        data: JSON.stringify(postData),
+                        success: function (common) {
+                            if (common.status == 1) {
+                                bootbox.alert({
+                                    message: common.message,
+                                    callback: function () {
+                                        window.location.href = "/Shippers/CheckIn";
+                                    }
+                                });
+
+                            } else {
+                                bootbox.alert(common.message);
+                            }
+                        }
+
+                    });
+                }
+            }
+        });
+    };
+
+    $(document).ready(function () {
+        $('#finish-btn').hide();
+
+        $('.nav-guard').addClass("active");
+       
+
+        $('.btn-check').change(function () {
+            if ($(this).is(':checked')) {
+                $(this).parent('td').children('label').text('Checked!');
+                $(this).parent('td').children('label').removeClass('btn-outline-warning');
+                $(this).parent('td').children('label').addClass('btn-outline-success');
+            } else {
+                $(this).parent('td').children('label').text('Mark as correct');
+                $(this).parent('td').children('label').removeClass('btn-outline-success');
+                $(this).parent('td').children('label').addClass('btn-outline-warning');
+            }
+            var allSet = false;
+            $('.btn-check').each(function () {
+                if ($('.btn-check:checked').length !== $('.btn-check').length) {
+                    return false;
+                } else {
+                    allSet = true;
+                }
+            });
+
+            if (allSet) {
+                $('#finish-btn').show();
+            } else {
+                $('#finish-btn').hide();
+            }
+        });
+
+        
+
+    });
+</script>
+

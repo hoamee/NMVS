@@ -442,6 +442,9 @@ namespace NMVS.Migrations
                     b.Property<DateTime?>("PoDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("PtNote")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("RecycleId")
                         .HasColumnType("int");
 
@@ -815,6 +818,9 @@ namespace NMVS.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("MovementNote")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<double>("Picked")
                         .HasColumnType("float");
 
@@ -935,6 +941,9 @@ namespace NMVS.Migrations
 
                     b.Property<bool>("IssueConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("IssueConfirmedTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Loc")
                         .IsRequired()
@@ -1194,6 +1203,58 @@ namespace NMVS.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UnqualifiedTransacs");
+                });
+
+            modelBuilder.Entity("NMVS.Models.DbModels.UploadError", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Error")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UploadId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UploadErrors");
+                });
+
+            modelBuilder.Entity("NMVS.Models.DbModels.UploadReport", b =>
+                {
+                    b.Property<string>("UploadId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Errors")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Inserted")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalRecord")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Updated")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UploadFunction")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UploadTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("UploadId");
+
+                    b.ToTable("UploadReports");
                 });
 
             modelBuilder.Entity("NMVS.Models.DbModels.Warehouse", b =>

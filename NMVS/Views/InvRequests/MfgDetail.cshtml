@@ -133,8 +133,8 @@
                         url: routeURL + '/api/InvRequest/CloseNote',
                         contentType: "application/json; charset=utf8",
                         data: JSON.stringify(postData),
-                        success: function (mes) {
-                            if (mes == "Success") {
+                        success: function (common) {
+                            if (common.status == 1) {
                                 bootbox.alert({
                                     message: "Confirmed!"
                                 });
@@ -142,7 +142,7 @@
                                     window.location.href = window.location.href;
                                 }, 1000);
                             } else {
-                                bootbox.alert('<div class="text-danger">Failed! ' + mes + '</div>');
+                                bootbox.alert('<div class="text-danger">Failed! ' + common.message + '</div>');
                             }
                         }
 

@@ -1,4 +1,5 @@
 ﻿
+using NMVS.Models.DbModels;
 using NMVS.Models.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,6 @@ namespace NMVS.Services
 
         public List<TypeVm> GetSupplier();
 
-        public Task<ExcelRespone> ImportList(string filepath, string user);
+        public Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user);
     }
 }

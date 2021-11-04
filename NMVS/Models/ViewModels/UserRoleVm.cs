@@ -28,5 +28,8 @@ namespace NMVS.Models.ViewModels
         public bool Guard { set; get; }
 
         public bool Active { set; get; }
+
+        public bool ArrangeInventory { set; get; }
+        public bool MoveInv { set; get; }
     }
 }

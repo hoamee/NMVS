@@ -95,21 +95,21 @@ namespace NMVS.Controllers
         [HttpPost]
         public async Task<JsonResult> UploadList(IList<IFormFile> files)
         {
-            ExcelRespone excelRespose = new();
+            var common = new CommonResponse<UploadReport>();
             foreach (IFormFile source in files)
             {
                 string filename = ContentDispositionHeaderValue.Parse(source.ContentDisposition).FileName.Trim('"');
 
-                filename = this.EnsureCorrectFilename(filename);
+                filename = EnsureCorrectFilename(filename);
 
                 using (FileStream output = System.IO.File.Create("uploads/" + filename))
                     await source.CopyToAsync(output);
 
-                excelRespose = await _customerService.ImportCustomer("uploads/" + filename);
-                excelRespose.fileName = filename;
+                common = await _customerService.ImportCustomer("uploads/" + filename, filename, User.Identity.Name);
+                
                 
             }
-            return Json(excelRespose);
+            return Json(common);
         }
 
         private string EnsureCorrectFilename(string filename)

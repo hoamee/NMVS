@@ -166,27 +166,28 @@ namespace NMVS.Controllers
 
         public async Task<JsonResult> UploadList(IList<IFormFile> files)
         {
-            ExcelRespone excelRespose = new();
+            var common = new CommonResponse<UploadReport>();
             foreach (IFormFile source in files)
             {
                 string filename = ContentDispositionHeaderValue.Parse(source.ContentDisposition).FileName.Trim('"');
 
-                filename = this.EnsureCorrectFilename(filename);
+                filename = EnsureCorrectFilename(filename);
 
                 using (FileStream output = System.IO.File.Create("uploads/" + filename))
                     await source.CopyToAsync(output);
 
-                excelRespose = await _service.ImportItemData("uploads/" + filename);
-                excelRespose.fileName = filename;
-
+                common = await _service.ImportItemData("uploads/" + filename, filename, User.Identity.Name);
+                
             }
-            return Json(excelRespose);
+           
+            
+            return Json(common);
         }
 
-        private string EnsureCorrectFilename(string filename)
+        private static string EnsureCorrectFilename(string filename)
         {
             if (filename.Contains("\\"))
-                filename = filename.Substring(filename.LastIndexOf("\\") + 1);
+                filename = filename[(filename.LastIndexOf("\\") + 1)..];
 
             return filename;
         }

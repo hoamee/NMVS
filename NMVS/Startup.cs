@@ -50,6 +50,7 @@ namespace NMVS
             services.AddTransient<IRequestService, RequestService>();
             services.AddTransient<ILocService, LocService>();
             services.AddTransient<ISoService, SoService>();
+            services.AddTransient<IExcelService, ExcelService>();
             services.AddHttpContextAccessor();
         }
 

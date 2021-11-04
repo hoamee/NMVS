@@ -41,7 +41,25 @@
             formData.append("files", files[i]);
         }
 
+        if (files.length == 0) {
+            valid = false;
+        }
+
         if (valid) {
+            var dialog = bootbox.dialog({
+                title: 'Upload status',
+                message: '<p><i class="fa fa-spin fa-spinner"></i> Loading...</p>',
+                buttons: {
+                    cancel: {
+                        label: "",
+                        className: 'btn-danger',
+                        callback: function () {
+
+                        }
+                    },
+                }
+            });
+
             $.ajax(
                 {
                     url: "/Suppliers/UploadList",
@@ -52,26 +70,64 @@
                         $.notify("Uploading...", "warning");
                     },
                     type: "POST",
-                    success: function (excelRespose) {
-                        var error = '<span class="text-success"><b> No Error </b></span>';
-                        $.notify("Process completed", "success");
-                        if (excelRespose.error.length > 0)
-                            error = '<span class="text-danger"><b> Error: ' + excelRespose.error + ' </b></span>';
-                        bootbox.alert({
-                            title: "Import finished",
-                            message: 'Finished importing file "<b>' + excelRespose.fileName + '</b>". </br> - '
-                                + excelRespose.processed + ' record(s) processed. </br> - '
-                                + ' <span class="text-success"><b>' + excelRespose.imported + ' added.</b></span> </br> - '
-                                + ' <span class="text-warning"><b>' + excelRespose.updated + ' updated.</b></span> </br>'
-                                + excelRespose.error
-                        })
-                        $('#' + inputId).val('');
+                    success: function (common) {
+                        if (common.status == -1) {
+                            dialog.init(function () {
+                                dialog.find('.bootbox-body').html('<h5 class="text-danger">Header not found. Please check your file! </h5>');
+                                dialog.find('.modal-footer').html('<a href="/Suppliers/" class="btn btn-secondary bootbox-cancel">cancel</button>' + '<a href="/UploadReports/Details/' + common.dataenum.uploadId + '" class="btn btn-primary bootbox-cancel">View report</button>');
+
+
+                            });
+                        } else {
+                            $.notify("Process completed", "success")
+                            dialog.init(function () {
+
+                                dialog.find('.bootbox-body').html('Finished importing file "<b>' + common.dataenum.fileName + '</b>". </br> - '
+                                    + ' <span class="text-bold">Processed: ' + common.dataenum.totalRecord + '</br> - '
+                                    + ' <span class="text-success"><b>Added: ' + common.dataenum.inserted + ' </b></span> </br> - '
+                                    + ' <span class="text-warning"><b>Updated: ' + common.dataenum.updated + '</b></span> </br> -'
+                                    + ' <span class="text-danger"><b>Errors: ' + common.dataenum.errors + ' </b></span> </br>');
+                                dialog.find('.modal-footer').html('<a href="/Suppliers/" class="btn btn-secondary bootbox-cancel">cancel</button>' + '<a href="/UploadReports/Details/'
+                                    + common.dataenum.uploadId
+                                    + '" class="btn btn-primary bootbox-cancel">View report</button>');
+
+
+                            });
+                            //bootbox.confirm({
+                            //    title: "Import finished",
+                            //    message: 'Finished importing file "<b>' + common.dataenum.fileName + '</b>". </br> - '
+                            //        + ' <span class="text-bold">Processed: ' + common.dataenum.totalRecord + '</br> - '
+                            //        + ' <span class="text-success"><b>Added: ' + common.dataenum.inserted + ' </b></span> </br> - '
+                            //        + ' <span class="text-warning"><b>Updated: ' + common.dataenum.updated + '</b></span> </br> -'
+                            //        + ' <span class="text-danger"><b>Errors: ' + common.dataenum.errors + ' </b></span> </br>',
+                            //    buttons: {
+                            //        confirm: {
+                            //            label: 'View detail',
+                            //            className: 'btn-outline-success'
+                            //        },
+                            //        cancel: {
+                            //            label: 'Back to list',
+                            //            className: 'btn-secondary'
+                            //        }
+                            //    },
+                            //    callback: function (go) {
+                            //        if (go) {
+                            //            window.location.href = '/UploadReports/Details/' + common.dataenum.uploadId;
+                            //        } else {
+                            //            window.location.href = window.location.href;
+                            //        }
+                            //    }
+
+                            //})
+
+                        }
                     }
 
                 }
             );
         } else {
             $('#' + inputId).val('');
+            $('#' + inputId).notify("Please select a file!");
         }
     }
 </script>

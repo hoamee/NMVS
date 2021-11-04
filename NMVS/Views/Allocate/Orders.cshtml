@@ -22,6 +22,7 @@
                             <th>
                                 Request No.
                             </th>
+                            <th>Inventory Id</th>
                             <th>
                                 Item No.
                             </th>
@@ -62,8 +63,12 @@
                                 @Html.DisplayFor(modelItem => item.RequestId)
                             </td>
                             <td>
+                                @Html.DisplayFor(modelItem => item.PtId)
+                            </td>
+                            <td>
                                 @Html.DisplayFor(modelItem => item.ItemNo)
                             </td>
+
                             <td class="td-qty">
                                 @Html.DisplayFor(modelItem => item.Qty)
                             </td>

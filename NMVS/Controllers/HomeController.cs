@@ -40,8 +40,8 @@ namespace NMVS.Controllers
                 {
                     hold += loc.LocHolding;
                     cap += loc.LocCap;
-                    remain += loc.LocRemain;
-                    outGo += loc.LocOutgo;
+                    remain += (loc.LocCap - _db.ItemMasters.Where(x=>x.LocCode == loc.LocCode && x.PtQty > 0).Sum(x=>x.PtQty)) ;
+                    outGo += _db.ItemMasters.Where(x => x.LocCode == loc.LocCode && x.PtQty > 0).Sum(x => x.PtHold);
                 }
 
                 if ((cap - remain - hold) / cap > 0.8)
@@ -88,8 +88,9 @@ namespace NMVS.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult Error(string message)
         {
+            ViewBag.message = message;
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }

@@ -20,7 +20,12 @@ namespace NMVS.Models.ViewModels
         public string Sup { set; get; }
         public string Lot { set; get; }
         public string RcvBy { set; get; }
-        
+        public string Um { set; get; }
+        public string Ref { set; get; }
+        public DateTime? RefDate { set; get; }
+        public string Note { set; get; }
+
+        public string Po { set; get; }
 
     }
 }

@@ -6,7 +6,34 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="xlsx\GRN01_Goods received note.xlsx" />
+    <None Remove="xlsx\IN01_Issue note.xlsx" />
+    <None Remove="xlsx\SO01_Sales order.xlsx" />
+    <None Remove="xlsx\SPN01_Shipper note.xlsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="xlsx\GRN01_Goods received note.xlsx">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="xlsx\IN01_Issue note.xlsx">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="xlsx\SO01_Sales order.xlsx">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="xlsx\SPN01_Shipper note.xlsx">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.13.1" />
+    <PackageReference Include="EPPlus" Version="5.8.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.10" />
     <PackageReference Include="microsoft.EntityFrameworkCore.SqlServer" Version="5.0.11" />
@@ -15,6 +42,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Download\" />
+    <Folder Include="wwwroot\download\" />
   </ItemGroup>
 
 </Project>

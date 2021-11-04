@@ -76,11 +76,11 @@ namespace NMVS.Services
 
         public IcmListVm GetListDetail(int? id)
         {
-            
+
 
             var icm = (from ic in _db.IncomingLists.Where(x => x.IcId == id)
                        join sp in _db.Suppliers
-                       on ic.SupCode equals sp.SupCode 
+                       on ic.SupCode equals sp.SupCode
                        select new IncomingListVm
                        {
                            IcId = ic.IcId,
@@ -109,7 +109,8 @@ namespace NMVS.Services
                               CheckedBy = pt.Qc,
                               IsChecked = icm.Closed ? (!string.IsNullOrEmpty(pt.Qc)) : null,
                               ItemName = a.ItemName,
-                              RcvQty = pt.RecQty
+                              RcvQty = pt.RecQty,
+                              Note = pt.PtCmt
                           }).ToList();
             IcmListVm icmList = new()
             {
@@ -134,9 +135,18 @@ namespace NMVS.Services
 
         }
 
-        public async Task<ExcelRespone> ImportList(string filepath, string user)
+        public async Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user)
         {
-            ExcelRespone excelRespose = new();
+            CommonResponse<UploadReport> common = new();
+            common.dataenum = new()
+            {
+                FileName = fileName,
+                UploadBy = user,
+                UploadTime = DateTime.Now,
+                UploadId = user + DateTime.Now.ToString("yyyyMMddHHmmss"),
+                UploadFunction = "Item data upload"
+
+            };
             ExcelDataHelper _eHelper = new();
             // Open the spreadsheet document for read-only access.
             using (SpreadsheetDocument document =
@@ -160,21 +170,46 @@ namespace NMVS.Services
                     (WorksheetPart)(wbPart.GetPartById(theSheet.Id));
 
                 int readingRow = 12;
-                int imported = 0;
-                int updateted = 0;
-                int recordCount = 0;
-                int failed = 0;
+
                 //check header
                 string supCode, po = "", vehicle = "", driver = "", sWarr = "";
                 DateTime poDate = new();
                 var delDate = DateTime.Now.Date;
                 bool headerCorrect = true;
+
+                headerCorrect = _eHelper.VefiryHeader(wsPart, wbPart, "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A11", "B11", "C11",
+                    "Supplier ID", "PO No.", "PO Date", "Vehicle", "Driver", "Delivery Date", "Warranty return", "No.", "Item code", "Item name");
+
+
                 supCode = _eHelper.GetCellValue(wsPart, wbPart, "C3");
                 //if can not find supplier code, break
-                if (string.IsNullOrEmpty(supCode))
+                if (string.IsNullOrEmpty(supCode) || !headerCorrect)
                 {
-                    excelRespose.error += "Cell C3: Missing Supplier code; Import session terminated";
-                    headerCorrect = false;
+                    if (string.IsNullOrEmpty(supCode))
+                    {
+                        common.message += "File header is incorrect! ";
+                    }
+                    if (!headerCorrect)
+                    {
+                        common.message += "File header is incorrect! ";
+                    }
+                    common.dataenum.TotalRecord = 0;
+                    common.dataenum.Updated = 0;
+                    common.dataenum.Errors = 1;
+                    common.dataenum.Inserted = 0;
+
+                    common.status = -1;
+
+
+                    _db.Add(new UploadError
+                    {
+                        UploadId = common.dataenum.UploadId,
+                        Error = common.message
+                    });
+
+                    _db.Add(common.dataenum);
+                    await _db.SaveChangesAsync();
+                    return common;
                 }
 
                 if (headerCorrect)
@@ -195,12 +230,17 @@ namespace NMVS.Services
                         || string.IsNullOrEmpty(driver)
                         || sWarrIsEmpty)
                     {
-                        excelRespose.error +=
+                        common.dataenum.Errors++;
+                        _db.Add(new UploadError
+                        {
+                            UploadId = common.dataenum.UploadId,
+                            Error =
                             (string.IsNullOrEmpty(vehicle) ? " Vehicle info not found; " : "")
                             + (string.IsNullOrEmpty(driver) ? " Driver name not found; " : "")
                             + (sWarrIsEmpty ? " Warranty return not found; '" + sWarr.ToUpper(new CultureInfo("en-US", false)) + "'" : ""
-                            + "Import session terminated!"
-                            );
+                            )
+                        });
+
                         headerCorrect = false;
                     }
                 }
@@ -221,14 +261,16 @@ namespace NMVS.Services
                         Po = po,
                         Vehicle = vehicle,
                         PoDate = poDate
+
                     };
                     await _db.AddAsync(incomingList);
                     await _db.SaveChangesAsync();
                     int icId = incomingList.IcId;
 
                     //Read data from table
-                    while (true)
+                    while (headerCorrect)
                     {
+                        common.dataenum.TotalRecord++;
                         readingRow++;
                         string lot, supRef, note;
                         DateTime refDate;
@@ -241,13 +283,13 @@ namespace NMVS.Services
 
                         try
                         {
+                            lot = _eHelper.GetCellValue(wsPart, wbPart, "D" + readingRow);
+                            note = _eHelper.GetCellValue(wsPart, wbPart, "H" + readingRow);
+                            supRef = _eHelper.GetCellValue(wsPart, wbPart, "F" + readingRow);
+                            var checkDate = DateTime.TryParse(_eHelper.GetCellValue(wsPart, wbPart, "G" + readingRow), out refDate);
                             if (item != null)
                             {
-                                lot = _eHelper.GetCellValue(wsPart, wbPart, "D" + readingRow);
-                                note = _eHelper.GetCellValue(wsPart, wbPart, "H" + readingRow);
-                                supRef = _eHelper.GetCellValue(wsPart, wbPart, "F" + readingRow);
-                                var checkDate = DateTime.TryParse(_eHelper.GetCellValue(wsPart, wbPart, "G" + readingRow), out refDate);
-
+                                
                                 var pt = _db.ItemMasters
                                     .Where(x => x.ItemNo == item.ItemNo
                                         && x.IcId == icId
@@ -261,7 +303,7 @@ namespace NMVS.Services
                                     pt.RecQty += qty;
                                     pt.RecBy = user;
                                     _db.Update(item);
-                                    updateted++;
+                                    common.dataenum.Updated++;
                                     await _db.SaveChangesAsync();
                                 }
                                 //if NOT exist: Create new
@@ -284,39 +326,52 @@ namespace NMVS.Services
                                         RefDate = refDate,
                                         SupCode = supCode,
                                         RefNo = supRef
+
                                     };
                                     incomingList.ItemCount++;
                                     await _db.AddAsync(newPt);
                                     await _db.SaveChangesAsync();
-                                    imported++;
+                                    common.dataenum.Inserted++;
                                 }
 
                             }
-                            else
+                            else 
                             {
-                                failed++;
-                                excelRespose.error += " Line " + readingRow + ": Error with item no. or quantity \" " + err + "\"; Import session terminated at line: " + readingRow;
-                                break;
+                                if (string.IsNullOrEmpty(lot)
+                                    && string.IsNullOrEmpty(note)
+                                    && string.IsNullOrEmpty(supRef))
+                                {
+                                    break;
+                                }
+                                    common.dataenum.Errors++;
+                                _db.Add(new UploadError
+                                {
+                                    UploadId = common.dataenum.UploadId,
+                                    Error = " Line " + readingRow + ": Error with item no. or quantity \" " + err + "\"; Skipped line: " + readingRow
+                                });
+
+                                continue;
                             }
 
 
                         }
                         catch (Exception e)
                         {
-                            failed++;
-                            excelRespose.error += "Line " + readingRow + ": "
-                               + e.Message + ";";
+                            common.dataenum.Errors++;
+                            _db.Add(new UploadError
+                            {
+                                UploadId = common.dataenum.UploadId,
+                                Error = "Line " + readingRow + ": "
+                               + e.Message + ";"
+                            });
                         }
-                        recordCount++;
                     }
                 }
-                excelRespose.processed = recordCount;
-                excelRespose.updated = updateted;
-                excelRespose.imported = imported;
             }
 
-
-            return excelRespose;
+            _db.Add(common.dataenum);
+            await _db.SaveChangesAsync();
+            return common;
         }
     }
 }

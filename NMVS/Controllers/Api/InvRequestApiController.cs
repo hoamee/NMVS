@@ -93,186 +93,198 @@ namespace NMVS.Controllers.Api
         [Route("FinishIssueOrder")]
         public async Task<IActionResult> FinishIssueOrder(AllocateOrder alo)
         {
-            var message = "Order not found!";
+            CommonResponse<int> commonResponse = new();
+
+            commonResponse.message = "Order not found!";
 
             var issueQty = alo.AlcOrdQty;
 
             var order = await _context.IssueOrders.FindAsync(alo.AlcOrdId);
 
-
-            if (order != null)
+            try
             {
-
-                //Check if shipper is checked out
-                message = "Shipper is already checked out!";
-                var shp = await _context.Shippers.FindAsync(order.ToVehicle);
-                if (shp != null && order.IssueType == "Issue")
+                if (order != null)
                 {
-                    if (!string.IsNullOrEmpty(shp.CheckOutBy))
+
+                    //Check if shipper is checked out
+                    commonResponse.message = "Shipper is already checked out!";
+                    var shp = await _context.Shippers.FindAsync(order.ToVehicle);
+                    if (shp != null && order.IssueType == "Issue")
                     {
-
-                        return Ok(message);
-                    }
-
-                }
-                //Check item exist
-                message = "Item not found";
-                var pt = await _context.ItemMasters.FindAsync(order.PtId);
-                if (pt != null)
-                {
-                    pt.PtHold -= issueQty;
-                    pt.PtQty -= issueQty;
-
-                    if (pt.PtHold < 0 || pt.PtQty < 0)
-                    {
-                        message = "Item quantity error";
-                        return Ok(message);
-                    }
-
-                    _context.Update(pt);
-
-
-                    //check location
-                    message = "From loc not found!";
-                    var fromLoc = await _context.Locs.FindAsync(pt.LocCode);
-                    if (fromLoc != null)
-                    {
-                        fromLoc.LocOutgo -= issueQty;
-                        fromLoc.LocRemain += issueQty;
-
-                        if (fromLoc.LocOutgo < 0 || fromLoc.LocRemain < 0)
+                        if (!string.IsNullOrEmpty(shp.CheckOutBy))
                         {
-                            message = "Location capacity error";
-                            return Ok(message);
+
+                            return Ok(commonResponse);
                         }
-                        _context.Update(fromLoc);
 
+                    }
+                    //Check item exist
+                    commonResponse.message = "Item not found";
+                    var pt = await _context.ItemMasters.FindAsync(order.PtId);
+                    if (pt != null)
+                    {
+                        pt.PtHold -= issueQty;
+                        pt.PtQty -= issueQty;
 
-                        //Check request det
-                        var reDet = await _context.RequestDets.FindAsync(order.DetId);
-                        message = "Request loc not found!";
-                        if (reDet != null)
+                        if (pt.PtHold < 0 || pt.PtQty < 0)
                         {
-                            reDet.Arranged += issueQty;
-                            _context.Update(reDet);
-                            //
-                            if (order.IssueType == "Issue")
-                            {
-                                var shpDet = _context.ShipperDets.FirstOrDefault(x => x.DetId == order.DetId && x.ShpId == order.ToVehicle);
-                                if (shpDet == null)
-                                {
-                                    _context.Add(new ShipperDet
-                                    {
-                                        InventoryId = order.PtId,
-                                        DetId = order.DetId,
-                                        ItemNo = pt.ItemNo,
-                                        Quantity = issueQty,
-                                        RqId = order.RqID,
-                                        ShpId = (int)order.ToVehicle
-                                    });
+                            commonResponse.message = "Item quantity error";
+                            return Ok(commonResponse);
+                        }
 
-                                }
-                                else
-                                {
-                                    shpDet.Quantity += issueQty;
-                                    _context.Update(shpDet);
-                                }
+                        _context.Update(pt);
+
+
+                        //check location
+                        commonResponse.message = "From loc not found!";
+                        var fromLoc = await _context.Locs.FindAsync(pt.LocCode);
+                        if (fromLoc != null )
+                        {
+                            fromLoc.LocOutgo -= issueQty;
+                            fromLoc.LocRemain += issueQty;
+
+                            if (fromLoc.LocOutgo < 0 || fromLoc.LocRemain < 0)
+                            {
+                                commonResponse.message = "Location capacity error";
+                                return Ok(commonResponse);
                             }
-                            else
+                            _context.Update(fromLoc);
+
+
+                            //Check request det
+                            var reDet = _context.RequestDets.Find(order.DetId);
+                            commonResponse.message = "Request loc not found!";
+                            if (reDet != null)
                             {
-                                var mfgIssueNote = _context.MfgIssueNotes.FirstOrDefault(x => x.RqId == order.RqID && string.IsNullOrEmpty(x.IssuedBy));
-                                if (mfgIssueNote == null)
+                                reDet.Arranged += issueQty;
+                                _context.Update(reDet);
+                                //
+                                if (order.IssueType == "Issue")
                                 {
-                                    var issueNote = new MfgIssueNote
+                                    var shpDet = _context.ShipperDets.FirstOrDefault(x => x.DetId == order.DetId && x.ShpId == order.ToVehicle);
+                                    if (shpDet == null)
                                     {
-                                        RqId = order.RqID
-                                    };
-
-                                    _context.Add(issueNote);
-                                    _context.SaveChanges();
-
-                                    var det = new MfgIssueNoteDet
-                                    {
-                                        IsNId = issueNote.IsNId,
-                                        ItemNo = order.ItemNo,
-                                        PtId = order.PtId,
-                                        Quantity = issueQty
-                                    };
-                                    _context.Add(det);
-                                    _context.SaveChanges();
-
-                                }
-                                else
-                                {
-                                    var det = _context.IssueNoteDets.FirstOrDefault(x => x.IsNId == mfgIssueNote.IsNId && x.PtId == order.PtId && x.ItemNo == order.ItemNo);
-                                    if (det == null)
-                                    {
-                                        _context.Add(new MfgIssueNoteDet
+                                        _context.Add(new ShipperDet
                                         {
-                                            ItemNo = order.ItemNo,
-                                            IsNId = mfgIssueNote.IsNId,
-                                            PtId = order.PtId,
-                                            Quantity = issueQty
+                                            InventoryId = order.PtId,
+                                            DetId = order.DetId,
+                                            ItemNo = pt.ItemNo,
+                                            Quantity = issueQty,
+                                            RqId = order.RqID,
+                                            ShpId = (int)order.ToVehicle
                                         });
-                                        _context.SaveChanges();
+
                                     }
                                     else
                                     {
-                                        det.Quantity += issueQty;
+                                        shpDet.Quantity += issueQty;
+                                        _context.Update(shpDet);
+                                    }
+                                }
+                                else
+                                {
+                                    var mfgIssueNote = _context.MfgIssueNotes.FirstOrDefault(x => x.RqId == order.RqID && string.IsNullOrEmpty(x.IssuedBy));
+                                    if (mfgIssueNote == null)
+                                    {
+                                        var issueNote = new MfgIssueNote
+                                        {
+                                            RqId = order.RqID
+                                        };
+
+                                        _context.Add(issueNote);
+                                        _context.SaveChanges();
+
+                                        var det = new MfgIssueNoteDet
+                                        {
+                                            IsNId = issueNote.IsNId,
+                                            ItemNo = order.ItemNo,
+                                            PtId = order.PtId,
+                                            Quantity = issueQty
+                                        };
+                                        _context.Add(det);
+                                        _context.SaveChanges();
+
+                                    }
+                                    else
+                                    {
+                                        var det = _context.IssueNoteDets.FirstOrDefault(x => x.IsNId == mfgIssueNote.IsNId && x.PtId == order.PtId && x.ItemNo == order.ItemNo);
+                                        if (det == null)
+                                        {
+                                            _context.Add(new MfgIssueNoteDet
+                                            {
+                                                ItemNo = order.ItemNo,
+                                                IsNId = mfgIssueNote.IsNId,
+                                                PtId = order.PtId,
+                                                Quantity = issueQty
+                                            });
+                                            _context.SaveChanges();
+                                        }
+                                        else
+                                        {
+                                            det.Quantity += issueQty;
+                                        }
+
                                     }
 
                                 }
 
+                                order.ConfirmedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
+                                order.MovedQty += issueQty;
+                                if (order.MovedQty >= order.ExpOrdQty)
+                                {
+                                    order.Confirm = true;
+                                }
+                                _context.Update(order);
+                                _context.SaveChanges();
+                                commonResponse.message = "Success"!;
                             }
 
-                            order.ConfirmedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
-                            order.MovedQty += issueQty;
-                            if (order.MovedQty >= order.ExpOrdQty)
-                            {
-                                order.Confirm = true;
-                            }
-                            _context.Update(order);
-                            _context.SaveChanges();
-                            message = "Success"!;
+
                         }
-
 
                     }
 
+
                 }
-
-
+            }
+            catch (Exception e)
+            {
+                commonResponse.message = e.ToString();
             }
 
-            return Ok(message);
+            return Ok(commonResponse);
         }
 
         [HttpPost]
         [Route("CloseNote")]
-        public async Task<IActionResult> CloseNote(MfgIssueNote issueNote)
+        public IActionResult CloseNote(MfgIssueNote issueNote)
         {
-            string message = "Success";
+            CommonResponse<int> common = new();
             try
             {
-                var note = await _context.MfgIssueNotes.FindAsync(issueNote.IsNId);
+                var note =  _context.MfgIssueNotes.Find(issueNote.IsNId);
                 if (note != null)
                 {
                     note.IssuedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
                     note.IssuedOn = DateTime.Now;
                     _context.Update(note);
                     _context.SaveChanges();
+                    common.status = 1;
+                    common.message = "Success";
                 }
                 else
                 {
-                    message = "Not found!";
+                    common.status = 0;
+                    common.message = "Not found!";
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                message = e.ToString();
+                common.status = -1;
+                common.message = e.ToString();
             }
 
-            return Ok(message);
+            return Ok(common);
         }
 
         [HttpPost]
@@ -296,7 +308,7 @@ namespace NMVS.Controllers.Api
                         common.status = -1;
                         return Ok(common);
                     }
-
+                    note.IssueConfirmedTime = DateTime.Now;
                     note.IssueConfirmed = true;
                     _context.Update(note);
                     _context.SaveChanges();
@@ -318,5 +330,158 @@ namespace NMVS.Controllers.Api
             return Ok(common);
         }
 
+
+        [HttpPost]
+        [Route("ReportOrder")]
+        public async Task<ActionResult> ReportOrder(BrokenVm report)
+        {
+            var common = new CommonResponse<int>();
+            try
+            {
+                var order = await _context.IssueOrders.FindAsync(report.OrId);
+                if (order != null)
+                {
+                    var rqDet = await _context.RequestDets.FindAsync(order.DetId);
+                    if (rqDet != null)
+                    {
+                        // decrease order qty
+                        order.ExpOrdQty -= report.Qty;
+
+                        // 1. decrease request qty
+                        // 2. add note
+                        rqDet.MovementNote += "**Issue order " + report.OrId + ": report quantity of " + report.Qty + ". Message:" + report.Note + ", By " + _httpContextAccessor.HttpContext.User.Identity.Name + "; ";
+                        rqDet.Quantity -= report.Qty;
+                        rqDet.Picked -= report.Qty;
+
+                        // decrease item master hold qty
+                        var pt = await _context.ItemMasters.FindAsync(order.PtId);
+                        pt.PtHold -= report.Qty;
+
+                        var request = await _context.InvRequests.FindAsync(rqDet.RqID);
+                        // decrease loc hold
+                        var fromLoc = await _context.Locs.FindAsync(pt.LocCode);
+                        fromLoc.LocOutgo -= report.Qty;
+
+
+                        if (request.RqType == "MFG")
+                        {
+
+                            var toLoc = await _context.Locs.FindAsync(order.ToLoc);
+                            toLoc.LocHolding -= report.Qty;
+
+                            _context.Update(toLoc);
+
+                        }
+
+
+                        //case unqualified: moving item to unqualified location
+                        if (report.Retrn)
+                        {
+                            //increase remain of loc
+                            fromLoc.LocRemain += report.Qty;
+
+                            // decrease qty
+                            pt.PtQty -= report.Qty;
+
+                            // add new broken
+                            _context.Unqualifieds.Add(new Unqualified
+                            {
+                                Description = report.Note,
+                                ItemNo = pt.ItemNo,
+                                Note = "",
+                                PtId = pt.PtId,
+                                Quantity = report.Qty
+                            });
+                        }
+
+
+
+                        if (order.ExpOrdQty <= order.MovedQty)
+                        {
+                            order.Confirm = true;
+                            order.ConfirmedBy = User.Identity.Name;
+                        }
+                        _context.Update(order);
+                        _context.Update(pt);
+                        _context.Update(rqDet);
+
+                        await _context.SaveChangesAsync();
+                        common.status = 1;
+                        common.message = "Report sent!";
+                    }
+                    else
+                    {
+                        common.status = 0;
+                        common.message = "Request not found.";
+                    }
+                }
+                else
+                {
+                    common.status = 0;
+                    common.message = "Order not found.";
+                }
+            }
+            catch (Exception e)
+            {
+                common.status = -1;
+                common.message = "Error: " + e.ToString();
+            }
+
+            return Ok(common);
+        }
+
+        [Route("ConfirmCheckOut")]
+        [HttpPost]
+        public async Task<IActionResult> ConfirmCheckOut(JsPickingData shpr)
+        {
+            CommonResponse<int> common = new();
+            try
+            {
+                var shipper = await _context.Shippers.FindAsync(shpr.id);
+                if (shipper == null)
+                {
+                    common.message = "System coundn't find this shipper";
+                    common.status = 0;
+                    return Ok(common);
+                }
+                shipper.CheckOutBy = User.Identity.Name;
+                shipper.ActualOut = DateTime.Now;
+
+
+                _context.Update(shipper);
+                _context.SaveChanges();
+                common.message = "Success";
+                common.status = 1;
+            }
+            catch (Exception e)
+            {
+                common.message = e.ToString();
+                common.status = -1;
+            }
+            return Ok(common);
+        }
+
+        [Route("CloseRequest")]
+        [HttpPost]
+        public async Task<IActionResult> CloseRequest(JsPickingData shpr)
+        {
+            var common = new CommonResponse<int>();
+            var request = await _context.InvRequests.FindAsync(shpr.whcd);
+            if (request == null)
+            {
+                common.status = 0;
+                common.message = "not found!";
+                return Ok(common);
+            }
+            else
+            {
+                request.SoConfirm = true;
+                _context.Update(request);
+                await _context.SaveChangesAsync();
+                common.status = 1;
+                common.message = "success!";
+                return Ok(common);
+            }
+        }
     }
 }

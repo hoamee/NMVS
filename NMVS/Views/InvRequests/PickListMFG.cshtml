@@ -57,39 +57,47 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var item in Model)
-                                {
-                                    <tr id="o-@item.Ptid">
-                                        <td class="td-id">
-                                            @Html.DisplayFor(modelItem => item.Ptid)
-                                        </td>
-                                        <td class="td-name">
-                                            @Html.DisplayFor(modelItem => item.No)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Name)
-                                        </td>
-                                        <td class="td-date">
-                                            @Html.DisplayFor(modelItem => item.DateIn)
-                                        </td>
-                                        <td class="td-loccode">
-                                            @Html.DisplayFor(modelItem => item.Loc)
-                                        </td>
-                                        <td class="pt-qty">
-                                            @Html.DisplayFor(modelItem => item.Qty)
-                                        </td>
-                                        <td class="td-hold">
-                                            @Html.DisplayFor(modelItem => item.Booked)
-                                        </td>
-                                        <td class="td-input">
-                                            @{ var maxInput = item.Qty - item.Booked;}
-                                            <input type="number" class="form-control val-input" step="0.01" max="@maxInput" min="0" />
-                                        </td>
-                                        <td>
-                                            <input type="button" class="btn btn-sm btn-success add-btn" value="Add" />
+                                @if (!Model.Any())
 
-                                        </td>
-                                    </tr>
+                                {
+
+                                }
+                                else
+                                {
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr id="o-@item.Ptid">
+                                            <td class="td-id">
+                                                @Html.DisplayFor(modelItem => item.Ptid)
+                                            </td>
+                                            <td class="td-name">
+                                                @Html.DisplayFor(modelItem => item.No)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </td>
+                                            <td class="td-date">
+                                                @Html.DisplayFor(modelItem => item.DateIn)
+                                            </td>
+                                            <td class="td-loccode">
+                                                @Html.DisplayFor(modelItem => item.Loc)
+                                            </td>
+                                            <td class="pt-qty">
+                                                @Html.DisplayFor(modelItem => item.Qty)
+                                            </td>
+                                            <td class="td-hold">
+                                                @Html.DisplayFor(modelItem => item.Booked)
+                                            </td>
+                                            <td class="td-input">
+                                                @{ var maxInput = item.Qty - item.Booked;}
+                                                <input type="number" class="form-control val-input" step="0.01" max="@maxInput" min="0" />
+                                            </td>
+                                            <td>
+                                                <input type="button" class="btn btn-sm btn-success add-btn" value="Add" />
+
+                                            </td>
+                                        </tr>
+                                    }
                                 }
                             </tbody>
                         </table>
