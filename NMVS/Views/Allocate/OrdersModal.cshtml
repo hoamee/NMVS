@@ -151,10 +151,10 @@
             var oQty = parseFloat($('#table2 #t2-tr').children('.td-qty').text().trim()) - parseFloat($('#table2 #t2-tr').children('.td-moved').text().trim());
 
             if (qty > oQty) {
-                $('#moved-qty').notify('Report quantity could\'nt be larger than order quantity');
+                $('#moved-qty').notify('Report quantity couldn\'t be larger than order quantity');
             }
             else if (qty <= 0) {
-                $('#moved-qty').notify('Report quantity could\'nt be less than or equal to 0');
+                $('#moved-qty').notify('Report quantity couldn\'t be less than or equal to 0');
             } else {
 
 
@@ -234,10 +234,10 @@
 
 
             if (qty > oQty) {
-                $('#input-qty').notify('Report quantity could\'nt be larger than order quantity');
+                $('#input-qty').notify('Report quantity couldn\'t be larger than order quantity');
             }
             else if (qty <= 0) {
-                $('#input-qty').notify('Report quantity could\'nt be less than or equal to 0');
+                $('#input-qty').notify('Report quantity couldn\'t be less than or equal to 0');
             }
             else if (note == "") {
                 cmmt.notify('Please describe the reason.');

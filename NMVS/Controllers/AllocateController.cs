@@ -152,7 +152,7 @@ namespace NMVS.Controllers
             toLoc.LocHolding += t.qty;
 
             //   4. Add Outgo to From-Loc
-            fromLoc.LocOutgo += t.qty;
+            //fromLoc.LocOutgo += t.qty;
 
 
             _db.AllocateRequests.Add(new AllocateRequest()

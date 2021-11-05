@@ -56,7 +56,7 @@ namespace NMVS.Controllers.Api
                 toLoc.LocHolding += t.qty;
 
                 //   4. Add Outgo to From-Loc
-                fromLoc.LocOutgo += t.qty;
+                //fromLoc.LocOutgo += t.qty;
 
 
                 _context.AllocateRequests.Add(new AllocateRequest()
@@ -159,7 +159,7 @@ namespace NMVS.Controllers.Api
                     toLoc.LocHolding -= request.AlcQty;
 
                     //   4. decrease Outgo to From-Loc
-                    fromLoc.LocOutgo -= request.AlcQty;
+                    //fromLoc.LocOutgo -= request.AlcQty;
 
                     request.IsClosed = false;
                     _context.Update(request);
@@ -218,7 +218,7 @@ namespace NMVS.Controllers.Api
                 //   outgo           -= OrderQty
                 //   remain capacity += OrderQty
                 var fromLoc = await _context.Locs.FindAsync(order.AlcOrdFrom);
-                fromLoc.LocOutgo -= alo.MovedQty;
+                //fromLoc.LocOutgo -= alo.MovedQty;
                 fromLoc.LocRemain += alo.MovedQty;
 
                 var toPt = _context.ItemMasters.FirstOrDefault(x => x.LocCode == order.LocCode && x.PtDateIn == pt.PtDateIn && x.SupCode == pt.SupCode && x.RefNo == pt.RefNo && x.ItemNo == pt.ItemNo);
@@ -298,7 +298,7 @@ namespace NMVS.Controllers.Api
 
                         // decrease loc hold
                         var loc = await _context.Locs.FindAsync(pt.LocCode);
-                        loc.LocOutgo -= report.Qty;
+                        //loc.LocOutgo -= report.Qty;
 
                         var toLoc = await _context.Locs.FindAsync(order.LocCode);
                         toLoc.LocHolding -= report.Qty;
@@ -500,7 +500,7 @@ namespace NMVS.Controllers.Api
 
                 request.Picked += jsArr.qty;
                 // 4. Add Outgo to From-Loc
-                fromLoc.LocOutgo += jsArr.qty;
+                //fromLoc.LocOutgo += jsArr.qty;
 
 
                 _context.IssueOrders.Add(new IssueOrder()
@@ -575,15 +575,15 @@ namespace NMVS.Controllers.Api
                         var fromLoc = await _context.Locs.FindAsync(pt.LocCode);
                         if (fromLoc != null)
                         {
-                            fromLoc.LocOutgo -= issueQty;
+                            //fromLoc.LocOutgo -= issueQty;
                             fromLoc.LocRemain += issueQty;
 
-                            if (fromLoc.LocOutgo < 0 || fromLoc.LocRemain < 0)
-                            {
-                                message = "Location capacity error";
-                                return Ok(message);
-                            }
-                            _context.Update(fromLoc);
+                            //if (fromLoc.LocOutgo < 0 || fromLoc.LocRemain < 0)
+                            //{
+                            //    message = "Location capacity error";
+                            //    return Ok(message);
+                            //}
+                            //_context.Update(fromLoc);
 
 
                             //Check request det

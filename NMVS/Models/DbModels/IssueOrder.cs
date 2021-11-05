@@ -42,7 +42,7 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Issue To")]
         public string IssueToDesc { get; set; }
 
-        [Display(Name = "Issued")]
+        [Display(Name = "Status")]
         public bool? Confirm { set; get; }
 
         [Display(Name = "Confirmed by")]
@@ -61,5 +61,8 @@ namespace NMVS.Models.DbModels
         [Required]
         [Display(Name = "Movement time")]
         public DateTime? MovementTime { get; set; }
+
+        [Display(Name = "Note")]
+        public string Note { set; get; }
     }
 }

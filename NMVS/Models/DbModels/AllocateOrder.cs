@@ -33,7 +33,7 @@ namespace NMVS.Models.DbModels
         public virtual Loc Loc { get; set; }
 
         [Display(Name = "Allocated")]
-        public bool Confirm { set; get; }
+        public bool? Confirm { set; get; }
 
         [Display(Name = "Confirmed by")]
         public string ConfirmedBy { set; get; }

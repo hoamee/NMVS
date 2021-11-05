@@ -54,10 +54,20 @@
                     </tbody>
                 </table>
             </div>
-            <div class="form-group text-xl-center">
-                <label class="form-check-label text-primary ">
-                    Movement Quantity <input type="number" class="form-control" id="moving-qty" step="0.01" />
-                </label>
+            <div class="row">
+                <div class="form-group text-xl-center">
+                    <label class="form-check-label text-primary ">
+                        Movement Quantity <input type="number" class="form-control" value="0" id="moving-qty" step="0.01" />
+                    </label>
+                    <label class="form-check-label text-danger" id="confirm-lbl">
+
+                    </label>
+                    <label class="form-check-label ">
+                        Or
+                        <input type="button" class="form-control" value="Scan QR" id="scan-qr" />
+                    </label>
+                </div>
+
             </div>
             <div id="reader" width="80%">
             </div>
@@ -80,36 +90,40 @@
                     <thead>
                         <tr>
                             <th>
-                                Order No.
+                                ID
                             </th>
                             <th>
-                                Request No.
+                                Type
                             </th>
                             <th>
-                                Item No.
+                                Item
                             </th>
                             <th>
-                                Quantity
+                                From Location
                             </th>
                             <th>
-                                Moved
+                                Inventory Id
                             </th>
-                            <th>
-                                From
-                            </th>
+
                             <th>
                                 To
                             </th>
                             <th>
-                                Destination Description
+                                Issued
                             </th>
                             <th>
-                                Time
+                                Comfirm by
                             </th>
-
                             <th>
-
+                                Request ID
                             </th>
+                            <th>
+                                Order by
+                            </th>
+                            <th>
+                                Movement time
+                            </th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -142,18 +156,35 @@
 </div>
 
 <script>
+    var winlocation = window.location.href;
     var routeURL = location.protocol + "//" + location.host;
     $('.modal-btn').click(function () {
         $('#table2 #t2-tr').html($(this).closest('tr').html());
         $('#table2 #t2-tr').children('td:last').remove();
         $('#exampleModal').modal('toggle');
+        var issueType = $(this).closest('tr').find('.exp-type').html().trim();
+        alert(issueType);
+        if (issueType == "MFG") {
+            $('#confirm-lbl').html('Location code <input type="text" placeholder="To location code" class="form-control" id="loc-code" />');
+        } else {
+            $('#confirm-lbl').html('Inventory code <input type="number" placeholder="Inventory ID" class="form-control" id="iv-id" /> ');
+        }
 
+
+        $('#reader').html('');
     });
+
+    $('.report-btn').click(function () {
+        $('#table3 #t3-tr').html($(this).closest('tr').html());
+        $('#table3 #t3-tr').children('td:last').remove();
+        $('#reportModal').modal('toggle');
+    });
+
     $(document).ready(function () {
-        
 
 
-        $('#confirm-end').click(function () {
+
+        $('#scan-qr').click(function () {
 
             var desCode = $('#table2').find('.exp-to-ve').text().trim();
             if (desCode == '0') {
@@ -167,13 +198,13 @@
 
             var qty = parseFloat($('#moving-qty').val());
             var remainQty = parseFloat($('#table2 #t2-tr').find('.exp-qty').text().trim()) - parseFloat($('#table2 #t2-tr').find('.exp-moved').text().trim());
-            
+
 
             if (qty > remainQty) {
-                $('#moving-qty').notify('Report quantity could\'nt be larger than order quantity');
+                $('#moving-qty').notify('Report quantity couldn\'t be larger than order quantity');
             }
             else if (qty <= 0) {
-                $('#moving-qty').notify('Report quantity could\'nt be less than or equal to 0');
+                $('#moving-qty').notify('Report quantity couldn\'t be less than or equal to 0');
             } else {
 
 
@@ -232,11 +263,73 @@
             }
         });
 
-        $('.report-btn').click(function () {
-            $('#table3 #t3-tr').html($(this).closest('tr').html());
-            $('#table3 #t3-tr').children('td:last').remove();
-            $('#reportModal').modal('toggle');
+        $('#confirm-end').click(function () {
+
+            var desCode = $('#table2').find('.exp-to-ve').text().trim();
+            var desInput;
+            if (desCode == '0') {
+                desCode = $('#table2').find('.exp-to-loc').text().trim();
+                desInput = $('#loc-code').val().trim();
+
+            } else {
+                //exp-pt-id
+                var desCode = $('#table2').find('.exp-pt-id').text().trim();
+                desInput = $('#iv-id').val();
+            }
+
+
+            var qty = parseFloat($('#moving-qty').val());
+            var remainQty = parseFloat($('#table2 #t2-tr').find('.exp-qty').text().trim()) - parseFloat($('#table2 #t2-tr').find('.exp-moved').text().trim());
+            
+
+            if (qty > remainQty) {
+                $('#moving-qty').notify('Report quantity couldn\'t be larger than order quantity');
+            }
+            else if (qty <= 0 || isNaN(qty)) {
+                $('#moving-qty').notify('Report quantity couldn\'t be less than or equal to 0');
+            }            
+            else {
+
+                if (desInput !== desCode) {
+                    $('#confirm-lbl input').notify('Incorrect destination! Please check your destination again! ' + desInput + ' - ' + desCode);
+                }
+                else {
+                    var oId = parseInt($('#table2').find('.exp-id').text().trim());
+                    var alo = {
+                        AlcOrdId: oId,
+                        AlcOrdQty: qty
+                    };
+
+                    var mess = ""
+
+                    $.ajax({
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                        type: 'POST',
+                        url: routeURL + '/api/InvRequest/FinishIssueOrder',
+                        data: JSON.stringify(alo),
+                        success: function (common) {
+                            bootbox.alert({
+                                message: '<h5> <span class="fa fa-check 3x" style="color: green"> </span> ' + common.message + ' </h5>',
+                                callback: function () {
+                                    window.location.reload();
+                                }
+                            });
+                        },
+                        failure: function (response) {
+                            alert(response);
+                        }
+
+                    });
+
+                   
+                    //setTimeout(function () {
+                    //    window.location.reload();
+                    //}, 1000);
+                }
+            }
         });
+
 
         $('#send-report').click(function () {
             var cmmt = $("#report-input");
@@ -248,10 +341,10 @@
 
 
             if (qty > oQty) {
-                $('#input-qty').notify('Report quantity could\'nt be larger than order quantity');
+                $('#input-qty').notify('Report quantity couldn\'t be larger than order quantity');
             }
             else if (qty <= 0) {
-                $('#input-qty').notify('Report quantity could\'nt be less than or equal to 0');
+                $('#input-qty').notify('Report quantity couldn\'t be less than or equal to 0');
             }
             else if (note == "") {
                 cmmt.notify('Please describe the reason.');

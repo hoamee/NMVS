@@ -41,7 +41,7 @@ namespace NMVS.Controllers
                              MovementTime = o.MovementTime,
                              MovedQty = o.MovedQty,
                              LocCode = o.LocCode,
-                             IssueToDesc = all == null ? (ol == null ? "" : all2.LocDesc) : all.ShpDesc,
+                             IssueToDesc = o.IssueType == "MFG" ? all2.LocDesc : all.ShpDesc,
                              Confirm = o.Confirm,
                              ConfirmedBy = o.ConfirmedBy,
                              DetId = o.DetId,

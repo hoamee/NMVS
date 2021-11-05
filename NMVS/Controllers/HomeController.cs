@@ -41,7 +41,9 @@ namespace NMVS.Controllers
                     hold += loc.LocHolding;
                     cap += loc.LocCap;
                     remain += (loc.LocCap - _db.ItemMasters.Where(x=>x.LocCode == loc.LocCode && x.PtQty > 0).Sum(x=>x.PtQty)) ;
-                    outGo += _db.ItemMasters.Where(x => x.LocCode == loc.LocCode && x.PtQty > 0).Sum(x => x.PtHold);
+                    outGo += _db.AllocateOrders.Where(x => x.LocCode == loc.LocCode && x.Confirm == null).Sum(x => x.AlcOrdQty - x.MovedQty)
+                        + _db.IssueOrders.Where(x => x.LocCode == loc.LocCode && x.Confirm == null).Sum(x => x.ExpOrdQty - x.MovedQty)
+                        ;
                 }
 
                 if ((cap - remain - hold) / cap > 0.8)

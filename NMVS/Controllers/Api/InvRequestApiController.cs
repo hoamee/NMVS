@@ -56,7 +56,7 @@ namespace NMVS.Controllers.Api
 
                     request.Picked += jsArr.qty;
                     // 4. Add Outgo to From-Loc
-                    fromLoc.LocOutgo += jsArr.qty;
+                    //fromLoc.LocOutgo += jsArr.qty;
 
 
                     _context.IssueOrders.Add(new IssueOrder()
@@ -99,10 +99,10 @@ namespace NMVS.Controllers.Api
 
             var issueQty = alo.AlcOrdQty;
 
-            var order = await _context.IssueOrders.FindAsync(alo.AlcOrdId);
-
             try
             {
+                var order = await _context.IssueOrders.FindAsync(alo.AlcOrdId);
+
                 if (order != null)
                 {
 
@@ -140,15 +140,15 @@ namespace NMVS.Controllers.Api
                         var fromLoc = await _context.Locs.FindAsync(pt.LocCode);
                         if (fromLoc != null )
                         {
-                            fromLoc.LocOutgo -= issueQty;
+                            //fromLoc.LocOutgo -= issueQty;
                             fromLoc.LocRemain += issueQty;
 
-                            if (fromLoc.LocOutgo < 0 || fromLoc.LocRemain < 0)
-                            {
-                                commonResponse.message = "Location capacity error";
-                                return Ok(commonResponse);
-                            }
-                            _context.Update(fromLoc);
+                            //if (fromLoc.LocOutgo < 0 || fromLoc.LocRemain < 0)
+                            //{
+                            //    commonResponse.message = "Location capacity error";
+                            //    return Ok(commonResponse);
+                            //}
+                            //_context.Update(fromLoc);
 
 
                             //Check request det
@@ -360,7 +360,7 @@ namespace NMVS.Controllers.Api
                         var request = await _context.InvRequests.FindAsync(rqDet.RqID);
                         // decrease loc hold
                         var fromLoc = await _context.Locs.FindAsync(pt.LocCode);
-                        fromLoc.LocOutgo -= report.Qty;
+                        //fromLoc.LocOutgo -= report.Qty;
 
 
                         if (request.RqType == "MFG")

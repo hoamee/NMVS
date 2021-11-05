@@ -17,7 +17,7 @@ namespace NMVS.Models.ViewModels
         public string AlcToCode { set; get; }
         public string AlcToDesc { set; get; }
         public DateTime MvmTime { set; get; }
-        public bool Confirmed { set; get; }
+        public bool? Confirmed { set; get; }
         public string ConfirmBy { set; get; }
     }
 }

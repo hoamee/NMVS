@@ -122,7 +122,10 @@ namespace NMVS.Controllers.Api
                         pt.PtQty = pt.RecQty - item.PtQty;
                         pt.Qc = _httpContextAccessor.HttpContext.User.Identity.Name;
                         pt.LocCode = receiveLoc.LocCode;
-                        pt.PtCmt += string.IsNullOrEmpty(pt.PtCmt)?  item.PtCmt : " | " + item.PtCmt ;
+                        if (item.PtQty > 0)
+                        {
+                            pt.PtCmt += string.IsNullOrEmpty(pt.PtCmt) ? item.PtCmt : " | " + item.PtCmt;
+                        }
                         var ic = _context.IncomingLists.Find(pt.IcId);
                         ic.Checked++;
                         receiveLoc.LocRemain -= pt.PtQty;
