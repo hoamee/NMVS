@@ -218,7 +218,7 @@
                     var desInput = decodedText;
                     html5QrcodeScanner.clear();
                     if (desInput !== desCode) {
-                        bootbox.alert('Incorrect destination! Please check your destination again! ' + desInput + ' - ' + desCode);
+                        bootbox.alert('Incorrect destination! Please check your destination again!! ' + desInput + ' - ' + desCode);
                     }
                     else {
                         var oId = parseInt($('#table2').find('.exp-id').text().trim());
@@ -237,7 +237,7 @@
                             data: JSON.stringify(alo),
                             success: function (common) {
                                 bootbox.alert({
-                                    message: '<h6> <span class="fa fa-check 3x" style="color: green"> </span> ' + common.message + ' </h6>',
+                                    message: '<h6> <span class="fa fa-check 5x" style="color: green"> </span> ' + common.message + ' </h6>',
                                     callback: function () {
                                         window.location.href = window.location.href;
                                     }
@@ -291,7 +291,7 @@
             else {
 
                 if (desInput !== desCode) {
-                    $('#confirm-lbl input').notify('Incorrect destination! Please check your destination again! ' + desInput + ' - ' + desCode);
+                    $('#confirm-lbl input').notify('Verification failed! Please check your input data! ' + desInput + ' - ' + desCode);
                 }
                 else {
                     var oId = parseInt($('#table2').find('.exp-id').text().trim());

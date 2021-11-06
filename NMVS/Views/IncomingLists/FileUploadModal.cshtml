@@ -21,9 +21,8 @@
         </div>
     </div>
 </div>
-<script src="~/assets/js/bootbox/bootbox.min.js"></script>
-<script src="~/assets/js/bootbox/bootbox.locales.min.js"></script>
 <script src="~/assets/js/notify.js"></script>
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
 <script>
 
     function uploadFiles(inputId) {
@@ -46,19 +45,7 @@
         }
 
         if (valid) {
-            var dialog = bootbox.dialog({
-                title: 'Upload status',
-                message: '<p><i class="fa fa-spin fa-spinner"></i> Loading...</p>',
-                buttons: {
-                    cancel: {
-                        label: "",
-                        className: 'btn-danger',
-                        callback: function () {
-
-                        }
-                    },
-                }
-            });
+           
             $.ajax(
                 {
                     url: "/IncomingLists/UploadList",
@@ -66,58 +53,39 @@
                     processData: false,
                     contentType: false,
                     beforeSend: function () {
-                        $.notify("Uploading...", "warning");
+                        Swal.showLoading();
                     },
                     type: "POST",
                     success: function (common) {
                         if (common.status == -1) {
-                            dialog.init(function () {
-                                dialog.find('.bootbox-body').html('<h5 class="text-danger">Header not found. Please check your file! </h5>');
-                                dialog.find('.modal-footer').html('<a href="/IncomingLists/" class="btn btn-secondary bootbox-cancel">cancel</button>' + '<a href="/UploadReports/Details/' + common.dataenum.uploadId + '" class="btn btn-primary bootbox-cancel">View report</button>');
-
-
-                            });
+                            
+                            Swal.fire(
+                                'Cancelled',
+                                '<h5 class="text-danger">' + common.message + '</h5>'
+                                + '<a href="/UploadReports/Details/' + common.dataenum.uploadId + '" class="btn btn-outline-primary ">View report</a>',
+                                'error'
+                            )
                         } else {
-                            $.notify("Process completed", "success")
-                            dialog.init(function () {
 
-                                dialog.find('.bootbox-body').html('Finished importing file "<b>' + common.dataenum.fileName + '</b>". </br> - '
-                                    + ' <span class="text-bold">Processed: ' + common.dataenum.totalRecord + '</br> - '
-                                    + ' <span class="text-success"><b>Added: ' + common.dataenum.inserted + ' </b></span> </br> - '
-                                    + ' <span class="text-warning"><b>Updated: ' + common.dataenum.updated + '</b></span> </br> -'
-                                    + ' <span class="text-danger"><b>Errors: ' + common.dataenum.errors + ' </b></span> </br>');
-                                dialog.find('.modal-footer').html('<a href="/IncomingLists/" class="btn btn-secondary bootbox-cancel">cancel</button>' + '<a href="/UploadReports/Details/'
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Completed!',
+                                html: '<span>Finished importing file "<b>' + common.dataenum.fileName + '</b>". </span></br>'
+                                    + ' <span class="text-bold">Processed: ' + common.dataenum.totalRecord + '</span></br>'
+                                    + ' <span class="text-success"><b>Added: ' + common.dataenum.inserted + ' </b></span> </br>'
+                                    + ' <span class="text-warning"><b>Updated: ' + common.dataenum.updated + '</b></span> </br>'
+                                    + ' <span class="text-danger"><b>Errors: ' + common.dataenum.errors + ' </b></span> </br>',
+                                footer: '<a href="/UploadReports/Details/'
                                     + common.dataenum.uploadId
-                                    + '" class="btn btn-primary bootbox-cancel">View report</button>');
-
-
-                            });
-                            //bootbox.confirm({
-                            //    title: "Import finished",
-                            //    message: 'Finished importing file "<b>' + common.dataenum.fileName + '</b>". </br> - '
-                            //        + ' <span class="text-bold">Processed: ' + common.dataenum.totalRecord + '</br> - '
-                            //        + ' <span class="text-success"><b>Added: ' + common.dataenum.inserted + ' </b></span> </br> - '
-                            //        + ' <span class="text-warning"><b>Updated: ' + common.dataenum.updated + '</b></span> </br> -'
-                            //        + ' <span class="text-danger"><b>Errors: ' + common.dataenum.errors + ' </b></span> </br>',
-                            //    buttons: {
-                            //        confirm: {
-                            //            label: 'View detail',
-                            //            className: 'btn-outline-success'
-                            //        },
-                            //        cancel: {
-                            //            label: 'Back to list',
-                            //            className: 'btn-secondary'
-                            //        }
-                            //    },
-                            //    callback: function (go) {
-                            //        if (go) {
-                            //            window.location.href = '/UploadReports/Details/' + common.dataenum.uploadId;
-                            //        } else {
-                            //            window.location.href = window.location.href;
-                            //        }
-                            //    }
-
-                            //})
+                                    + '" class="btn btn-outline-primary btn-sm">View report</a>',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            })
+                            
+                           
 
                         }
                     }

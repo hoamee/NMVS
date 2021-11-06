@@ -31,16 +31,22 @@ namespace NMVS.Controllers.Api
 
         [HttpPost]
         [Route("AddItem")]
-        public IActionResult AddItem(ItemMaster item)
+        public IActionResult AddItem(ItemMaster iItem)
         {
             var role = _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
-            ItemMaster iItem = item;
             CommonResponse<int> common = new();
             if (role)
             {
                 try
                 {
-                    var ic = _context.IncomingLists.Find(item.IcId);
+                    var itemData = _context.ItemDatas.Find(iItem.ItemNo);
+                    if (itemData == null)
+                    {
+                        common.message = "Item no. not found!";
+                        common.status = -1;
+                        return Ok(common);
+                    }
+                    var ic = _context.IncomingLists.Find(iItem.IcId);
                     ic.ItemCount++;
                     _context.Update(ic);
                     _context.Add(new ItemMaster
@@ -49,7 +55,7 @@ namespace NMVS.Controllers.Api
                         IcId = iItem.IcId,
                         RecQty = iItem.RecQty,
                         RefNo = iItem.RefNo,
-                        RefDate = iItem.RefDate,
+                        RefDate = iItem.RefDate == null ? null : iItem.RefDate,
                         PtCmt = iItem.PtCmt
                     });
                     _context.SaveChanges();

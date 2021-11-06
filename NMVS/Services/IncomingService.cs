@@ -182,16 +182,21 @@ namespace NMVS.Services
 
 
                 supCode = _eHelper.GetCellValue(wsPart, wbPart, "C3");
+                var supplier = await _db.Suppliers.FindAsync(supCode);
                 //if can not find supplier code, break
-                if (string.IsNullOrEmpty(supCode) || !headerCorrect)
+                if (string.IsNullOrEmpty(supCode) || !headerCorrect || supplier == null)
                 {
                     if (string.IsNullOrEmpty(supCode))
                     {
-                        common.message += "File header is incorrect! ";
+                        common.message += "Supplier code is not found! ";
+                    }
+                    else if (supplier == null)
+                    {
+                        common.message += "Supplier code not exist! ";
                     }
                     if (!headerCorrect)
                     {
-                        common.message += "File header is incorrect! ";
+                        common.message += "File header is incorrect! Please check your file";
                     }
                     common.dataenum.TotalRecord = 0;
                     common.dataenum.Updated = 0;
@@ -270,7 +275,6 @@ namespace NMVS.Services
                     //Read data from table
                     while (headerCorrect)
                     {
-                        common.dataenum.TotalRecord++;
                         readingRow++;
                         string lot, supRef, note;
                         DateTime refDate;
@@ -287,9 +291,9 @@ namespace NMVS.Services
                             note = _eHelper.GetCellValue(wsPart, wbPart, "H" + readingRow);
                             supRef = _eHelper.GetCellValue(wsPart, wbPart, "F" + readingRow);
                             var checkDate = DateTime.TryParse(_eHelper.GetCellValue(wsPart, wbPart, "G" + readingRow), out refDate);
-                            if (item != null)
+                            if (item != null && checkQty)
                             {
-                                
+
                                 var pt = _db.ItemMasters
                                     .Where(x => x.ItemNo == item.ItemNo
                                         && x.IcId == icId
@@ -298,6 +302,7 @@ namespace NMVS.Services
                                         && x.RefNo == supRef
                                         && x.PtCmt == note
                                     ).FirstOrDefault();
+                                //if existed: add quantity and rec user. Update
                                 if (pt != null)
                                 {
                                     pt.RecQty += qty;
@@ -331,11 +336,16 @@ namespace NMVS.Services
                                     incomingList.ItemCount++;
                                     await _db.AddAsync(newPt);
                                     await _db.SaveChangesAsync();
+                                    newPt.ParentId = newPt.PtId;
+                                    _db.Update(newPt);
+                                    await _db.SaveChangesAsync();
                                     common.dataenum.Inserted++;
+                                    common.dataenum.TotalRecord++;
+
                                 }
 
                             }
-                            else 
+                            else
                             {
                                 if (string.IsNullOrEmpty(lot)
                                     && string.IsNullOrEmpty(note)
@@ -343,17 +353,23 @@ namespace NMVS.Services
                                 {
                                     break;
                                 }
-                                    common.dataenum.Errors++;
+
+                                common.dataenum.Errors++;
                                 _db.Add(new UploadError
                                 {
                                     UploadId = common.dataenum.UploadId,
-                                    Error = " Line " + readingRow + ": Error with item no. or quantity \" " + err + "\"; Skipped line: " + readingRow
-                                });
+                                    Error = " Line " + readingRow + ": Error with " 
+                                    + (item == null ? "Item no." : "")
+                                    + (!checkQty ? "quantity" : "")
 
+                                    + ", Skipped line: " + readingRow
+                                });
+                                common.dataenum.TotalRecord++;
                                 continue;
                             }
 
 
+                            
                         }
                         catch (Exception e)
                         {

@@ -59,9 +59,7 @@
     </div>
 </div>
 
-
-<script src="~/assets/js/bootbox/bootbox.min.js"></script>
-<script src="~/assets/js/bootbox/bootbox.locales.min.js"></script>
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
 <script src="~/assets/js/notify.js"></script>
 <script src="~/assets/datatable/datatables.min.js"></script>
 <script>
@@ -78,88 +76,98 @@
             var pt = {
                 IcId: icId
             };
-            bootbox.confirm({
-                message: '<h5 class="text-danger"><b>Is all information correct?</b></h5>',
-                closeButton: false,
-                buttons: {
-                    confirm: {
-                        label: 'Yes',
-                        className: 'btn-success'
-                    },
-                    cancel: {
-                        label: 'No',
-                        className: 'btn-danger'
-                    }
-                },
-                callback: function (result) {
-                    if (result) {
-                        $.ajax(
-                            {
-                                url: routeURL + "/api/IncomingList/CloseList",
-                                data: JSON.stringify(pt),
-                                contentType: 'application/json',
-                                type: "POST",
-                                success: function (common) {
 
-                                    if (common.status == 1) {
-                                        $.notify("Process completed", "success");
-                                        setTimeout(
-                                            function () {
+            Swal.fire({
+                title: 'Do you want to save the changes?',
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Save',
+                denyButtonText: `Don't save`,
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    $.ajax(
+                        {
+                            url: routeURL + "/api/IncomingList/CloseList",
+                            data: JSON.stringify(pt),
+                            contentType: 'application/json',
+                            type: "POST",
+                            success: function (common) {
 
-                                                window.location.href = window.location.href;
-                                            }, 1000);
-                                    } else {
-                                        $.notify(common.message);
-                                    }
+                                if (common.status == 1) {
+                                    Swal.fire('Saved!', '', 'success')
+                                    setTimeout(
+                                        function () {
+                                            window.location.reload;
+                                        }, 1500);
+                                } else {
+                                    Swal.fire(common.message, '', 'error');
                                 }
-
+                            },
+                            error: function () {
+                                Swal.fire('Connection unavailable!', '', 'error');
                             }
-                        );
-                    }
+
+                        }
+                    );
+                } else if (result.isDenied) {
+                    Swal.fire('Changes are not saved', '', 'info')
                 }
-            });
-            
+            })
+
 
         });
 
         $('#submit-item').click(function () {
-            var itemCode = $('#item-code').val();
+            var itemCode = $('#item-code').val().trim();
             var qty = parseFloat($('#item-qty').val());
             var itemRef = $('#item-ref').val();
             var refDate = $('#item-ref-date').val();
             var itemNote = $('#item-note').val();
             var icId = parseInt(@Html.Raw(Model.Icm.IcId));
-            var pt = {
-                ItemNo : itemCode,
-                RecQty : qty,
-                RefNo : itemRef,
-                RefDate : refDate,
-                IcId: icId,
-                PtCmt: itemNote
 
-            }
-            $.ajax(
-                {
-                    url: routeURL + "/api/IncomingList/AddItem",
-                    data: JSON.stringify(pt),
-                    contentType: 'application/json',
-                    type: "POST",
-                    success: function (common) {
+            if (itemCode == "") {
+                $('#item-code').notify("Please enter item code");
+            } else if (qty <= 0 || isNaN(qty)) {
+                $('#item-qty').notify("Please enter a valid quantity");
+            } else {
 
-                        if (common.status == 1) {
-                            $.notify("Process completed", "success");
-                            setTimeout(
-                                function () {
-
-                                    window.location.href = window.location.href;
-                                }, 1000);
-                        } else {
-                            $.notify(common.message);
-                        }
-                    }
+                if (!Date.parse(refDate)) {
+                    refDate = NaN;
+                }
+                var pt = {
+                    ItemNo : itemCode,
+                    RecQty : qty,
+                    RefNo : itemRef,
+                    RefDate : refDate,
+                    IcId: icId,
+                    PtCmt: itemNote
 
                 }
-            );
+                $.ajax(
+                    {
+                        url: routeURL + "/api/IncomingList/AddItem",
+                        data: JSON.stringify(pt),
+                        contentType: 'application/json',
+                        type: "POST",
+                        success: function (common) {
+
+                            if (common.status == 1) {
+                                $.notify("Process completed", "success");
+                                setTimeout(
+                                    function () {
+
+                                        window.location.href = window.location.href;
+                                    }, 1000);
+                            } else {
+                                $('#item-code').notify(common.message);
+                            }
+                        }
+
+                    }
+                    );
+
+               }
 
         });
     });

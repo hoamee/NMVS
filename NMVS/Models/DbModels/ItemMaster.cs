@@ -57,7 +57,7 @@ namespace NMVS.Models.DbModels
         public string RefNo { set; get; }
 
         [Display(Name = "Supplier Ref Date")]
-        public DateTime RefDate { set; get; }
+        public DateTime? RefDate { set; get; }
 
         public int IcId { set; get; }
         public virtual IncomingList Ic { set; get; }
@@ -72,6 +72,8 @@ namespace NMVS.Models.DbModels
         public DateTime? RecycleDate { set; get; }
 
         public int? UnqualifiedId { set; get; }
+
+        public int ParentId { set; get; }
 
     }
 }

@@ -1,8 +1,7 @@
 ﻿
 
-
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
 <script src="~/assets/js/bootbox/bootbox.min.js"></script>
-<script src="~/assets/js/bootbox/bootbox.locales.min.js"></script>
 <script src="~/assets/js/notify.js"></script>
 <script src="~/assets/datatable/datatables.min.js"></script>
 <script>
@@ -61,7 +60,14 @@
                                             success: function (common) {
 
                                                 if (common.status == 1) {
-                                                    $.notify("Process completed", { position: "right middle", className:"success" });
+                                                    Swal.fire({
+                                                        position: 'center',
+                                                        icon: 'success',
+                                                        title: 'Your work has been saved',
+                                                        showConfirmButton: false,
+                                                        timer: 1500
+                                                    })
+
                                                     $('#td-' + ptId).html('<span class="badge bg-success">Checked</span>');
                                                     $('#qty-' + ptId).html(accept);
                                                     $('#user-' + ptId).html(common.dataenum);

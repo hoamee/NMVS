@@ -14,6 +14,7 @@
                             <th>
                                 Request No.
                             </th>
+                            <th>Inventory Id</th>
                             <th>
                                 Item No.
                             </th>
@@ -35,9 +36,11 @@
                             <th>
                                 Time
                             </th>
-
                             <th>
-
+                                Moved by
+                            </th>
+                            <th>
+                                Confirmation
                             </th>
                         </tr>
                     </thead>
@@ -50,6 +53,13 @@
             <div class="form-group text-xl-center">
                 <label class="form-check-label text-primary ">
                     Movement Quantity <input type="number" class="form-control" id="moved-qty" step="0.01" />
+                </label>
+                <label class="form-check-label text-danger" id="confirm-lbl">
+
+                </label>
+                <label class="form-check-label ">
+                    Or
+                    <input type="button" class="form-control" value="Scan QR" id="scan-qr" />
                 </label>
             </div>
             <div id="reader" width="80%">
@@ -78,6 +88,7 @@
                             <th>
                                 Request No.
                             </th>
+                            <th>Inventory Id</th>
                             <th>
                                 Item No.
                             </th>
@@ -99,10 +110,10 @@
                             <th>
                                 Time
                             </th>
-
                             <th>
-
+                                Moved by
                             </th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -133,18 +144,19 @@
         </div>
     </div>
 </div>
-
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
 <script>
     var routeURL = location.protocol + "//" + location.host;
+    $('.modal-btn').click(function () {
+        $('#table2 #t2-tr').html($(this).closest('tr').html());
+        $('#table2 #t2-tr').children('td:last').remove();
+        $('#exampleModal').modal('toggle');
+        $('#confirm-lbl').html('Location code <input type="text" placeholder="To location code" class="form-control" id="loc-code" />');
+        $('#reader').html('');
+    });
     $(document).ready(function () {
-        $('.modal-btn').click(function () {
-            $('#table2 #t2-tr').html($(this).closest('tr').html());
-            $('#table2 #t2-tr').children('td:last').remove();
-            $('#exampleModal').modal('toggle');
-        });
 
-
-        $('#confirm-end').click(function () {
+        $('#scan-qr').click(function () {
 
             var desCode = $('#table2 .to-code').text().trim();
             var qty = $('#moved-qty').val();
@@ -191,11 +203,23 @@
                                     $("#exampleModal").modal('toggle');
                                     $(`#table1 tbody #tr-${oId} td:last`).html('<p class="badge bg-success"> Allocated </p>');
                                     $('#reader').html('');
-                                    $.notify("Success", "success");
-                                    
+                                    Swal.fire({
+                                        position: 'center',
+                                        icon: 'success',
+                                        title: 'Your work has been saved',
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 1000);
 
                                 } else {
-                                    $.notify("An error occurred");
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: 'Something went wrong!'
+                                    })
                                 }
 
                             },
@@ -214,6 +238,94 @@
                     }
                 }
                 html5QrcodeScanner.render(onScanSuccess);
+
+            }
+        });
+
+        $('#confirm-end').click(function () {
+
+            var desCode = $('#table2 .to-code').text().trim();
+            var qty = $('#moved-qty').val();
+            desInput = $('#loc-code').val().trim();
+            var oQty = parseFloat($('#table2 #t2-tr').children('.td-qty').text().trim()) - parseFloat($('#table2 #t2-tr').children('.td-moved').text().trim());
+
+            if (qty > oQty) {
+                $('#moved-qty').notify('Report quantity couldn\'t be larger than order quantity');
+            }
+            else if (qty <= 0) {
+                $('#moved-qty').notify('Report quantity couldn\'t be less than or equal to 0');
+            } else {
+
+                
+                if (desInput !== desCode) {
+                    $('#confirm-lbl input').notify('Incorrect destination! Please check your destination again! ' + desInput + ' - ' + desCode);
+                }
+                else {
+                    var oId = parseInt($('#table2 .td-id').text().trim());
+                    var alo = {
+                        AlcOrdId: oId,
+                        MovedQty: qty
+                    };
+
+                    Swal.fire({
+                        title: 'Is all information correct?',
+                        text: "You won't be able to revert this!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, submit!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+                            $.ajax({
+                                contentType: 'application/json; charset=utf-8',
+                                dataType: 'json',
+                                type: 'POST',
+                                url: routeURL + '/api/Allocate/FinishOrder',
+                                data: JSON.stringify(alo),
+                                onBegin: function () {
+                                    $('#confirm-end').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...');
+                                },
+                                success: function (data) {
+                                    if (data.status == 1) {
+                                        $("#exampleModal").modal('toggle');
+                                        $(`#table1 tbody #tr-${oId} td:last`).html('<p class="badge bg-success"> Allocated </p>');
+                                        $('#reader').html('');
+                                        Swal.fire({
+                                            position: 'center',
+                                            icon: 'success',
+                                            title: 'Your work has been saved',
+                                            showConfirmButton: false,
+                                            timer: 2000
+                                        });
+                                        setTimeout(function () {
+                                            window.location.reload();
+                                        }, 1000);
+
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Oops...',
+                                            text: 'Something went wrong!'
+                                        })
+                                    }
+
+                                },
+                                failure: function (response) {
+                                    alert(response);
+                                },
+                                complete: function () {
+                                    $('#confirm-end').html('Save changes');
+                                }
+
+                            });
+                        }
+                    })
+
+
+                   
+                }
 
             }
         });
@@ -250,37 +362,51 @@
                     OrId: oId
                 };
 
-                bootbox.confirm({
-                    message: '<h5 >Is all information correct?</h5>',
-                    closeButton: false,
-                    buttons: {
-                        confirm: {
-                            label: 'Yes',
-                            className: 'btn-success'
-                        },
-                        cancel: {
-                            label: 'No',
-                            className: 'btn-danger'
-                        }
-                    },
-                    callback: function (cf) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
                         $.ajax({
                             contentType: 'application/json; charset=utf-8',
                             dataType: 'json',
                             type: 'POST',
                             url: routeURL + '/api/Allocate/ReportOrder',
                             data: JSON.stringify(postData),
-                            success: function (data) {
-                                if (data.status == 1) {
-                                    $.notify(data.message, 'success');
+                            success: function (common) {
+                                if (common.status == 1) {
+                                    Swal.fire({
+                                        position: 'Center',
+                                        icon: 'success',
+                                        title: 'Report sumitted!',
+                                        showConfirmButton: false
+                                    });
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 1200);
                                 }
 
-                                if (data.status == 0) {
-                                    $.notify(data.message, 'warning');
+                                if (common.status == 0) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: comoon.message,
+                                    });
                                 }
 
-                                if (data.status == -1) {
-                                    $.notify(data.message, 'error');
+                                if (common.status == -1) {
+                                    if (data.status == 0) {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Oops...',
+                                            text: common.message
+                                        });
+                                    };
                                 }
 
 
@@ -293,9 +419,9 @@
                             }
 
                         });
+                        
                     }
-
-                });
+                })
 
 
             }
