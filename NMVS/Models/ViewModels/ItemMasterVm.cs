@@ -24,7 +24,7 @@ namespace NMVS.Models.ViewModels
         public string Ref { set; get; }
         public DateTime? RefDate { set; get; }
         public string Note { set; get; }
-
+        public int Parent { set; get; }
         public string Po { set; get; }
 
     }

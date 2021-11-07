@@ -74,6 +74,7 @@ namespace NMVS.Models.DbModels
         public int? UnqualifiedId { set; get; }
 
         public int ParentId { set; get; }
-
+        
+        public string MovementNote { set; get; }
     }
 }

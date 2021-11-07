@@ -17,17 +17,13 @@ namespace NMVS.Controllers.Api
     [ApiController]
     public class InvRequestApiController : Controller
     {
-        private readonly IIncomingService _service;
-        private readonly IAllocateService _alcService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         ApplicationDbContext _context;
 
-        public InvRequestApiController(IIncomingService service, IHttpContextAccessor httpContextAccessor, ApplicationDbContext context, IAllocateService allocateService)
+        public InvRequestApiController(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context)
         {
             _context = context;
-            _service = service;
             _httpContextAccessor = httpContextAccessor;
-            _alcService = allocateService;
         }
 
         [HttpPost]
@@ -113,7 +109,6 @@ namespace NMVS.Controllers.Api
                     {
                         if (!string.IsNullOrEmpty(shp.CheckOutBy))
                         {
-
                             return Ok(commonResponse);
                         }
 
@@ -131,14 +126,13 @@ namespace NMVS.Controllers.Api
                             commonResponse.message = "Item quantity error";
                             return Ok(commonResponse);
                         }
-
                         _context.Update(pt);
 
 
                         //check location
                         commonResponse.message = "From loc not found!";
                         var fromLoc = await _context.Locs.FindAsync(pt.LocCode);
-                        if (fromLoc != null )
+                        if (fromLoc != null)
                         {
                             //fromLoc.LocOutgo -= issueQty;
                             fromLoc.LocRemain += issueQty;
@@ -153,7 +147,8 @@ namespace NMVS.Controllers.Api
 
                             //Check request det
                             var reDet = _context.RequestDets.Find(order.DetId);
-                            commonResponse.message = "Request loc not found!";
+                            commonResponse.message = "Request not found!";
+                            var itemNote = "";
                             if (reDet != null)
                             {
                                 reDet.Arranged += issueQty;
@@ -174,15 +169,29 @@ namespace NMVS.Controllers.Api
                                             ShpId = (int)order.ToVehicle
                                         });
 
+                                        
                                     }
                                     else
                                     {
                                         shpDet.Quantity += issueQty;
                                         _context.Update(shpDet);
                                     }
+                                    _context.Add(new InventoryTransac
+                                    {
+                                        From = pt.LocCode,
+                                        To = "Shipper Id: "+shp.ShpId,
+                                        LastId = pt.PtId,
+                                        NewId = null,
+                                        OrderNo = order.ExpOrdId,
+                                        IsAllocate = false,
+                                        IsDisposed = false,
+                                        MovementTime = DateTime.Now
+                                    });
                                 }
                                 else
                                 {
+                                    //Create new issue note only
+                                    //To loc is not considerred
                                     var mfgIssueNote = _context.MfgIssueNotes.FirstOrDefault(x => x.RqId == order.RqID && string.IsNullOrEmpty(x.IssuedBy));
                                     if (mfgIssueNote == null)
                                     {
@@ -225,6 +234,17 @@ namespace NMVS.Controllers.Api
                                         }
 
                                     }
+                                    _context.Add(new InventoryTransac
+                                    {
+                                        From = fromLoc.LocCode,
+                                        To = pt.LocCode,
+                                        LastId = pt.PtId,
+                                        NewId = null,
+                                        OrderNo = order.ExpOrdId,
+                                        IsAllocate = false,
+                                        IsDisposed = false,
+                                        MovementTime = DateTime.Now
+                                    });
 
                                 }
 
@@ -234,6 +254,8 @@ namespace NMVS.Controllers.Api
                                 {
                                     order.Confirm = true;
                                 }
+                                pt.MovementNote += itemNote;
+                                _context.Update(pt);
                                 _context.Update(order);
                                 _context.SaveChanges();
                                 commonResponse.message = "Success"!;
@@ -262,9 +284,22 @@ namespace NMVS.Controllers.Api
             CommonResponse<int> common = new();
             try
             {
-                var note =  _context.MfgIssueNotes.Find(issueNote.IsNId);
+                var note = _context.MfgIssueNotes.Find(issueNote.IsNId);
                 if (note != null)
                 {
+                    var requestDets = _context.RequestDets.Where(x => x.RqID == note.RqId).Select(x=>x.DetId).ToList();
+                    var remainOrder = 0;
+                    foreach (var order in _context.IssueOrders.Where(x=> requestDets.Contains(x.DetId) && x.Confirm == null))
+                    {
+                        remainOrder++;
+                    }
+                    if (remainOrder > 0)
+                    {
+                        common.status = 0;
+                        common.message = remainOrder > 1 ? "Unable to finish. There are " + remainOrder + " unfinished movements for this request"
+                            : "Unable to finish. There is an unfinished movement for this request";
+                        return Ok(common);
+                    }
                     note.IssuedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
                     note.IssuedOn = DateTime.Now;
                     _context.Update(note);
@@ -383,14 +418,28 @@ namespace NMVS.Controllers.Api
                             // decrease qty
                             pt.PtQty -= report.Qty;
 
-                            // add new broken
-                            _context.Unqualifieds.Add(new Unqualified
+                            var uq = new Unqualified
                             {
                                 Description = report.Note,
                                 ItemNo = pt.ItemNo,
                                 Note = "",
                                 PtId = pt.PtId,
                                 Quantity = report.Qty
+                            };
+                            // add new broken
+                            _context.Unqualifieds.Add(uq);
+                            _context.SaveChanges();
+
+                            _context.Add(new InventoryTransac
+                            {
+                                From = fromLoc.LocCode,
+                                To = "Unqualified",
+                                LastId = pt.PtId,
+                                NewId = uq.UqId,
+                                OrderNo = order.ExpOrdId,
+                                MovementTime = DateTime.Now,
+                                IsDisposed = false,
+                                IsAllocate = false
                             });
                         }
 

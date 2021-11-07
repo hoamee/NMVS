@@ -1,0 +1,162 @@
+﻿@model NMVS.Models.ViewModels.InventoryDetail
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-2">
+                        Id
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.ItemMasterVm.Ptid)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Item No.
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.ItemMasterVm.No)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Name
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.ItemMasterVm.Name)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Parent
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.ItemMasterVm.Parent)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Location
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.ItemMasterVm.Loc)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Quantity
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.ItemMasterVm.Qty)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Booked
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.ItemMasterVm.Booked)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Supplier
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.ItemMasterVm.Sup)
+                    </dd>
+
+                </dl>
+            </div>
+            <div class="card-footer">
+                <a asp-action="Inventory" class="btn btn-outline-secondary">Back to browse</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">Items</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-flush" id="datatable-search">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Transaction id
+                                </th>
+                                <th>
+                                    Time
+                                </th>
+                                <th>
+                                    From
+                                </th>
+                                <th>
+                                    To
+                                </th>
+                                <th>
+                                    Last Id
+                                </th>
+                                <th>
+                                    New Id
+                                </th>
+                                <th>
+                                    Movement type
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var t in Model.Transacs)
+                            {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.Id)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.MovementTime)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.From)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.To)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.LastId)
+                                </td>
+
+                                <td>
+                                    New ID/Unqualified ID
+                                </td>
+                                <td>
+                                    @if (t.IsDisposed)
+                                    {
+                                        <span class="badge bg-danger">Unqualified</span>
+                                    }
+                                    else
+                                    {
+                                        if (t.IsAllocate)
+                                        {
+
+
+                                            <span class="badge bg-info">Allocate</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-primary">Issue</span>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -33,27 +33,26 @@ namespace NMVS.Controllers
             foreach (var wh in listWh)
             {
                 double cap = 0;
-                double remain = 0;
+                double used = 0;
                 double hold = 0;
                 double outGo = 0;
                 foreach (var loc in listLoc.Where(x => x.WhCode == wh.WhCode))
                 {
-                    hold += loc.LocHolding;
+                    hold += _db.AllocateOrders.Where(x => x.LocCode == loc.LocCode && x.Confirm == null).Sum(x => x.AlcOrdQty - x.MovedQty)
+                        + _db.IssueOrders.Where(x => x.ToLoc == loc.LocCode && x.Confirm == null).Sum(x => x.ExpOrdQty - x.MovedQty);
                     cap += loc.LocCap;
-                    remain += (loc.LocCap - _db.ItemMasters.Where(x=>x.LocCode == loc.LocCode && x.PtQty > 0).Sum(x=>x.PtQty)) ;
-                    outGo += _db.AllocateOrders.Where(x => x.LocCode == loc.LocCode && x.Confirm == null).Sum(x => x.AlcOrdQty - x.MovedQty)
-                        + _db.IssueOrders.Where(x => x.LocCode == loc.LocCode && x.Confirm == null).Sum(x => x.ExpOrdQty - x.MovedQty)
-                        ;
+                    outGo += _db.ItemMasters.Where(x => x.LocCode == loc.LocCode && x.PtQty > 0).Sum(x => x.PtHold);
+                    used += _db.ItemMasters.Where(x => x.LocCode == loc.LocCode && x.PtQty > 0).Sum(x => x.PtQty) - outGo;
                 }
 
-                if ((cap - remain - hold) / cap > 0.8)
+                if ((cap - used - hold - outGo) / cap > 0.8)
                 {
                     fullWarehouse++;
                 }
                 listHold.Add(hold);
-                listRemain.Add(remain - hold);
+                listRemain.Add(cap - hold - outGo - used);
                 listOutGo.Add(outGo);
-                listUsed.Add(cap - remain - outGo);
+                listUsed.Add(used);
             }
 
             ViewBag.FullWH = fullWarehouse;

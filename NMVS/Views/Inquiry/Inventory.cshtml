@@ -1,0 +1,146 @@
+﻿@model NMVS.Models.ViewModels.ItemInquiryVm
+@{
+    ViewData["Title"] = "Item master inquiry";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="ItemNo" class="control-label">ItemNo.</label>
+                        <input id="ItemNo" class="form-control" />
+                    </div>
+                    <div class="form-group form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" id="Available" type="checkbox" /> Show only available
+                        </label>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary" id="search-btn">
+                        <span class="fa fa-search"></span>
+                        Search
+                    </button>
+
+                </div>
+                <div class="col-12">
+                    <hr />
+                    <h3>Result:</h3>
+                    <table class="table table-striped" id="result-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Inventory Id
+                                </th>
+
+                                <th>
+                                    Item No
+                                </th>
+                                <th>
+                                    Item Name
+                                </th>
+                                <th>
+                                    Parent Id
+                                </th>
+                                <th>
+                                    Location
+                                </th>
+                                <th>
+                                    Quantity
+                                </th>
+                                <th>
+                                    Booked
+                                </th>
+                                <th>
+                                    Supplier
+                                </th>
+                                <th>
+
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<partial name="ItemModal" />
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+    function setItemNo(sup) {
+        $('#ItemNo').val(sup);
+        $('#item-modal').modal('toggle');
+    };
+    $(document).ready(function () {
+        $('.nav-inquiry').addClass('active');
+        $('.nav-item-inquiry').addClass('active');
+        $('#navInquiry').addClass('show');
+        $('#item-tb').DataTable();
+
+        $('#ItemNo').click(function () {
+            $('#item-modal').modal('toggle');
+        });
+
+        $('#search-btn').click(function () {
+            var itemNo = $('#ItemNo').val();
+            var avail = $('#Available').is(":checked")
+
+            var vm = {
+                ItemNo: itemNo,
+                Available: avail
+            };
+
+            var routeURL = location.protocol + "//" + location.host;
+            var tb = $('#result-table > tbody');
+            $.ajax(
+                {
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'POST',
+                    url: routeURL + '/api/Allocate/GetInventory',
+                    data: JSON.stringify(vm),
+                    beforeSend: function () {
+                        Swal.showLoading();
+                    },
+                    type: "POST",
+                    success: function (res) {
+                        if (res.status == 1) {
+                            tb.empty();
+                            for (i = 0; i < res.dataenum.length; ++i) {
+                                tb.append('<tr><td><a href="/Inquiry/InventoryDetail/' + res.dataenum[i].ptid + '">' + res.dataenum[i].ptid + ' </a></td>'
+                                    + '<td>' + res.dataenum[i].no + '</td>'
+                                    + '<td>' + res.dataenum[i].name + '</td>'
+                                    + '<td>' + res.dataenum[i].parent + '</td>'
+                                    + '<td>' + res.dataenum[i].loc + '</td>'
+                                    + '<td>' + res.dataenum[i].qty + '</td>'
+                                    + '<td>' + res.dataenum[i].booked + '</td>'
+                                    + '<td>' + res.dataenum[i].sup + '</td></tr>'
+                                );
+                            }
+
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Query completed',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+
+                        } else {
+
+                        }
+                    }
+
+                }
+            );
+        });
+    });
+</script>

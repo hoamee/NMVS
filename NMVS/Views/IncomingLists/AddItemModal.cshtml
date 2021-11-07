@@ -95,11 +95,17 @@
                             success: function (common) {
 
                                 if (common.status == 1) {
-                                    Swal.fire('Saved!', '', 'success')
-                                    setTimeout(
-                                        function () {
-                                            window.location.reload;
-                                        }, 1500);
+                                    Swal.fire({
+                                        position: 'center',
+                                        icon: 'success',
+                                        title: 'Your work has been saved',
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 1000);
+                                    
                                 } else {
                                     Swal.fire(common.message, '', 'error');
                                 }

@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <script src="~/assets/js/notify.js"></script>
-<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
 <div class="row mt-4">
     <div class="col-12">
         <div class="card">
@@ -42,7 +42,7 @@
                                     Holding
                                 </th>
                                 <th>
-                                    Max packing
+                                    Frammable
                                 </th>
                                 <th>Quantity</th>
                                 <th>
@@ -67,7 +67,17 @@
                                         @Html.DisplayFor(modelItem => item.Holding)
                                     </td>
                                     <td>
-                                        @Html.DisplayFor(modelItem => item.Packing)
+                                        @if (item.Framable)
+                                        {
+
+
+                                            <span class="fa fa-fire-alt fa-2x" style="color: red;"></span>
+
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">No</span>
+                                        }
                                     </td>
                                     <td class="td-input">
                                         @{ var maxVal = item.RemainCapacity - item.Holding;}
@@ -146,33 +156,30 @@
 <script>
 
     function removeRow(loc, tr, qty) {
-        bootbox.confirm({
-            message: "Are you sure want to remove this row?",
 
-            buttons: {
-                confirm: {
-                    label: 'Yes',
-                    className: 'btn-success'
-                },
-                cancel: {
-                    label: 'No',
-                    className: 'btn-danger'
-                }
-            },
-            callback: function (result) {
-                if (result) {
-                    var vSelectQty = parseFloat($("#selected-qty").html()) - qty;
-                    var vInitQty = parseFloat($('#init-quantity').html()) + qty;
-                    var vHold = parseFloat($("#" + loc).children(".td-hold").html()) - qty;
+        Swal.fire({
+            title: 'Are you sure want to remove this row?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            denyButtonText: `No`,
+        }).then((result) => {
+            if (result) {
+                var vSelectQty = parseFloat($("#selected-qty").html()) - qty;
+                var vInitQty = parseFloat($('#init-quantity').html()) + qty;
+                var vHold = parseFloat($("#" + loc).children(".td-hold").html()) - qty;
 
-                    $("#" + loc).closest('tr').children('.td-hold').html(vHold);
-                    $('#init-quantity').html(vInitQty);
-                    $("#selected-qty").html(vSelectQty);
-                    $('#' + tr).remove();
-                }
+                $("#" + loc).closest('tr').children('.td-hold').html(vHold);
+                $('#init-quantity').html(vInitQty);
+                $("#selected-qty").html(vSelectQty);
+                $('#' + tr).remove();
+            } else if (result.isDenied) {
+                Swal.fire('Changes are not saved', '', 'info')
             }
+
         });
 
+        
 
 
     }
@@ -257,14 +264,22 @@
             var wid = 0;
             var mess = "";
             $('.modal-body #selected-table > tbody  > tr').each(function (index, tr) {
-                
+
                 var code = $(this).children('.whl-code').text().trim();
                 var quantity = parseFloat($(this).children('.qty').text());
                 var reqTime = $('#req-time').val();
                 if (code == "" || isNaN(quantity) || reqTime.isNaN) {
-                    bootbox.alert("Please check your data");
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'error',
+                        title: 'Please check your data',
+                        showConfirmButton: true
+                    });
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 1000);
                 } else {
-                    
+
                     var routeURL = location.protocol + "//" + location.host;
                     var record = { whcd: code, qty: quantity, id: @Html.Raw(ViewBag.ptid), reqTime };
                     $.ajax({
@@ -282,24 +297,28 @@
                         }
 
                     });
-                    
+
                     setTimeout(function () {
                         wid += eachRow;
                         progress.width(wid)
                     }, 100);
                 }
 
-                
-                
+
+
             });
 
-            bootbox.alert({
-                message: "Process completed",
-                callback: function () {
-                    window.location.href = "/Allocate/AllocateRequests";
-                }
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Your work has been saved',
+                showConfirmButton: false,
+                timer: 2000
             });
-            
+            setTimeout(function () {
+                window.location.reload();
+            }, 1000);
+
 
         });
     });

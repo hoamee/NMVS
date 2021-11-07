@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NMVS.Models;
 
 namespace NMVS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211107034707_InvTransac1")]
+    partial class InvTransac1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -503,17 +505,14 @@ namespace NMVS.Migrations
                     b.Property<string>("From")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsAllocate")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDisposed")
-                        .HasColumnType("bit");
-
                     b.Property<int>("LastId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("MovementTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("MovementType")
+                        .HasColumnType("int");
 
                     b.Property<int?>("NewId")
                         .HasColumnType("int");

@@ -1,7 +1,6 @@
 ﻿@model IEnumerable<NMVS.Models.ViewModels.AllocateRequestVm>
 
 @{
-    ViewData["Title"] = "History";
     ViewData["Title"] = "Allocate request";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -136,7 +135,7 @@
         </div>
     </div>
 </div>
-<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
 <script src="~/assets/js/notify.js"></script>
 <script src="~/assets/datatable/datatables.min.js"></script>
 <script>
@@ -148,42 +147,50 @@
             AlcId: rq
         };
 
-        bootbox.confirm({
-            message: '<h5>Is all information correct?</h5>',
-            closeButton: false,
-            buttons: {
-                confirm: {
-                    label: 'Yes',
-                    className: 'btn-success'
-                },
-                cancel: {
-                    label: 'No',
-                    className: 'btn-danger'
-                }
-            },
-            callback: function (cf) {
-                if (cf) {
-                    $.ajax(
-                        {
-                            url: routeURL + "/api/Allocate/PostOrder",
-                            data: JSON.stringify(postData),
-                            contentType: 'application/json',
-                            type: "POST",
-                            success: function (common) {
+        Swal.fire({
+            title: 'Is all information correct?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            denyButtonText: `Don't save`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax(
+                    {
+                        url: routeURL + "/api/Allocate/PostOrder",
+                        data: JSON.stringify(postData),
+                        contentType: 'application/json',
+                        type: "POST",
+                        success: function (common) {
 
-                                if (common.status == 1) {
-                                    $.notify("Order posted!", "success");
-                                    $('#' + ts).closest('.p-2').html('<p class="badge bg-success">Order posted</p>');
-                                } else {
-                                    $.notify(common.message);
-                                }
+                            if (common.status == 1) {
+                                Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: 'Order posted',
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                });
+                                $('#' + ts).closest('.p-2').html('<p class="badge bg-success">Order posted</p>');
+                            } else {
+                                Swal.fire({
+                                    position: 'center',
+                                    icon: 'error',
+                                    title: common.message,
+                                    showConfirmButton: true,
+                                });
                             }
-
                         }
-                    );
-                }
+
+                    }
+                );
+            } else {
+
             }
         });
+
+
+        
 
 
     }
@@ -194,42 +201,45 @@
         var postData = {
             AlcId: rq
         };
-        bootbox.confirm({
-            message: '<h5 > Are your sure to <b class="text-danger">decline</b> this request</h5>',
-            closeButton: false,
-            buttons: {
-                confirm: {
-                    label: 'Yes',
-                    className: 'btn-success'
-                },
-                cancel: {
-                    label: 'No',
-                    className: 'btn-danger'
-                }
-            },
-            callback: function (cf) {
-                if (cf) {
-                    $.ajax(
-                        {
-                            url: routeURL + "/api/Allocate/DeclineRequest",
-                            data: JSON.stringify(postData),
-                            contentType: 'application/json',
-                            type: "POST",
-                            success: function (common) {
 
-                                if (common.status == 1) {
-                                    $.notify("Request declined!", "success");
-                                    $('#' + ts).closest('.p-2').html('<p class="badge bg-danger">Declined</p>');
-                                } else {
-                                    $.notify(common.message);
-                                }
+        Swal.fire({
+            title: 'Are your sure to <b class="text-danger">decline</b> this request?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            denyButtonText: `Don't save`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax(
+                    {
+                        url: routeURL + "/api/Allocate/DeclineRequest",
+                        data: JSON.stringify(postData),
+                        contentType: 'application/json',
+                        type: "POST",
+                        success: function (common) {
+
+                            if (common.status == 1) {
+                                Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: 'Request declined!',
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                });
+                                $('#' + ts).closest('.p-2').html('<p class="badge bg-danger">Declined</p>');
+                            } else {
+                                $.notify(common.message);
                             }
-
                         }
-                    );
-                }
+
+                    }
+                );
+            } else {
+
             }
         });
+
+
 
 
     }

@@ -16,5 +16,7 @@ namespace NMVS.Models.ViewModels
         public Double? Holding { get; set; }
         public Double? RemainCapacity { get; set; }
         public string Packing { get; set; }
+
+        public bool Framable { set; get; }
     }
 }

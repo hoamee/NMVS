@@ -30,5 +30,23 @@ namespace NMVS.Common
         public const string ArrangeInventory = "Arrange inventory";
 
         public const string SupperUser = "SupperUser";
+
+        public string GetItemHistory(string from, string to, int lastId, int newId, bool isAllocate, int orderNo)
+        {
+            string s = " **" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "Moved from " + from + " to " + to + "; " +
+                "Last ID - New ID: " + lastId + " - " + 
+                (isAllocate ? newId + "; " + "Allocate order No.:" : "Issued; Issue order No.: ") + orderNo;
+
+            return s;
+        }
+
+        public string GetItemHistory(string from, int newId, bool isAllocate, int orderNo)
+        {
+            string s = " **" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "Moved from " + from + " to UQ location; " +
+                "Unqualified Id: " + newId + "; " +
+                (isAllocate ? "Allocate order No.:" : "Issue order No.: ") + orderNo;
+
+            return s;
+        }
     }
 }

@@ -319,6 +319,9 @@
             $('#upload-lb').text("Done!");
             progress.text("100%");
             progress.width("100%")
+            setTimeout(function () {
+                window.location.reload();
+            }, 1000);
         });
     });
 

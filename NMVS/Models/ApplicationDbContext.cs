@@ -66,5 +66,6 @@ namespace NMVS.Models
         public DbSet<MfgIssueNoteDet> IssueNoteDets { set; get; }
         public DbSet<UploadReport> UploadReports { set; get; }
         public DbSet<UploadError> UploadErrors { set; get; }
+        public DbSet<InventoryTransac> InventoryTransacs { set; get; }
     }
 }

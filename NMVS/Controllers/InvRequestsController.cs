@@ -344,6 +344,21 @@ namespace NMVS.Controllers
                 return RedirectToAction("Error", "Home", new { common.message });
             }
         }
+        public async Task<IActionResult> GetIssueNote(int id)
+        {
+
+            var common = await _excelService.GetIssueNoteMFG(id, User.Identity.Name);
+            if (common.status == 1)
+            {
+                var filePath = common.dataenum;
+                var fs = System.IO.File.OpenRead(filePath);
+                return File(fs, "application /vnd.ms-excel", common.message);
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home", new { common.message });
+            }
+        }
 
        
     }

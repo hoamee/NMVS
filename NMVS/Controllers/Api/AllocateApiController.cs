@@ -17,17 +17,83 @@ namespace NMVS.Controllers.Api
     [ApiController]
     public class AllocateApiController : Controller
     {
-        private readonly IIncomingService _service;
         private readonly IAllocateService _alcService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         ApplicationDbContext _context;
 
-        public AllocateApiController(IIncomingService service, IHttpContextAccessor httpContextAccessor, ApplicationDbContext context, IAllocateService allocateService)
+        public AllocateApiController(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context, IAllocateService allocateService)
         {
             _context = context;
-            _service = service;
             _httpContextAccessor = httpContextAccessor;
             _alcService = allocateService;
+        }
+
+        [HttpPost]
+        [Route("GetInventory")]
+        public IActionResult GetInventory(ItemInquiryVm vm)
+        {
+            CommonResponse<List<ItemMasterVm>> common = new();
+            try
+            {
+                var ls = (from item in _context.ItemMasters.Where(x => !string.IsNullOrEmpty(x.LocCode))
+                          join dt in _context.ItemDatas on item.ItemNo equals dt.ItemNo into itemData
+
+                          from i in itemData.DefaultIfEmpty()
+                          join loc in _context.Locs on item.LocCode equals loc.LocCode into fullData
+
+                          from f in fullData.DefaultIfEmpty()
+                          join sup in _context.Suppliers on item.SupCode equals sup.SupCode into suppliers
+
+                          from s in suppliers.DefaultIfEmpty()
+
+                          select new ItemMasterVm
+                          {
+                              Booked = item.PtHold,
+                              DateIn = item.PtDateIn,
+                              Loc = f.LocDesc + " (" + f.LocCode + ")",
+                              Name = i.ItemName,
+                              No = i.ItemNo,
+                              Ptid = item.PtId,
+                              Qty = item.PtQty,
+                              PackingType = i.ItemPkg,
+                              Sup = s.SupDesc,
+                              Lot = item.PtLotNo,
+                              RcvBy = item.RecBy,
+                              Parent = item.ParentId
+                          }).ToList();
+
+                if (string.IsNullOrEmpty(vm.ItemNo))
+                {
+                    if (vm.Available)
+                    {
+                        common.dataenum = ls.Where(x => x.Qty > 0).ToList();
+
+                    }
+                    else
+                    {
+                        common.dataenum = ls;
+                    }
+                    common.status = 1;
+                }
+                else
+                {
+                    if (vm.Available)
+                    {
+                        common.dataenum = ls.Where(x => x.Qty > 0 && x.No == vm.ItemNo).ToList();
+                    }
+                    else
+                    {
+                        common.dataenum = ls.Where(x => x.No == vm.ItemNo).ToList();
+                    }
+                    common.status = 1;
+                }
+            }
+            catch (Exception e)
+            {
+                common.status = -1;
+                common.message = e.ToString();
+            }
+            return Ok(common);
         }
 
 
@@ -221,16 +287,31 @@ namespace NMVS.Controllers.Api
                 //fromLoc.LocOutgo -= alo.MovedQty;
                 fromLoc.LocRemain += alo.MovedQty;
 
-                var toPt = _context.ItemMasters.FirstOrDefault(x => x.LocCode == order.LocCode && x.PtDateIn == pt.PtDateIn && x.SupCode == pt.SupCode && x.RefNo == pt.RefNo && x.ItemNo == pt.ItemNo);
-                if (toPt !=null)
+                var toPt = _context.ItemMasters.FirstOrDefault(x => x.LocCode == order.LocCode
+                    && x.PtDateIn == pt.PtDateIn
+                    && x.SupCode == pt.SupCode
+                    && x.RefNo == pt.RefNo
+                    && x.ItemNo == pt.ItemNo
+                    && x.PtCmt == pt.PtCmt);
+                if (toPt != null)
                 {
                     toPt.PtQty += alo.MovedQty;
                     _context.Update(toPt);
+                    _context.Add(new InventoryTransac
+                    {
+                        From = fromLoc.LocCode,
+                        To = toLoc.LocCode,
+                        LastId = pt.PtId,
+                        NewId = toPt.PtId,
+                        OrderNo = order.AlcOrdId,
+                        IsAllocate = true,
+                        IsDisposed = false,
+                        MovementTime = DateTime.Now
+                    });
                 }
                 else
                 {
-                    //4. add new item master
-                    _context.ItemMasters.Add(new ItemMaster()
+                    var newPt = new ItemMaster()
                     {
                         ItemNo = pt.ItemNo,
                         PtHold = 0,
@@ -246,10 +327,26 @@ namespace NMVS.Controllers.Api
                         Qc = pt.Qc,
                         RecQty = pt.RecQty,
                         RefDate = pt.RefDate,
-                        RefNo = pt.RefNo
+                        RefNo = pt.RefNo,
+                        ParentId = pt.PtId
+                    };
+                    //4. add new item master
+                    _context.ItemMasters.Add(newPt);
+                    await _context.SaveChangesAsync();
+
+                    _context.Add(new InventoryTransac
+                    {
+                        From = fromLoc.LocCode,
+                        To = toLoc.LocCode,
+                        LastId = pt.PtId,
+                        NewId = newPt.PtId,
+                        OrderNo = order.AlcOrdId,
+                        IsDisposed = false,
+                        IsAllocate = true,
+                        MovementTime = DateTime.Now
                     });
                 }
-                
+
 
                 //5. update from-item master
                 pt.PtHold -= alo.MovedQty;
@@ -312,23 +409,33 @@ namespace NMVS.Controllers.Api
                             // decrease qty
                             pt.PtQty -= report.Qty;
 
-                            // add new broken
-                            _context.Unqualifieds.Add(new Unqualified
+
+                            var unqualified = new Unqualified
                             {
                                 Description = report.Note,
                                 ItemNo = pt.ItemNo,
                                 Note = "",
                                 PtId = pt.PtId,
                                 Quantity = report.Qty
+                            };
+
+                            // add new broken
+                            _context.Unqualifieds.Add(unqualified);
+                            await _context.SaveChangesAsync();
+                            _context.Add(new InventoryTransac
+                            {
+                                From = pt.LocCode,
+                                To = "Unqualified",
+                                LastId = pt.PtId,
+                                NewId = unqualified.UqId,
+                                OrderNo = order.AlcOrdId,
+                                IsAllocate = true,
+                                MovementTime = DateTime.Now,
+                                IsDisposed = true
                             });
                         }
-                        else
-                        {
-                            
 
-                        }
-
-                        if(order.AlcOrdQty <= order.MovedQty)
+                        if (order.AlcOrdQty <= order.MovedQty)
                         {
                             order.Confirm = true;
                             order.ConfirmedBy = User.Identity.Name;
@@ -394,9 +501,9 @@ namespace NMVS.Controllers.Api
                     {
                         uq.RecycleQty += report.Qty;
                         dispose = "recycled ";
-                       
 
-                        var icm = _context.IncomingLists.FirstOrDefault(x=>x.IsRecycle == true && x.RecycleId == uq.UqId && x.Closed != true);
+
+                        var icm = _context.IncomingLists.FirstOrDefault(x => x.IsRecycle == true && x.RecycleId == uq.UqId && x.Closed != true);
                         if (icm == null)
                         {
                             var pt = _context.ItemMasters.Find(uq.PtId);
@@ -442,7 +549,7 @@ namespace NMVS.Controllers.Api
                         else
                         {
                             var pt = _context.ItemMasters.FirstOrDefault(x => x.IcId == icm.IcId);
-                            if (pt!= null)
+                            if (pt != null)
                             {
                                 pt.RecQty++;
                                 _context.Update(pt);
@@ -536,7 +643,7 @@ namespace NMVS.Controllers.Api
             var issueQty = alo.AlcOrdQty;
 
             var order = await _context.IssueOrders.FindAsync(alo.AlcOrdId);
-            
+
 
             if (order != null)
             {
@@ -555,85 +662,85 @@ namespace NMVS.Controllers.Api
                 }
                 //Check item exist
                 message = "Item not found";
-                    var pt = await _context.ItemMasters.FindAsync(order.PtId);
-                    if (pt != null)
+                var pt = await _context.ItemMasters.FindAsync(order.PtId);
+                if (pt != null)
+                {
+                    pt.PtHold -= issueQty;
+                    pt.PtQty -= issueQty;
+
+                    if (pt.PtHold < 0 || pt.PtQty < 0)
                     {
-                        pt.PtHold -= issueQty;
-                        pt.PtQty -= issueQty;
+                        message = "Item quantity error";
+                        return Ok(message);
+                    }
 
-                        if (pt.PtHold < 0 || pt.PtQty <0)
+                    _context.Update(pt);
+
+
+                    //check location
+                    message = "From loc not found!";
+                    var fromLoc = await _context.Locs.FindAsync(pt.LocCode);
+                    if (fromLoc != null)
+                    {
+                        //fromLoc.LocOutgo -= issueQty;
+                        fromLoc.LocRemain += issueQty;
+
+                        //if (fromLoc.LocOutgo < 0 || fromLoc.LocRemain < 0)
+                        //{
+                        //    message = "Location capacity error";
+                        //    return Ok(message);
+                        //}
+                        //_context.Update(fromLoc);
+
+
+                        //Check request det
+                        var reDet = await _context.RequestDets.FindAsync(order.DetId);
+                        message = "Request loc not found!";
+                        if (reDet != null)
                         {
-                            message = "Item quantity error";
-                            return Ok(message);
-                        }
-
-                        _context.Update(pt);
-
-
-                        //check location
-                        message = "From loc not found!";
-                        var fromLoc = await _context.Locs.FindAsync(pt.LocCode);
-                        if (fromLoc != null)
-                        {
-                            //fromLoc.LocOutgo -= issueQty;
-                            fromLoc.LocRemain += issueQty;
-
-                            //if (fromLoc.LocOutgo < 0 || fromLoc.LocRemain < 0)
-                            //{
-                            //    message = "Location capacity error";
-                            //    return Ok(message);
-                            //}
-                            //_context.Update(fromLoc);
-
-
-                            //Check request det
-                            var reDet = await _context.RequestDets.FindAsync(order.DetId);
-                            message = "Request loc not found!";
-                            if (reDet != null)
+                            reDet.Arranged += issueQty;
+                            _context.Update(reDet);
+                            if (order.IssueType == "Issue")
                             {
-                                reDet.Arranged += issueQty;
-                                _context.Update(reDet);
-                                if (order.IssueType == "Issue")
+                                var shpDet = _context.ShipperDets.FirstOrDefault(x => x.DetId == order.DetId && x.ShpId == order.ToVehicle);
+                                if (shpDet == null)
                                 {
-                                    var shpDet = _context.ShipperDets.FirstOrDefault(x => x.DetId == order.DetId && x.ShpId == order.ToVehicle);
-                                    if (shpDet == null)
+                                    _context.Add(new ShipperDet
                                     {
-                                        _context.Add(new ShipperDet
-                                        {
-                                            InventoryId = order.PtId,
-                                            DetId = order.DetId,
-                                            ItemNo = pt.ItemNo,
-                                            Quantity = issueQty,
-                                            RqId = order.RqID,
-                                            ShpId = (int)order.ToVehicle
-                                        });
+                                        InventoryId = order.PtId,
+                                        DetId = order.DetId,
+                                        ItemNo = pt.ItemNo,
+                                        Quantity = issueQty,
+                                        RqId = order.RqID,
+                                        ShpId = (int)order.ToVehicle
+                                    });
 
-                                    }
-                                    else
-                                    {
-                                        shpDet.Quantity += issueQty;
-                                        _context.Update(shpDet);
-                                    }
                                 }
-
-                                order.ConfirmedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
-                                order.MovedQty += issueQty;
-                                if (order.MovedQty >= order.ExpOrdQty)
+                                else
                                 {
-                                    order.Confirm = true;
+                                    shpDet.Quantity += issueQty;
+                                    _context.Update(shpDet);
                                 }
-                                _context.Update(order);
-                                _context.SaveChanges();
-                                message = "Success"!;
                             }
 
-
-
+                            order.ConfirmedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
+                            order.MovedQty += issueQty;
+                            if (order.MovedQty >= order.ExpOrdQty)
+                            {
+                                order.Confirm = true;
+                            }
+                            _context.Update(order);
+                            _context.SaveChanges();
+                            message = "Success"!;
                         }
-                    }
-                
 
-                
+
+
+                    }
+                }
+
+
+
             }
 
             return Ok(message);

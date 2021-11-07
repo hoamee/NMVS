@@ -163,7 +163,6 @@
         $('#table2 #t2-tr').children('td:last').remove();
         $('#exampleModal').modal('toggle');
         var issueType = $(this).closest('tr').find('.exp-type').html().trim();
-        alert(issueType);
         if (issueType == "MFG") {
             $('#confirm-lbl').html('Location code <input type="text" placeholder="To location code" class="form-control" id="loc-code" />');
         } else {
@@ -218,7 +217,11 @@
                     var desInput = decodedText;
                     html5QrcodeScanner.clear();
                     if (desInput !== desCode) {
-                        bootbox.alert('Incorrect destination! Please check your destination again!! ' + desInput + ' - ' + desCode);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error..',
+                            text: 'Incorrect destination! Please check your destination again!! ' + desInput + ' - ' + desCode
+                        })
                     }
                     else {
                         var oId = parseInt($('#table2').find('.exp-id').text().trim());
@@ -227,8 +230,6 @@
                             AlcOrdQty: qty
                         };
 
-                        var mess = ""
-
                         $.ajax({
                             contentType: 'application/json; charset=utf-8',
                             dataType: 'json',
@@ -236,12 +237,19 @@
                             url: routeURL + '/api/InvRequest/FinishIssueOrder',
                             data: JSON.stringify(alo),
                             success: function (common) {
-                                bootbox.alert({
-                                    message: '<h6> <span class="fa fa-check 5x" style="color: green"> </span> ' + common.message + ' </h6>',
-                                    callback: function () {
-                                        window.location.href = window.location.href;
-                                    }
+                                
+                                Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: 'Your work has been saved',
+                                    message: common.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
                                 });
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+
                             },
                             failure: function (response) {
                                 alert(response);
@@ -309,12 +317,18 @@
                         url: routeURL + '/api/InvRequest/FinishIssueOrder',
                         data: JSON.stringify(alo),
                         success: function (common) {
-                            bootbox.alert({
-                                message: '<h5> <span class="fa fa-check 3x" style="color: green"> </span> ' + common.message + ' </h5>',
-                                callback: function () {
-                                    window.location.reload();
-                                }
+                           
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Your work has been saved',
+                                message: common.message,
+                                showConfirmButton: false,
+                                timer: 2000
                             });
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 1000);
                         },
                         failure: function (response) {
                             alert(response);
@@ -356,21 +370,14 @@
                     Note: note,
                     OrId: oId
                 };
-
-                bootbox.confirm({
-                    message: '<h5 >Is all information correct?</h5>',
-                    closeButton: false,
-                    buttons: {
-                        confirm: {
-                            label: 'Yes',
-                            className: 'btn-success'
-                        },
-                        cancel: {
-                            label: 'No',
-                            className: 'btn-danger'
-                        }
-                    },
-                    callback: function (cf) {
+                Swal.fire({
+                    title: 'Is all information correct?',
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    denyButtonText: `No`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
                         $.ajax({
                             contentType: 'application/json; charset=utf-8',
                             dataType: 'json',
@@ -379,21 +386,48 @@
                             data: JSON.stringify(postData),
                             success: function (data) {
                                 if (data.status == 1) {
-                                    $.notify(data.message, 'success');
+                                    Swal.fire({
+                                        position: 'center',
+                                        icon: 'success',
+                                        title: data.message,
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 1000);
                                 }
 
                                 if (data.status == 0) {
-                                    $.notify(data.message, 'warning');
+                                    Swal.fire({
+                                        position: 'center',
+                                        icon: 'warning',
+                                        title: data.message,
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
                                 }
 
                                 if (data.status == -1) {
-                                    $.notify(data.message, 'error');
+                                    Swal.fire({
+                                        position: 'center',
+                                        icon: 'error',
+                                        title: data.message,
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
                                 }
 
 
                             },
                             failure: function (response) {
-                                bootbox.alert(response);
+                                Swal.fire({
+                                    position: 'center',
+                                    icon: 'error',
+                                    title: response,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
                             },
                             complete: function () {
                                 $('#reportModal').modal('toggle');

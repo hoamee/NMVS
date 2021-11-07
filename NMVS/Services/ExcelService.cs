@@ -418,11 +418,165 @@ namespace NMVS.Services
 
                         sheet.Cells["B" + writingRow].Value = noteDet[i].ItemName;
                         sheet.Cells["C" + writingRow].Value = noteDet[i].ItemUnit;
-                        sheet.Cells["D" + writingRow].Value = noteDet[i].PkgType;
-                        sheet.Cells["E" + writingRow].Value = noteDet[i].PkgQty;
-                        sheet.Cells["F" + writingRow].Value = noteDet[i].Quantity;
-                        sheet.Cells["G" + writingRow].Value = noteDet[i].Quantity * noteDet[i].PkgQty;
+                        sheet.Cells["D" + writingRow].Value = noteDet[i].PkgQty;
+                        sheet.Cells["E" + writingRow].Value = noteDet[i].Quantity;
+                        sheet.Cells["F" + writingRow].Value = noteDet[i].Quantity * noteDet[i].PkgQty;
+                        sheet.Cells["G" + writingRow].Value = noteDet[i].RqId;
                         sheet.Cells["H" + writingRow].Value = noteDet[i].BatchNo;
+
+                        ptIndex++;
+
+                        if (i + 1 < noteDet.Count)
+                        {
+                            var nextDet = noteDet[ptIndex];
+                            if (nextDet.RqId != rqId)
+                            {
+                                rqId = nextDet.RqId;
+                                writingRow = 21;
+                                break;
+                            }
+                            if (writingRow >= 27)
+                            {
+                                writingRow = 21;
+                                break;
+                            }
+                            writingRow++;
+                        }
+
+                    }
+
+                }
+
+                common.dataenum = @"D:\Temp download\" + common.message;
+                var outputInfo = new FileInfo(common.dataenum);
+                // save changes
+                excel.SaveAs(outputInfo);
+
+                common.status = 1;
+            }
+            catch (Exception e)
+            {
+                common.message = e.ToString();
+                common.status = -1;
+
+            }
+
+
+
+            return common;
+        }
+
+        public async Task<CommonResponse<string>> GetIssueNoteMFG(int shpId, string user)
+        {
+            CommonResponse<string> common = new();
+            ExcelDataHelper _eHelper = new();
+            common.dataenum = @"D:\Temp download\";
+            try
+            {
+                //Check icoming list exist
+                var iNote = await _db.MfgIssueNotes.FindAsync(shpId);
+                if (iNote == null)
+                {
+                    common.message = "List not found";
+                    common.status = 0;
+                    return common;
+
+                }
+
+                var noteDet = (from d in _db.IssueNoteDets.Where(x => x.IsNId == shpId)
+                               join i in _db.ItemDatas on d.ItemNo equals i.ItemNo into all
+                               from a in all.DefaultIfEmpty()
+                              
+                               select new In01Vm
+                               {
+                                   ItemName = a.ItemName,
+                                   ItemNo = a.ItemNo,
+                                   Quantity = d.Quantity,
+                                   RqId = iNote.RqId,
+                                   ShpId = shpId,
+                                   SoldToName = "Aica",
+                                   ShipToName = "Aica",
+                                   PkgType = a.ItemPkg,
+                                   PkgQty = a.ItemPkgQty,
+                                   ItemUnit = a.ItemUm
+
+                               }).OrderBy(x => x.RqId).ToList();
+
+                if (!noteDet.Any())
+                {
+                    common.message = "No item in list";
+                    common.status = 0;
+                    return common;
+                }
+
+
+
+
+                var date = (DateTime)iNote.IssuedOn;
+                common.message = user + "_MFG Issue note_" + (date).ToString("yyyyMMdd") + ".xlsx";
+                string templatePath = "xlsx/IN01_Issue note.xlsx";
+                FileInfo fileInfo = new(templatePath);
+                ExcelPackage excel = new(fileInfo);
+
+
+                var listSo = noteDet.Select(x => x.RqId).Distinct();
+
+                int createdPages = 1;
+                var dataRows = 7;
+
+                foreach (var so in listSo)
+                {
+                    var itemCount = noteDet.Where(x => x.RqId == so).Count();
+                    var detCount = ((itemCount + dataRows - 1) / dataRows);
+
+                    for (int i = 0; i < detCount; i++)
+                    {
+                        if (createdPages != 1)
+                        {
+
+                            excel.Workbook.Worksheets.Copy("PXK", "PXK(" + createdPages + ")");
+                        }
+                        createdPages++;
+                    }
+                }
+
+
+                string rqId = "";
+                int ptIndex = 0;
+                int writingRow = 21;
+                int sheetDuplicate = 1;
+
+                foreach (var sheet in excel.Workbook.Worksheets)
+                {
+                    if (ptIndex == 0)
+                    {
+                        rqId = noteDet[0].RqId;
+                    }
+                    if (sheet.Name == rqId)
+                    {
+                        sheet.Name = rqId + "(" + sheetDuplicate + ")";
+                        sheetDuplicate++;
+                    }
+                    else
+                    {
+                        sheet.Name = rqId;
+                        sheetDuplicate = 1;
+                    }
+
+                    sheet.Cells["A8"].Value += " " + noteDet[ptIndex].RqId;
+                    sheet.Cells["G8"].Value += " " + date;
+                    sheet.Cells["A10"].Value += " " + noteDet[ptIndex].SoldToName;
+                    sheet.Cells["F10"].Value += " " + noteDet[ptIndex].ShipToName;
+
+                    for (int i = ptIndex; i < noteDet.Count; i++)
+                    {
+
+
+                        sheet.Cells["B" + writingRow].Value = noteDet[i].ItemName;
+                        sheet.Cells["C" + writingRow].Value = noteDet[i].ItemUnit;
+                        sheet.Cells["D" + writingRow].Value = noteDet[i].PkgQty;
+                        sheet.Cells["E" + writingRow].Value = noteDet[i].Quantity;
+                        sheet.Cells["F" + writingRow].Value = noteDet[i].Quantity * noteDet[i].PkgQty;
 
                         ptIndex++;
 

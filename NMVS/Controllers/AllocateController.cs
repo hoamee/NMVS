@@ -118,12 +118,15 @@ namespace NMVS.Controllers
 
             foreach (var item in whl)
             {
+                var itemQty = _db.ItemMasters.Where(x => x.LocCode == item.LocCode).Sum(s => s.PtQty);
+                var locHold = _db.AllocateOrders.Where(x => x.LocCode == item.LocCode && x.Confirm == null).Sum(s => s.AlcOrdQty - s.MovedQty);
                 locList.Add(new LocationCapSelect()
                 {
                     Ptid = id,
                     LcpId = item.LocCode,
-                    Holding = item.LocHolding,
-                    RemainCapacity = item.LocRemain,
+                    Holding = locHold,
+                    RemainCapacity = item.LocCap - itemQty,
+                    Framable = item.Flammable,
                     LcName = item.LocDesc
                 });
             }
