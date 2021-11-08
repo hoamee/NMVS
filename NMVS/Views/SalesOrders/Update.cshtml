@@ -1,7 +1,7 @@
 ﻿@model NMVS.Models.DbModels.SalesOrder
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Update SO";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -20,8 +20,11 @@
                             <input type="hidden" asp-for="SoNbr" />
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <div class="form-group col-md-4">
-                                <label asp-for="SoNbr" class="control-label"></label>
-                                <input asp-for="SoNbr" class="form-control" />
+                                <label asp-for="SoType" class="control-label">Type</label>
+                                <select class="form-control" asp-for="SoType">
+                                    <option value="WH Transfer">WH transfer</option>
+                                    <option value="Sale" selected>Sale</option>
+                                </select>
                                 <span asp-validation-for="SoNbr" class="text-danger"></span>
                             </div>
                             <div class="form-group">

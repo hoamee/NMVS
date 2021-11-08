@@ -195,7 +195,6 @@
 
     $(document).ready(function () {
 
-        var jsArr = new Array();
 
 
         $('#submit-btn').click(function () {
@@ -287,10 +286,6 @@
 
                 var record = { id: code, qty: quantity, whcd: loc, shipper: 0, reqTime: rqTime, det: @Html.Raw(ViewBag.DetId) };
                 jsArr.push(record);
-                setTimeout(function () {
-
-
-                }, 1000);
                 progress.text(wid + "%");
                 progress.width(wid+"%")
 

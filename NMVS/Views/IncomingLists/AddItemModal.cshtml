@@ -59,9 +59,7 @@
     </div>
 </div>
 
-<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
-<script src="~/assets/js/notify.js"></script>
-<script src="~/assets/datatable/datatables.min.js"></script>
+
 <script>
     var routeURL = location.protocol + "//" + location.host;
     $(document).ready(function () {
@@ -105,7 +103,7 @@
                                     setTimeout(function () {
                                         window.location.reload();
                                     }, 1000);
-                                    
+
                                 } else {
                                     Swal.fire(common.message, '', 'error');
                                 }
@@ -150,28 +148,46 @@
                     PtCmt: itemNote
 
                 }
-                $.ajax(
-                    {
-                        url: routeURL + "/api/IncomingList/AddItem",
-                        data: JSON.stringify(pt),
-                        contentType: 'application/json',
-                        type: "POST",
-                        success: function (common) {
 
-                            if (common.status == 1) {
-                                $.notify("Process completed", "success");
-                                setTimeout(
-                                    function () {
+                var qty = $('#item-qty').val(0);
+                Swal.fire({
+                    title: 'Is all the information correct?',
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    denyButtonText: `No`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax(
+                            {
+                                url: routeURL + "/api/IncomingList/AddItem",
+                                data: JSON.stringify(pt),
+                                contentType: 'application/json',
+                                type: "POST",
+                                success: function (common) {
 
-                                        window.location.href = window.location.href;
-                                    }, 1000);
-                            } else {
-                                $('#item-code').notify(common.message);
+                                    if (common.status == 1) {
+                                        Swal.fire({
+                                            position: 'center',
+                                            icon: 'success',
+                                            title: 'Item added',
+                                            showConfirmButton: false,
+                                            timer: 2000
+                                        });
+                                        setTimeout(
+                                            function () {
+
+                                                window.location.href = window.location.href;
+                                            }, 1000);
+                                    } else {
+                                        $('#item-code').notify(common.message);
+                                    }
+                                }
+
                             }
-                        }
-
+                        );
                     }
-                    );
+                });
 
                }
 

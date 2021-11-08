@@ -74,7 +74,7 @@
                         if (common.status == -1) {
                             dialog.init(function () {
                                 dialog.find('.bootbox-body').html('<h5 class="text-danger">Header not found. Please check your file! </h5>');
-                                dialog.find('.modal-footer').html('<a href="/Suppliers/" class="btn btn-secondary bootbox-cancel">cancel</button>' + '<a href="/UploadReports/Details/' + common.dataenum.uploadId + '" class="btn btn-primary bootbox-cancel">View report</button>');
+                                dialog.find('.modal-footer').html('<a href="/Suppliers/" class="btn btn-secondary bootbox-cancel">Close</button>' + '<a href="/UploadReports/Details/' + common.dataenum.uploadId + '" class="btn btn-primary bootbox-cancel">View report</button>');
 
 
                             });
@@ -87,7 +87,7 @@
                                     + ' <span class="text-success"><b>Added: ' + common.dataenum.inserted + ' </b></span> </br> - '
                                     + ' <span class="text-warning"><b>Updated: ' + common.dataenum.updated + '</b></span> </br> -'
                                     + ' <span class="text-danger"><b>Errors: ' + common.dataenum.errors + ' </b></span> </br>');
-                                dialog.find('.modal-footer').html('<a href="/Suppliers/" class="btn btn-secondary bootbox-cancel">cancel</button>' + '<a href="/UploadReports/Details/'
+                                dialog.find('.modal-footer').html('<a href="/Suppliers/" class="btn btn-secondary bootbox-cancel">Close</button>' + '<a href="/UploadReports/Details/'
                                     + common.dataenum.uploadId
                                     + '" class="btn btn-primary bootbox-cancel">View report</button>');
 

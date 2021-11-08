@@ -14,6 +14,8 @@ namespace NMVS.Models.DbModels
         [Key]
         public string SoNbr { get; set; }
 
+        public string SoType { set; get; }
+
         [Required]
         [StringLength(50)]
         public string CustCode { set; get; }
@@ -54,7 +56,7 @@ namespace NMVS.Models.DbModels
         public string Comment { set; get; }
 
         [Display(Name = "Confirmed")]
-        public bool Confirm { set; get; }
+        public bool? Confirm { set; get; }
 
         [Display(Name = "Confirmed by")]
         public string ConfirmBy { set; get; }
@@ -65,6 +67,12 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Updated On")]
         public DateTime UpdatedOn { set; get; }
 
+        public bool Warning { set; get; }
+
+        public bool? RequestConfirmed { set; get; }
+        public string ConfirmationNote { set; get; }
+        public string RequestConfirmedBy { set; get; }
+        public bool Closed { set; get; }
         public ICollection<SoDetail> SoDets { set; get; }
     }
 
@@ -107,7 +115,10 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Tax (%)")]
         public double Tax { get; set; }
 
-        public double? Avail { set; get; }
+        [Display(Name = "Shipped")]
+        public double Shipped { get; set; }
+
+        public int? RqDetId { set; get; }
     }
 
 }

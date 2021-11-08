@@ -100,7 +100,7 @@
                                     Last Id
                                 </th>
                                 <th>
-                                    New Id
+                                    New ID/Unqualified ID
                                 </th>
                                 <th>
                                     Movement type
@@ -129,7 +129,7 @@
                                 </td>
 
                                 <td>
-                                    New ID/Unqualified ID
+                                    @Html.DisplayFor(modelItem => t.NewId)
                                 </td>
                                 <td>
                                     @if (t.IsDisposed)

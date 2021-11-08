@@ -30,6 +30,14 @@ namespace NMVS.Models.DbModels
 
         [Display(Name = "Note")]
         public string RqCmt { get; set; }
+
+        public bool? Confirmed { set; get; }
+
+        public string ConfirmedBy { set; get; }
+
+        public string ConfirmationNote { set; get; }
+
+        public bool Closed { set; get; }
     }
 
     public class RequestDet
@@ -79,5 +87,7 @@ namespace NMVS.Models.DbModels
 
         [Display(Name = "Request No.")]
         public string RqID { get; set; }
+
+        public int? SodId { set; get; }
     }
 }

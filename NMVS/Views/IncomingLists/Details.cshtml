@@ -126,8 +126,12 @@
                                     Item name
                                 </th>
                                 <th>
+                                    Ref
+                                </th>
+                                <th>
                                     Received
                                 </th>
+
                                 <th>
                                     Accepted
                                 </th>
@@ -146,40 +150,52 @@
                         <tbody>
                             @foreach (var t in Model.Pt)
                             {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => t.ItemNo)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => t.ItemName)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => t.RcvQty)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => t.AcceptQty)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => t.CheckedBy)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => t.Note)
-                                </td>
-                                <td>
-                                    @if (t.IsChecked == true)
-                                    {
-                                        <span class="badge bg-success">Checked</span>
-                                    }
-                                    @if (t.IsChecked == false)
-                                    {
-                                        <span class="badge bg-warning">Pending QC</span>
-                                    }
-                                    @if (t.IsChecked == null)
-                                    {
-                                        <span class="badge bg-secondary">Pending close</span>
-                                    }
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>
+                                        @if (Model.Icm.Closed)
+                                        {
+                                            @t.ItemNo
+                                        }
+                                        else
+                                        {
+                                            <span class="btn btn-sm" onclick="getUpdateModal(@t.PtId, '@t.ItemNo', @t.RcvQty, '@t.Ref','@t.RefDate' , '@t.Note')">
+                                                @t.ItemNo
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.ItemName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.Ref)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.RcvQty)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.AcceptQty)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.CheckedBy)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.Note)
+                                    </td>
+                                    <td>
+                                        @if (t.IsChecked == true)
+                                        {
+                                            <span class="badge bg-success">Checked</span>
+                                        }
+                                        @if (t.IsChecked == false)
+                                        {
+                                            <span class="badge bg-warning">Pending QC</span>
+                                        }
+                                        @if (t.IsChecked == null)
+                                        {
+                                            <span class="badge bg-secondary">Open</span>
+                                        }
+                                    </td>
+                                </tr>
                             }
                         </tbody>
                     </table>
@@ -187,18 +203,25 @@
             </div>
             <div class="card-footer">
 
-                <div class="row col-12">
+                @if (Model.Icm.Closed != true)
+                {
+                    <div class="row col-12">
 
-                    <span class="col-auto">
-                        <button class="btn btn-sm btn-outline-info" id="new-list">
-                            <span class="fa fa-add"></span>
-                            <span>Add item</span>
-                        </button>
-                    </span>
-                </div>
+                        <span class="col-auto">
+                            <button class="btn btn-sm btn-outline-info" id="new-list">
+                                <span class="fa fa-add"></span>
+                                <span>Add item</span>
+                            </button>
+                        </span>
+                    </div>
+                }
             </div>
         </div>
     </div>
 </div>
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
+<script src="~/assets/js/notify.js"></script>
+<script src="~/assets/datatable/datatables.min.js"></script>
 <partial name="AddItemModal" />
+<partial name="UpdateItemModal" />
 

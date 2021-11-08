@@ -77,11 +77,107 @@ namespace NMVS.Controllers.Api
         }
 
         [HttpPost]
+        [Route("UpdateItem")]
+        public IActionResult UpdateItem(ItemMaster iItem)
+        {
+            var role = _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
+            CommonResponse<int> common = new();
+            if (role)
+            {
+                try
+                {
+                    var pt = _context.ItemMasters.Find(iItem.PtId); var itemData = _context.ItemDatas.Find(iItem.ItemNo);
+                    if (itemData == null)
+                    {
+                        common.message = "Item no. not found!";
+                        common.status = -1;
+                        return Ok(common);
+                    }
+
+                    if (pt != null)
+                    {
+                        pt.ItemNo = iItem.ItemNo;
+                        pt.RecQty = iItem.RecQty;
+                        pt.RefNo = iItem.RefNo;
+                        pt.RefDate = iItem.RefDate;
+                        pt.PtCmt = iItem.PtCmt;
+
+                        _context.Update(pt);
+                        _context.SaveChanges();
+                        common.status = 1;
+                    }
+                    else
+                    {
+                        common.message = "An error occurred!";
+                        common.status = -1;
+                        return Ok(common);
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    common.status = -1;
+                    common.message = e.ToString();
+                }
+            }
+            else
+            {
+                common.status = 0;
+            }
+
+            return Ok(common);
+        }
+
+        [HttpPost]
+        [Route("DeleteItem")]
+        public IActionResult DeleteItem(ItemMaster iItem)
+        {
+            var role = _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
+            CommonResponse<int> common = new();
+            if (role)
+            {
+                try
+                {
+                    var pt = _context.ItemMasters.Find(iItem.PtId); var itemData = _context.ItemDatas.Find(iItem.ItemNo);
+
+                    if (pt != null)
+                    {
+                        var ic = _context.IncomingLists.Find(pt.IcId);
+                        ic.ItemCount--;
+
+                        _context.Update(ic);
+                        _context.Remove(pt);
+                        _context.SaveChanges();
+                        common.status = 1;
+                    }
+                    else
+                    {
+                        common.message = "An error occurred!";
+                        common.status = -1;
+                        return Ok(common);
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    common.status = -1;
+                    common.message = e.ToString();
+                }
+            }
+            else
+            {
+                common.status = 0;
+            }
+
+            return Ok(common);
+        }
+
+        [HttpPost]
         [Route("CloseList")]
         public IActionResult CloseList(ItemMaster item)
         {
             var role = _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
-            
+
             CommonResponse<int> common = new();
             if (role)
             {

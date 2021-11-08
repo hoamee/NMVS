@@ -26,7 +26,8 @@ namespace NMVS.Services
                          select new SoVm
                          {
                              CustCode = a.CustName,
-                             ShipTo = c.Addr + (!string.IsNullOrEmpty(c.City) ? ", " + c.City : "") + (!string.IsNullOrEmpty(c.Ctry) ? ", " + c.Ctry : ""),
+                             SoType = so.SoType,
+                             ShipTo = c.CustName,
                              Comment = so.Comment,
                              Confirm = so.Confirm,
                              ConfirmBy = so.ConfirmBy,
@@ -38,7 +39,11 @@ namespace NMVS.Services
                              SoCurr = so.SoCurr,
                              SoNbr = so.SoNbr,
                              UpdatedBy = so.UpdatedBy,
-                             UpdatedOn = so.UpdatedOn
+                             UpdatedOn = so.UpdatedOn,
+                             WhConfirmed = so.RequestConfirmed,
+                             WhConfirmedBy = so.RequestConfirmedBy,
+                             ConfirmationNote = so.ConfirmationNote,
+                             Closed = so.Closed
                          }).ToList();
 
             return model;

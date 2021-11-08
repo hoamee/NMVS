@@ -247,7 +247,9 @@ namespace NMVS.Controllers.Api
                                     });
 
                                 }
+                                var soDet = _context.SoDetails.Find(reDet.SodId);
 
+                                soDet.Shipped += issueQty;
                                 order.ConfirmedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
                                 order.MovedQty += issueQty;
                                 if (order.MovedQty >= order.ExpOrdQty)
@@ -255,6 +257,7 @@ namespace NMVS.Controllers.Api
                                     order.Confirm = true;
                                 }
                                 pt.MovementNote += itemNote;
+                                _context.Update(soDet);
                                 _context.Update(pt);
                                 _context.Update(order);
                                 _context.SaveChanges();
@@ -525,6 +528,73 @@ namespace NMVS.Controllers.Api
             else
             {
                 request.SoConfirm = true;
+                _context.Update(request);
+                await _context.SaveChangesAsync();
+                common.status = 1;
+                common.message = "success!";
+                return Ok(common);
+            }
+        }
+
+        [Route("RemoveRqLine")]
+        [HttpPost]
+        public async Task<IActionResult> RemoveRqLine(JsPickingData rqd)
+        {
+            var common = new CommonResponse<int>();
+            var request = await _context.RequestDets.FindAsync(rqd.id);
+            if (request == null)
+            {
+                common.status = 0;
+                common.message = "not found!";
+                return Ok(common);
+            }
+            else
+            {
+                _context.Remove(request);
+                await _context.SaveChangesAsync();
+                common.status = 1;
+                common.message = "success!";
+                return Ok(common);
+            }
+        }
+
+        [Route("ConfirmRequest")]
+        [HttpPost]
+        public async Task<IActionResult> ConfirmRequest(JsPickingData rqd)
+        {
+            var common = new CommonResponse<int>();
+            var request = await _context.InvRequests.FindAsync(rqd.whcd);
+            if (request == null)
+            {
+                common.status = 0;
+                common.message = "not found!";
+                return Ok(common);
+            }
+            else
+            {
+                request.ConfirmationNote = rqd.loc;
+                request.Confirmed = rqd.accepted;
+                request.ConfirmedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
+                if (request.RqType == "Issue")
+                {
+                    var so = await _context.SalesOrders.FindAsync(request.RqID);
+                    if (so == null)
+                    {
+                        common.status = -1;
+                        common.message = "Unable to find SO";
+                        return Ok(common);
+                    }
+                    else
+                    {
+                        so.RequestConfirmed = rqd.accepted;
+                        so.RequestConfirmedBy = request.ConfirmedBy;
+                        so.ConfirmationNote = rqd.loc;
+                        so.Confirm = null;
+                        so.ConfirmBy = "Un-confirmed by WH reject";
+                        so.Closed = false;
+                        _context.Update(so);
+                    }
+                }
                 _context.Update(request);
                 await _context.SaveChangesAsync();
                 common.status = 1;

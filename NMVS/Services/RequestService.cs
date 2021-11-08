@@ -69,7 +69,10 @@ namespace NMVS.Services
                            Note = i.RqCmt,
                            Ref = i.Ref,
                            RqBy = i.RqBy,
-                           SoConfirm = i.SoConfirm
+                           SoConfirm = i.SoConfirm,
+                           ConfirmationNote = i.ConfirmationNote,
+                           Confirmed = i.Confirmed,
+                           ConfirmedBy = i.ConfirmedBy
                        }).FirstOrDefault();
 
             var dets = _db.RequestDets.Where(x => x.RqID == id).ToList();

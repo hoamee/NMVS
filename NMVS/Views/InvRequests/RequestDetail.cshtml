@@ -75,7 +75,24 @@
                         </dd>
                     }
 
+                    <dt class="col-sm-2">
+                        Request confirmation
+                    </dt>
 
+                    <dd class="col-sm-10">
+                        @if (Model.Rq.Confirmed == true)
+                        {
+                            <span class="badge bg-success"> Confirmed </span> <span> By @Model.Rq.ConfirmedBy </span>
+                        }
+                        else if (Model.Rq.Confirmed == null)
+                        {
+                            <span class="badge bg-secondary">Not Yet</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger"> Rejected </span> <span> By @Model.Rq.ConfirmedBy: @Model.Rq.ConfirmationNote </span>
+                        }
+                    </dd>
 
                 </dl>
             </div>
@@ -86,6 +103,12 @@
                 }
 
                 <a asp-action="History" class="btn btn-outline-secondary">History</a>
+                @if (Model.Rq.SoConfirm == true && Model.Rq.Confirmed == null)
+                {
+                    <span class="btn btn-outline-success" onclick="confirmRequest(true)">Confirm</span>
+                    <span class="btn btn-outline-danger" onclick="confirmRequest(false)">Reject</span>
+                }
+
             </div>
         </div>
     </div>
@@ -140,7 +163,7 @@
                             {
                                 <tr>
                                     <td>
-                                        @if (Model.Rq.SoConfirm == true)
+                                        @if (Model.Rq.SoConfirm == true && Model.Rq.Confirmed == true)
                                         {
                                             if (item.Quantity > item.Picked || item.Picked == 0)
                                             {
@@ -159,6 +182,15 @@
                                             {
                                                 <span class="badge bg-success">Picked</span>
                                             }
+                                        }
+                                        else
+                                        {
+                                            @if (Model.Rq.RqType == "MFG")
+                                            {
+                                                <a class="btn btn-outline-info btn-sm" href="/InvRequests/UpdateDet/@item.DetId">Edit</a>
+                                            }
+
+
                                         }
 
                                     </td>
@@ -180,7 +212,7 @@
                                     <td>
                                         @Html.DisplayFor(m => item.Arranged)
                                     </td>
-                                    <td>
+                                    <td class="text-danger">
                                         @Html.DisplayFor(m => item.MovementNote)
                                     </td>
                                     <td>
@@ -194,14 +226,14 @@
                             {
                                 <tr>
                                     <td colspan="9" class="text-center col-6">
-                                        <a class="btn btn-primary" href="/InvRequests/RequestDetCreate/@Model.Rq.Id">
+                                        <a class="btn btn-outline-primary" href="/InvRequests/RequestDetCreate/@Model.Rq.Id">
                                             <span><i class="bi bi-plus-circle"></i></span>
                                             <span>
                                                 Add item
                                             </span>
                                         </a>
 
-                                        <div class="btn btn-primary" id="close-btn">
+                                        <div class="btn btn-outline-success" id="close-btn">
                                             <span><i class="fa fa-check" style="color: green"></i></span>
                                             <span>
                                                 Close
@@ -223,20 +255,102 @@
         </div>
     </div>
 </div>
-<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
 <script>
+
+    var routeURL = location.protocol + "//" + location.host;
+
+    function confirmRequest(accept) {
+         Swal.fire({
+                title: 'Do you want to save the changes?',
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Save',
+                denyButtonText: `Don't save`,
+                input: 'text',
+                inputAttributes: {
+                    autocapitalize: 'off',
+                    placeholder: 'Add some note'
+                },
+                showLoaderOnConfirm: true,
+                preConfirm: (dt) => {
+                    if (!accept) {
+                        if (dt.trim() == "") {
+                            Swal.showValidationMessage(
+                                `Please add some note`
+                            )
+                        }
+                    }
+                    return { valid: true, mess: dt };
+
+
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.value.valid == true) {
+
+                    var shpr;
+                    if (accept) {
+                        shpr = {
+                            whcd: '@Html.Raw(Model.Rq.Id)',
+                            accepted: accept
+                        };
+                    } else {
+                        shpr = {
+                            whcd: '@Html.Raw(Model.Rq.Id)',
+                            accepted: accept,
+                            loc: result.value.mess
+                        };
+                    }
+                        var postData = JSON.stringify(shpr);
+                        $.ajax({
+                            url: routeURL + '/api/InvRequest/ConfirmRequest',
+                            method: "POST",
+                            contentType: "application/json; charset=utf8",
+                            data: postData,
+                            success: function (dt) {
+                                if (dt.status == 1) {
+                                    Swal.fire('Saved!', '', 'success')
+                                        .then((r) => {
+                                            if (r.isConfirmed) {
+                                                window.location.reload();
+                                            }
+                                        });
+                                } else {
+
+                                    Swal.fire('An error occurred', '', 'error')
+                                }
+
+                            }
+
+                        });
+
+                } else if (result.isDenied) {
+                    Swal.fire('Changes are not saved', '', 'info')
+                }
+            })
+
+    }
+
     $(document).ready(function () {
         $('.nav-request').addClass('active');
         $('.nav-rq-his').addClass('active');
         $('#navRequest').addClass('show');
-        var routeURL = location.protocol + "//" + location.host;
 
         $('#close-btn').click(function () {
-            bootbox.confirm({
-                message: "Are you sure want to close this request",
-                callback: function (e) {
-                    if (e) {
-                        var shpr = {
+
+            Swal.fire({
+                title: 'Do you want to save the changes?',
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Save',
+                denyButtonText: `Don't save`,
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    var shpr = {
                             whcd: '@Html.Raw(Model.Rq.Id)',
                             qty: 0,
                             id: 0,
@@ -251,23 +365,25 @@
                             data: postData,
                             success: function (dt) {
                                 if (dt.status == 1) {
-                                    bootbox.alert({
-                                        message: "Completed!",
-                                        data: postData,
-                                        callback: function () {
-                                            window.location.href = window.location.href;
-                                        }
-                                    });
+                                    Swal.fire('Saved!', '', 'success')
+                                        .then((result) => {
+                                            if (result.isConfirmed) {
+                                                window.location.reload();
+                                            }
+                                        });
                                 } else {
-                                    bootbox.alert('<span class="text-center text-danger"> Failed! </span>');
+                                    Swal.fire('An error occurred', '', 'error')
                                 }
 
                             }
 
                         });
-                    }
+
+                } else if (result.isDenied) {
+                    Swal.fire('Changes are not saved', '', 'info')
                 }
-            });
+            })
+
 
         })
 

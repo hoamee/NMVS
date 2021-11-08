@@ -68,7 +68,15 @@
                     <dd class="col-sm-10">
                         @if (Model.Icm.Closed)
                         {
-                            <p class="badge bg-secondary">Closed (Passed to QC)</p>
+                            if (Model.Icm.Checked >= Model.Icm.ItemCount)
+                            {
+                                <p class="badge bg-success">Completed @Model.Icm.Checked/@Model.Icm.ItemCount </p>
+                            }
+                            else
+                            {
+                                <p class="badge bg-secondary">@Model.Icm.Checked/@Model.Icm.ItemCount Checked</p>
+                            }
+
                         }
                         else
                         {

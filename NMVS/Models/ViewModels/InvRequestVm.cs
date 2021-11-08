@@ -20,5 +20,10 @@ namespace NMVS.Models.ViewModels
         public string RqBy { set; get; }
 
         public bool SoConfirm { set; get; }
+        public bool? Confirmed { set; get; }
+
+        public string ConfirmedBy { set; get; }
+
+        public string ConfirmationNote { set; get; }
     }
 }

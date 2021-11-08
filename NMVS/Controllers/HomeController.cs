@@ -23,8 +23,8 @@ namespace NMVS.Controllers
 
         public ActionResult Dashboard()
         {
-            var listWh = _db.Warehouses.Where(x => x.WhCode != "Other").ToList();
-            var listLoc = _db.Locs.ToList();
+            var listWh = _db.Warehouses.Where(x => x.Type != "MFG").ToList();
+            var listLoc = _db.Locs.Where(x=>x.LocType != "MFG").ToList();
             var listRemain = new List<double>();
             var listUsed = new List<double>();
             var listHold = new List<double>();

@@ -22,5 +22,6 @@ namespace NMVS.Models.ViewModels
         public int det { set; get; }
         public string loc { set; get; }
         public DateTime reqTime { set; get; }
+        public bool? accepted { set; get; }
     }
 }

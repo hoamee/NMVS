@@ -1,7 +1,7 @@
 ﻿@model NMVS.Models.DbModels.RequestDet
 
 @{
-    ViewData["Title"] = "RequestDetCreate";
+    ViewData["Title"] = "Update request";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -14,9 +14,10 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-4">
-                        <form asp-action="RequestDetCreate">
+                    <div class="col-md-5">
+                        <form asp-action="UpdateDet">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="DetId" />
                             <div class="form-group">
                                 <label asp-for="ItemNo" class="control-label"></label>
                                 <input asp-for="ItemNo" class="form-control" readonly />
@@ -49,7 +50,10 @@
                                 <span asp-validation-for="RqID" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <input type="submit" value="Create" class="btn btn-primary" />
+                                <input type="submit" value="Save" class="btn btn-outline-success" />
+                                <span class="btn btn-danger" id="remove-btn">Remove</span>
+                                <a href="/InvRequests/RequestDetail/@ViewBag.RqId" class="btn btn-secondary">Back to list</a>
+
                             </div>
                         </form>
                     </div>
@@ -59,7 +63,7 @@
         </div>
     </div>
 </div>
-<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
 <partial name="ItemModal" />
 <partial name="SpecDate" />
 <script src="~/assets/datatable/datatables.min.js"></script>
@@ -79,6 +83,7 @@
 
 
     $(document).ready(function () {
+        //layout side nav
         $('.nav-request').addClass('active');
         $('.nav-rq-his').addClass('active');
         $('#navRequest').addClass('show');
@@ -87,6 +92,9 @@
         });
         $('#item-tb').DataTable();
 
+
+
+        var routeURL = location.protocol + "//" + location.host;
         $('#ItemNo').click(function () {
             $('#item-modal').modal('toggle');
         });
@@ -99,22 +107,65 @@
                 url: "/InvRequests/GetItemMaster/?id=" + pt,
                 method: "GET",
                 success: function (res) {
-                    tb.empty()
+
                     if (res.status == 1) {
                         var i;
                         for (i = 0; i < res.dataenum.length; ++i) {
+                            tb.empty();
                             tb.append('<tr><td>' + res.dataenum[i].itemNo + '</td>' + '<td>' + res.dataenum[i].desc + '</td>' + '<td> <span class="btn btn-sm btn-outline-primary" onclick="setDate(\'' + res.dataenum[i].sDateIn + '\')">' + res.dataenum[i].sDateIn + '</span></td>' + '<td>' + res.dataenum[i].quantity + '</td></tr>')
                         }
                         $('#spec-modal').modal('toggle');
                     }
                     if (res.status == -1) {
-                        bootbox.alert({
-                            message: "No item found"
-                        });
+                        Swal.fire('No related item found', '', 'info');
                     }
                 }
             });
 
+        });
+
+        $('#remove-btn').click(function () {
+            Swal.fire({
+                title: 'Are you sure want to remove this line of request?',
+                showDenyButton: true,
+                confirmButtonText: 'Yes, remove!',
+                confirmButtonColor: '#d33',
+                denyButtonText: `No`,
+                denyButtonColor: '#3085d6',
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    var rqd = {
+                                id: @Html.Raw(Model.DetId)
+                            };
+                    $.ajax(
+                        {
+                            url: routeURL + "/api/InvRequest/RemoveRqLine",
+                            data: JSON.stringify(rqd),
+                            contentType: 'application/json',
+                            type: "POST",
+                            success: function (common) {
+
+                                if (common.status == 1) {
+                                    Swal.fire('Removed!', '', 'success');
+                                    setTimeout(
+                                        function () {
+
+                                            window.location.href = "/InvRequests/RequestDetail/@ViewBag.RqId";
+                                        }, 1000);
+                                } else {
+                                    Swal.fire('An error occurred...', '', 'danger');
+                                }
+                            }
+
+                        }
+                    );
+
+
+                } else if (result.isDenied) {
+                    Swal.fire('Changes are not saved', '', 'info')
+                }
+            })
         });
     });
 </script>

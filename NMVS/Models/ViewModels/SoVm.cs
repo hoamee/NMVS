@@ -11,6 +11,10 @@ namespace NMVS.Models.ViewModels
         [Display(Name = "SO Number")]
         public string SoNbr { get; set; }
 
+        public string SoType { set; get; }
+
+        public bool Closed { set; get; }
+
         public string CustCode { set; get; }
 
         [Display(Name = "Ship to")]
@@ -42,13 +46,17 @@ namespace NMVS.Models.ViewModels
         public string Comment { set; get; }
 
         [Display(Name = "Confirmed")]
-        public bool Confirm { set; get; }
+        public bool? Confirm { set; get; }
 
         [Display(Name = "Confirmed by")]
         public string ConfirmBy { set; get; }
 
         [Display(Name = "Updated by")]
         public string UpdatedBy { set; get; }
+
+        public bool? WhConfirmed { set; get; }
+        public string WhConfirmedBy { set; get; }
+        public string ConfirmationNote { set; get; }
 
         [Display(Name = "Updated On")]
         public DateTime UpdatedOn { set; get; }

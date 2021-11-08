@@ -343,10 +343,11 @@
             var oQty = parseFloat($('#table3 #t3-tr').children('.td-qty').text().trim());
             var qty = $('#input-qty').val();
             var note = cmmt.val().trim();
+            var moved = parseFloat($('#table3 #t3-tr').children('.td-moved').text().trim());
+            var remainQty = oQty - moved;
 
-
-            if (qty > oQty) {
-                $('#input-qty').notify('Report quantity couldn\'t be larger than order quantity');
+            if (qty > remainQty) {
+                $('#input-qty').notify('Report quantity couldn\'t be larger than remain quantity');
             }
             else if (qty <= 0) {
                 $('#input-qty').notify('Report quantity couldn\'t be less than or equal to 0');

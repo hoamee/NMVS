@@ -1,0 +1,203 @@
+﻿<!-- Modal -->
+
+<div class="modal" tabindex="-1" id="update-item-modal">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table ">
+                    <thead>
+                        <tr>
+                            <th>
+                                Item code
+                            </th>
+                            <th>
+                                Quantity
+                            </th>
+                            <th>
+                                Supplier ref no.
+                            </th>
+                            <th>
+                                Ref date
+                            </th>
+                            <th>
+                                Note
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>
+                                <span id="pt-id" hidden></span>
+                                <input type="text" class="form-control" id="u-item-code" />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control" step="0.001" id="u-item-qty" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" id="u-item-ref" />
+                            </td>
+                            <td>
+                                <input type="date" class="form-control" id="u-item-ref-date" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" id="u-item-note" />
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="updateItem()">Save changes</button>
+                <button type="button" class="btn btn-danger" onclick="deleteItem()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getUpdateModal(ptId, itemCode, qty, ref, refDate, itemNote) {
+        $('#pt-id').empty();
+        $('#u-item-code').empty();
+        $('#u-item-qty').empty();
+        $('#u-item-ref').empty();
+        $('#u-item-ref-date').empty();
+        $('#u-item-note').empty();
+
+        $('#pt-id').html(ptId);
+        $('#u-item-code').val(itemCode);
+        $('#u-item-qty').val(qty);
+        $('#u-item-ref').val(ref);
+        $('#u-item-note').val(itemNote);
+
+        $('#update-item-modal').modal('toggle');
+    }
+
+    function updateItem() {
+        var itemCode = $('#u-item-code').val().trim();
+        var qty = parseFloat($('#u-item-qty').val());
+        var itemRef = $('#u-item-ref').val();
+        var refDate = $('#u-item-ref-date').val();
+        var itemNote = $('#u-item-note').val();
+        var ptId = parseInt($('#pt-id').html());
+        var icId = parseInt(@Html.Raw(Model.Icm.IcId));
+
+        if (itemCode == "") {
+            $('#u-item-code').notify("Please enter item code");
+        } else if (qty <= 0 || isNaN(qty)) {
+            $('#u-item-qty').notify("Please enter a valid quantity");
+        } else {
+
+            if (!Date.parse(refDate)) {
+                refDate = NaN;
+            }
+            var pt = {
+                PtId: ptId,
+                ItemNo: itemCode,
+                RecQty: qty,
+                RefNo: itemRef,
+                RefDate: refDate,
+                IcId: icId,
+                PtCmt: itemNote
+
+            }
+
+            var qty = $('#u-item-qty').val(0);
+            Swal.fire({
+                title: 'Are you sure want to updated this row?',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: `No`,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax(
+                        {
+                            url: routeURL + "/api/IncomingList/UpdateItem",
+                            data: JSON.stringify(pt),
+                            contentType: 'application/json',
+                            type: "POST",
+                            success: function (common) {
+
+                                if (common.status == 1) {
+                                    Swal.fire({
+                                        position: 'center',
+                                        icon: 'success',
+                                        title: 'Updated',
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                    setTimeout(
+                                        function () {
+
+                                            window.location.href = window.location.href;
+                                        }, 1000);
+                                } else {
+                                    $('#u-item-code').notify(common.message);
+                                }
+                            }
+
+                        }
+                    );
+                }
+            });
+
+        }
+
+    }
+
+    function deleteItem() {
+        var ptId = parseInt($('#pt-id').html());
+
+        var pt = {
+            PtId: ptId
+        }
+
+        Swal.fire({
+            title: 'Are you sure want to remove this row?',
+            showDenyButton: true,
+            confirmButtonText: 'Yes',
+            denyButtonText: `No`,
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                $.ajax(
+                    {
+                        url: routeURL + "/api/IncomingList/DeleteItem",
+                        data: JSON.stringify(pt),
+                        contentType: 'application/json',
+                        type: "POST",
+                        success: function (common) {
+
+                            if (common.status == 1) {
+                                Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: 'Removed',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                                setTimeout(
+                                    function () {
+
+                                        window.location.href = window.location.href;
+                                    }, 1000);
+                            } else {
+                                $('#u-item-code').notify(common.message);
+                            }
+                        }
+
+                    }
+                );
+
+            } else if (result.isDenied) {
+                Swal.fire('Changes are not saved', '', 'info')
+            }
+        });
+    }
+</script>

@@ -174,6 +174,101 @@ namespace NMVS.Controllers
             return View();
         }
 
+        public IActionResult UpdateDet(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var det = _db.RequestDets.Find(id);
+            if (det == null)
+            {
+                return NotFound();
+            }
+            List<ItemAvailVm> ls = new();
+            var ptMstr = _db.ItemMasters.ToList();
+            foreach (var item in _db.ItemDatas.ToList())
+            {
+                var pt = ptMstr.Where(x => x.ItemNo == item.ItemNo);
+                double avail = 0;
+                if (pt.Any())
+                {
+                    var hold = pt.Sum(x => x.PtHold);
+                    var qty = pt.Sum(x => x.PtQty);
+                    avail = qty - hold;
+                }
+
+                ls.Add(new ItemAvailVm
+                {
+                    ItemNo = item.ItemNo,
+                    Quantity = avail,
+                    Desc = item.ItemName
+                });
+            }
+
+            ViewBag.ItemList = ls;
+
+            ViewBag.RqId = det.RqID;
+
+            return View(det);
+        }
+
+        [HttpPost]
+        public IActionResult UpdateDet(RequestDet det)
+        {
+            if (ModelState.IsValid)
+            {
+                bool valid = true;
+                if (det.SpecDate != null)
+                {
+                    var pt = _db.ItemMasters.Where(x => x.ItemNo == det.ItemNo && det.SpecDate == x.PtDateIn.Date).Sum(x => x.PtQty - x.PtHold);
+
+                    if (pt < det.Quantity || det.Quantity <= 0)
+                    {
+                        ModelState.AddModelError("", "Quantity should be less or equal to available quantity. And greater than 0");
+                        valid = false;
+                    }
+                }
+
+                if (valid)
+                {
+                    det.Arranged = 0;
+                    det.Issued = 0;
+                    det.Picked = 0;
+                    _db.RequestDets.Update(det);
+                    _db.SaveChanges();
+                    return RedirectToAction("RequestDetail", new { id = det.RqID });
+                }
+            }
+
+            List<ItemAvailVm> ls = new();
+            var ptMstr = _db.ItemMasters.ToList();
+            foreach (var item in _db.ItemDatas.ToList())
+            {
+                var pt = ptMstr.Where(x => x.ItemNo == item.ItemNo);
+                double avail = 0;
+                if (pt.Any())
+                {
+                    var hold = pt.Sum(x => x.PtHold);
+                    var qty = pt.Sum(x => x.PtQty);
+                    avail = qty - hold;
+                }
+
+                ls.Add(new ItemAvailVm
+                {
+                    ItemNo = item.ItemNo,
+                    Quantity = avail,
+                    Desc = item.ItemName
+                });
+            }
+
+            ViewBag.ItemList = ls;
+
+            ViewBag.RqId = det.RqID;
+
+            return View();
+        }
+
         public IActionResult GetItemMaster(string id)
         {
             CommonResponse<List<ItemAvailVm>> commonResponse = new();

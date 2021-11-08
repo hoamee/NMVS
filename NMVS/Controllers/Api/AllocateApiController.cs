@@ -99,48 +99,50 @@ namespace NMVS.Controllers.Api
 
         [HttpPost]
         [Route("ConfirmJsAllocate")]
-        public ActionResult ConfirmJsAllocate(JsPickingData jsArr)
+        public ActionResult ConfirmJsAllocate(List<JsPickingData> jsArr)
         {
             CommonResponse<int> common = new();
             try
             {
-                var t = jsArr;
                 //Test response
                 //string s = jsArr[1].id + ", " + jsArr[1].whcd + ", " + jsArr[1].qty;
                 //return Json(s);
 
-                //Get Item master
-                var pt = _context.ItemMasters.Find(t.id);
-                var fromLoc = _context.Locs.Find(pt.LocCode);
-
-
-                //   2.Add holding to From-item
-                pt.PtHold += t.qty;
-
-                //   3. Add holding to To-Loc
-                var toLoc = _context.Locs.Find(t.whcd);
-                toLoc.LocHolding += t.qty;
-
-                //   4. Add Outgo to From-Loc
-                //fromLoc.LocOutgo += t.qty;
-
-
-                _context.AllocateRequests.Add(new AllocateRequest()
+                foreach (var t in jsArr)
                 {
-                    PtId = pt.PtId,
-                    AlcFrom = pt.LocCode,
-                    LocCode = t.whcd,
-                    AlcQty = t.qty,
-                    AlcFromDesc = fromLoc.LocDesc,
-                    MovementTime = t.reqTime
-                });
+                    //Get Item master
+                    var pt = _context.ItemMasters.Find(t.id);
+                    var fromLoc = _context.Locs.Find(pt.LocCode);
 
-                //Meeting 3 remove. No no
-                //pt.PtHold = t.qty;
-                //pt.PtQty = pt.PtQty - t.qty;
-                _context.SaveChanges();
-                common.status = 1;
-                common.message += "Success";
+
+                    //   2.Add holding to From-item
+                    pt.PtHold += t.qty;
+
+                    //   3. Add holding to To-Loc
+                    var toLoc = _context.Locs.Find(t.whcd);
+                    toLoc.LocHolding += t.qty;
+
+                    //   4. Add Outgo to From-Loc
+                    //fromLoc.LocOutgo += t.qty;
+
+
+                    _context.AllocateRequests.Add(new AllocateRequest()
+                    {
+                        PtId = pt.PtId,
+                        AlcFrom = pt.LocCode,
+                        LocCode = t.whcd,
+                        AlcQty = t.qty,
+                        AlcFromDesc = fromLoc.LocDesc,
+                        MovementTime = t.reqTime
+                    });
+
+                    //Meeting 3 remove. No no
+                    //pt.PtHold = t.qty;
+                    //pt.PtQty = pt.PtQty - t.qty;
+                    _context.SaveChanges();
+                    common.status = 1;
+                    common.message = "Success";
+                }
             }
             catch (Exception e)
             {

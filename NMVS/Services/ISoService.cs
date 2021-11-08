@@ -13,5 +13,7 @@ namespace NMVS.Services
         public List<SoVm> GetBrowseData();
 
         public List<ItemAvailVm> GetItemNAvail();
+
+        
     }
 }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NMVS.Models;
 
 namespace NMVS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211108175649_SoWarning2")]
+    partial class SoWarning2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -472,10 +474,7 @@ namespace NMVS.Migrations
                     b.Property<bool>("Closed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("ConfirmationNote")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("Confirmed")
+                    b.Property<bool>("Confirmed")
                         .HasColumnType("bit");
 
                     b.Property<string>("ConfirmedBy")
@@ -916,19 +915,13 @@ namespace NMVS.Migrations
                     b.Property<string>("SoNbr")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("Closed")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("Confirm")
+                    b.Property<bool>("Confirm")
                         .HasColumnType("bit");
 
                     b.Property<string>("ConfirmBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConfirmationNote")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CustCode")
@@ -951,7 +944,7 @@ namespace NMVS.Migrations
                     b.Property<DateTime?>("ReqDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool?>("RequestConfirmed")
+                    b.Property<bool>("RequestConfirmed")
                         .HasColumnType("bit");
 
                     b.Property<string>("RequestConfirmedBy")
@@ -1125,6 +1118,9 @@ namespace NMVS.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<double?>("Avail")
+                        .HasColumnType("float");
+
                     b.Property<double>("Discount")
                         .HasColumnType("float");
 
@@ -1141,9 +1137,6 @@ namespace NMVS.Migrations
                     b.Property<DateTime?>("RequiredDate")
                         .IsRequired()
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("RqDetId")
-                        .HasColumnType("int");
 
                     b.Property<string>("SalesOrderSoNbr")
                         .HasColumnType("nvarchar(450)");

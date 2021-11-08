@@ -33,7 +33,7 @@ namespace NMVS.Controllers
             var model = new InventoryDetail
             {
                 Transacs = _db.InventoryTransacs.Where(x => x.LastId == id || (x.NewId == id && !x.IsDisposed)).ToList(),
-                ItemMasterVm = (from item in _db.ItemMasters.Where(x => !string.IsNullOrEmpty(x.LocCode))
+                ItemMasterVm = (from item in _db.ItemMasters.Where(x => !string.IsNullOrEmpty(x.LocCode) && x.PtId == id)
                               join dt in _db.ItemDatas on item.ItemNo equals dt.ItemNo into itemData
 
                               from i in itemData.DefaultIfEmpty()

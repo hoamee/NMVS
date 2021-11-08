@@ -240,6 +240,7 @@ namespace NMVS.Services
                     if (pageCount > 1)
                     {
                         sheet.Cells["I7"].Value += "Page" + sheetIndex + "/" + pageCount;
+                        sheet.Cells["G7"].Value += incoming.IcId.ToString();
                         sheetIndex++;
                     }
                     else

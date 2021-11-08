@@ -110,7 +110,9 @@ namespace NMVS.Services
                               IsChecked = icm.Closed ? (!string.IsNullOrEmpty(pt.Qc)) : null,
                               ItemName = a.ItemName,
                               RcvQty = pt.RecQty,
-                              Note = pt.PtCmt
+                              Note = pt.PtCmt,
+                              Ref = pt.RefNo,
+                              RefDate = pt.RefDate
                           }).ToList();
             IcmListVm icmList = new()
             {
@@ -144,7 +146,7 @@ namespace NMVS.Services
                 UploadBy = user,
                 UploadTime = DateTime.Now,
                 UploadId = user + DateTime.Now.ToString("yyyyMMddHHmmss"),
-                UploadFunction = "Item data upload"
+                UploadFunction = "Incoming list upload"
 
             };
             ExcelDataHelper _eHelper = new();

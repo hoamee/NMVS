@@ -61,12 +61,43 @@ namespace NMVS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> NewSo([Bind("SoNbr,CustCode,ShipTo,OrdDate,ReqDate,DueDate,PriceDate,SoCurr,ShipVia,Comment,Confirm,ConfirmBy,UpdatedBy,UpdatedOn")] SalesOrder salesOrder)
+        public async Task<IActionResult> NewSo([Bind("SoNbr,SoType,CustCode,ShipTo,OrdDate,ReqDate,DueDate,PriceDate,SoCurr,ShipVia,Comment,Confirm,ConfirmBy,UpdatedBy,UpdatedOn")] SalesOrder salesOrder)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
+                    string nbr = salesOrder.SoNbr;
+                    if (salesOrder.SoType == "Sale")
+                    {
+                        var header = nbr.Substring(0, 2);
+                        if (header != "SO")
+                        {
+                            if (header == "WT")
+                            {
+                                nbr = nbr[2..];
+                            }
+                            salesOrder.SoNbr = "SO" + nbr;
+                        }
+                    }
+                    if (salesOrder.SoType == "WH Transfer")
+                    {
+                        var header = nbr.Substring(0, 2);
+                        if (header != "WT")
+                        {
+                            if (header == "SO")
+                            {
+                                nbr = nbr[2..];
+                            }
+                            salesOrder.SoNbr = "WT" + nbr;
+                        }
+                    }
+                    var so = await _context.SalesOrders.FindAsync(salesOrder.SoNbr);
+                    if (so != null)
+                    {
+                        return RedirectToAction(nameof(Details), new { id = salesOrder.SoNbr });
+                    }
+
                     salesOrder.UpdatedBy = User.Identity.Name;
                     salesOrder.UpdatedOn = DateTime.Now;
                     _context.Add(salesOrder);
@@ -104,7 +135,7 @@ namespace NMVS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(string id, [Bind("SoNbr,CustCode,ShipTo,OrdDate,ReqDate,DueDate,PriceDate,SoCurr,ShipVia,Comment,Confirm,ConfirmBy,UpdatedBy,UpdatedOn")] SalesOrder salesOrder)
+        public async Task<IActionResult> Update(string id, [Bind("SoNbr,SoType,CustCode,ShipTo,OrdDate,ReqDate,DueDate,PriceDate,SoCurr,ShipVia,Comment,Confirm,ConfirmBy,UpdatedBy,UpdatedOn")] SalesOrder salesOrder)
         {
             if (id != salesOrder.SoNbr)
             {
@@ -115,6 +146,8 @@ namespace NMVS.Controllers
             {
                 try
                 {
+                    salesOrder.UpdatedOn = DateTime.Now;
+                    salesOrder.UpdatedBy = User.Identity.Name;
                     _context.Update(salesOrder);
                     await _context.SaveChangesAsync();
                 }
@@ -135,68 +168,7 @@ namespace NMVS.Controllers
             return View(salesOrder);
         }
 
-        public async Task<ActionResult> SoConfirm(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            SalesOrder saleOrder = await _context.SalesOrders.FindAsync(id);
-
-            if (saleOrder == null)
-            {
-                return NotFound();
-            }
-            saleOrder.Confirm = true;
-            saleOrder.ConfirmBy = User.Identity.Name;
-
-            var invRequest = await _context.InvRequests.FindAsync(id);
-            if (invRequest != null)
-            {
-                invRequest.SoConfirm = true;
-            }
-            else
-            {
-                invRequest = new InvRequest()
-                {
-                    RqType = "Issue",
-                    Ref = id,
-                    RqCmt = saleOrder.Comment,
-                    RqBy = saleOrder.UpdatedBy,
-                    SoConfirm = saleOrder.Confirm,
-                    RqDate = DateTime.Now,
-                    RqID = id
-                };
-                _context.InvRequests.Add(invRequest);
-                await _context.SaveChangesAsync();
-            }
-
-
-            _context.RequestDets.RemoveRange(_context.RequestDets.Where(x => x.RqID == id));
-            await _context.SaveChangesAsync();
-
-            var soDets = await _context.SoDetails.Where(w => w.SoNbr == saleOrder.SoNbr).ToListAsync();
-            foreach (var line in soDets)
-            {
-                var rqDet = new RequestDet()
-                {
-                    Arranged = 0,
-                    Issued = 0,
-                    Closed = null,
-                    Picked = 0,
-                    ItemNo = line.ItemNo,
-                    RequireDate = line.RequiredDate,
-                    Shipped = null,
-                    Quantity = line.Quantity,
-                    SpecDate = line.SpecDate,
-                    RqID = id
-                };
-                _context.Add(rqDet);
-            }
-
-            await _context.SaveChangesAsync();
-            return Ok();
-        }
+        
 
         // GET: SalesOrders/Delete/5
         public async Task<IActionResult> Delete(string id)
@@ -235,7 +207,7 @@ namespace NMVS.Controllers
         // GET: SalesOrderPartial/Create
         public ActionResult SoDetCreate(string id)
         {
-            
+
             ViewBag.SoNbr = id;
             ViewBag.ItemList = _soService.GetItemNAvail();
             return View();
@@ -252,7 +224,7 @@ namespace NMVS.Controllers
                 if (soDet.SpecDate != null)
                 {
                     soDet.SpecDate = Convert.ToDateTime(soDet.SpecDate);
-                    var availItem = _context.ItemMasters.Where(x => x.ItemNo == soDet.ItemNo && x.PtDateIn.Date == soDet.SpecDate).Sum(x=>x.PtQty - x.PtHold);
+                    var availItem = _context.ItemMasters.Where(x => x.ItemNo == soDet.ItemNo && x.PtDateIn.Date == soDet.SpecDate).Sum(x => x.PtQty - x.PtHold);
                     if (availItem < soDet.Quantity)
                     {
                         ModelState.AddModelError("", "Input quantity couldn't be greater than available! (" + availItem + ")");
@@ -266,18 +238,6 @@ namespace NMVS.Controllers
                                                                                  soDet.NetPrice == x.NetPrice &&
                                                                                  x.Tax == soDet.Tax
                                                                                  && x.SpecDate == soDet.SpecDate).FirstOrDefaultAsync();
-
-
-                    if (so != null)
-                    {
-                        so.Quantity += soDet.Quantity;
-                        await _context.SaveChangesAsync();
-                    }
-                    else
-                    {
-                        _context.SoDetails.Add(soDet);
-                        await _context.SaveChangesAsync();
-                    }
 
                     var invRq = await _context.InvRequests.FindAsync(soId);
                     if (invRq == null)
@@ -294,33 +254,114 @@ namespace NMVS.Controllers
                         await _context.SaveChangesAsync();
                     }
 
-                    foreach (var rq in _context.RequestDets.Where(x => x.RqID == soId))
+                    if (so != null)
                     {
-                        _context.RequestDets.Remove(rq);
+                        so.Quantity += soDet.Quantity;
+                        var rqD = _context.RequestDets.Find(so.RqDetId);
+                        rqD.Quantity = so.Quantity;
+                        _context.Update(rqD);
+                        _context.Update(so);
+                        await _context.SaveChangesAsync();
                     }
-
-                    foreach (var det in _context.SoDetails.Where(x => x.SoNbr == soDet.SoNbr))
+                    else
                     {
-                        _context.RequestDets.Add(new RequestDet
+                        _context.SoDetails.Add(soDet);
+                        var rqDet = new RequestDet
                         {
                             RqID = soId,
-                            ItemNo = det.ItemNo,
-                            SpecDate = det.SpecDate,
+                            ItemNo = soDet.ItemNo,
+                            SpecDate = soDet.SpecDate,
                             Arranged = 0,
                             Picked = 0,
                             Issued = 0,
                             Ready = 0,
-                            RequireDate = det.RequiredDate,
+                            RequireDate = soDet.RequiredDate,
                             Shipped = null,
-                            Quantity = det.Quantity
-                        });
+                            Quantity = soDet.Quantity,
+                            SodId = soDet.SodId
+                        };
+                        await _context.SaveChangesAsync();
+                        _context.Add(rqDet);
+                        _context.SaveChanges();
+                        rqDet.SodId = soDet.SodId;
+                        soDet.RqDetId = rqDet.DetId;
+                        _context.Update(rqDet);
+                        _context.Update(soDet);
+                        await _context.SaveChangesAsync();
                     }
-                    await _context.SaveChangesAsync();
                     return RedirectToAction("Details", new { id = soId });
                 }
             }
 
             ViewBag.SoNbr = soId;
+            ViewBag.ItemList = _soService.GetItemNAvail();
+            return View(soDet);
+        }
+
+        public ActionResult UpdateSodet(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var soDet = _context.SoDetails.Find(id);
+            if (soDet == null)
+            {
+                return NotFound();
+            }
+            ViewBag.ItemList = _soService.GetItemNAvail();
+            return View(soDet);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UpdateSodet([Bind("SodId,SoNbr,SpecDate,ItemNo,Quantity,Discount,RequiredDate,NetPrice,RqDetId,Tax")] SoDetail soDet)
+        {
+            var soId = soDet.SoNbr;
+            if (ModelState.IsValid)
+            {
+                var dataReady = true;
+                if (soDet.SpecDate != null)
+                {
+                    soDet.SpecDate = Convert.ToDateTime(soDet.SpecDate);
+                    var availItem = _context.ItemMasters.Where(x => x.ItemNo == soDet.ItemNo && x.PtDateIn.Date == soDet.SpecDate).Sum(x => x.PtQty - x.PtHold);
+                    if (availItem < soDet.Quantity)
+                    {
+                        ModelState.AddModelError("", "Input quantity couldn't be greater than available! (" + availItem + ")");
+                        dataReady = false;
+                    }
+                }
+                if (dataReady)
+                {
+                    var sod = await _context.SoDetails.Where(x => x.ItemNo == soDet.ItemNo
+                                                                                 && x.Discount == soDet.Discount &&
+                                                                                 soDet.NetPrice == x.NetPrice
+                                                                                 && x.Tax == soDet.Tax
+                                                                                 && x.SpecDate == soDet.SpecDate
+                                                                                 && x.SodId != soDet.SodId
+                                                                                 ).FirstOrDefaultAsync();
+
+                    var rqDet = _context.RequestDets.Find(soDet.RqDetId);
+                    var invRq = await _context.InvRequests.FindAsync(soId);
+                    if(invRq.Confirmed == null)
+                    {
+                        {
+                            soDet.Shipped = rqDet.Arranged;
+                            rqDet.Quantity = soDet.Quantity;
+                            _context.Update(rqDet);
+                            _context.Update(soDet);
+                            await _context.SaveChangesAsync();
+                            return RedirectToAction("Details", new { id = soId });
+                        }
+                    }
+                    else if (soDet.Quantity < rqDet.Arranged && invRq.Confirmed == false)
+                    {
+                        ModelState.AddModelError("", "New quantity should greater than or equal to issued quantity");
+                    }
+                    
+                }
+            }
+
             ViewBag.ItemList = _soService.GetItemNAvail();
             return View(soDet);
         }
