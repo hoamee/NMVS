@@ -19,6 +19,18 @@
                         <hr />
                         <dl class="row">
                             <dt class="col-sm-2">
+                                Sales order no.
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoVm.SoNbr)
+                            </dd>
+                            <dt class="col-sm-2">
+                                Type
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoVm.SoType)
+                            </dd>
+                            <dt class="col-sm-2">
                                 Sold-to
                             </dt>
                             <dd class="col-sm-10">
@@ -77,17 +89,15 @@
                             </dt>
                             <dd class="col-sm-10">
 
-                                @if (Model.SoVm.Confirm == true)
+                                @if (Model.SoVm.Confirm == null)
                                 {
-                                    <span class="badge bg-success">Yes</span>
+                                    <span class="badge bg-secondary">Not yet</span>
                                 }
                                 else
                                 {
-                                    if (Model.SoVm.Confirm == null)
+                                    if (Model.SoVm.Confirm == true)
                                     {
-
-
-                                        <span class="badge bg-secondary">Not yet</span>
+                                        <span class="badge bg-success">Yes</span>
                                     }
                                     else
                                     {
@@ -118,18 +128,25 @@
                                 Warehouse confirmation
                             </dt>
                             <dd class="col-sm-10">
-                                @if (Model.SoVm.WhConfirmed == true)
+                                @if (Model.SoVm.ReqReported )
                                 {
-                                    <span class="badge bg-success">Confirmed</span> <span>By @Model.SoVm.WhConfirmedBy</span>
+                                    <span class="badge bg-danger">Reported</span> <span>@Model.SoVm.ReqReportedNote</span>
                                 }
-                                else if (Model.SoVm.WhConfirmed == null)
+                                else
                                 {
-                                    <span class="badge bg-secondary">Not yet</span>
-                                }
-                                else if (Model.SoVm.WhConfirmed == false)
-                                {
-                                    <span class="badge bg-danger">Rejected</span>
-                                    <span class="text-danger">By @Model.SoVm.WhConfirmedBy: @Model.SoVm.ConfirmationNote</span>
+                                    if (Model.SoVm.WhConfirmed == true)
+                                    {
+                                        <span class="badge bg-success">Confirmed</span> <span>By @Model.SoVm.WhConfirmedBy</span>
+                                    }
+                                    else if (Model.SoVm.WhConfirmed == null)
+                                    {
+                                        <span class="badge bg-secondary">Not yet</span>
+                                    }
+                                    else if (Model.SoVm.WhConfirmed == false)
+                                    {
+                                        <span class="badge bg-danger">Rejected</span>
+                                        <span class="text-danger">By @Model.SoVm.WhConfirmedBy: @Model.SoVm.ConfirmationNote</span>
+                                    }
                                 }
                             </dd>
                         </dl>
@@ -138,7 +155,10 @@
                         <a asp-action="Browse" class="btn btn-secondary">Back to List</a>
                         @if (Model.SoVm.Confirm != true)
                         {
-                            <span>| </span><a asp-action="Update" asp-route-id="@Model.SoVm.SoNbr" class="btn btn-outline-warning">Update</a>
+                            if (!Model.SoVm.Closed)
+                            {
+                                <span>| </span><a asp-action="Update" asp-route-id="@Model.SoVm.SoNbr" class="btn btn-outline-warning">Update</a>
+                            }
                             @if (Model.SoDets.Count > 0 && User.IsInRole("Approve SO") && Model.SoVm.Closed)
                             {
                                 <span>|</span> <span id="btn-approve" class="btn btn-success">Approve</span>
@@ -193,7 +213,7 @@
                         {
                             <tr>
                                 <td>
-                                    @if (Model.SoVm.Confirm == true)
+                                    @if (Model.SoVm.Closed == true)
                                     {
                                         @item.ItemNo
                                     }

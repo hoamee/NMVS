@@ -37,6 +37,9 @@ namespace NMVS.Models.DbModels
 
         public string ConfirmationNote { set; get; }
 
+        public bool Reported { set; get; }
+        public string ReportedNote { set; get; }
+
         public bool Closed { set; get; }
     }
 

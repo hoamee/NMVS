@@ -350,11 +350,12 @@
             var oId = parseInt($('#table3').find('.exp-id').text().trim());
             var unq = $('#unqualified').is(":checked");
             var oQty = parseFloat($('#table3 #t3-tr').find('.exp-qty').text().trim());
+            var moved = parseFloat($('#table3 #t3-tr').find('.exp-moved').text().trim());
             var qty = $('#input-qty').val();
             var note = cmmt.val().trim();
+            var remain = oQty - moved;
 
-
-            if (qty > oQty) {
+            if (qty > remain) {
                 $('#input-qty').notify('Report quantity couldn\'t be larger than order quantity');
             }
             else if (qty <= 0) {

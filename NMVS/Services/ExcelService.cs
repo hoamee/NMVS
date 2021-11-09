@@ -402,7 +402,7 @@ namespace NMVS.Services
                         sheet.Name = rqId;
                         sheetDuplicate = 1;
                     }
-
+                    
                     sheet.Cells["A8"].Value += " " + noteDet[ptIndex].RqId;
                     sheet.Cells["G8"].Value += " " + date;
                     sheet.Cells["A10"].Value += " " + noteDet[ptIndex].SoldToName;

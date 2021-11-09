@@ -16,17 +16,12 @@
                 <div class="row">
                     <div class="col-md-12">
                         <form asp-action="Update">
+                            <input type="hidden" asp-for="SoNbr" />
+                            <input type="hidden" asp-for="SoType" />
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <input type="hidden" asp-for="SoNbr" />
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <div class="form-group col-md-4">
-                                <label asp-for="SoType" class="control-label">Type</label>
-                                <select class="form-control" asp-for="SoType">
-                                    <option value="WH Transfer">WH transfer</option>
-                                    <option value="Sale" selected>Sale</option>
-                                </select>
-                                <span asp-validation-for="SoNbr" class="text-danger"></span>
-                            </div>
+
                             <div class="form-group">
                                 <label asp-for="CustCode" class="control-label">Customer</label>
                                 <div class="row col-md-12">

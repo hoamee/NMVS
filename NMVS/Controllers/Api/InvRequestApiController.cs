@@ -210,6 +210,12 @@ namespace NMVS.Controllers.Api
                                             PtId = order.PtId,
                                             Quantity = issueQty
                                         };
+
+                                        var soDet = _context.SoDetails.Find(reDet.SodId);
+
+                                        soDet.Shipped += issueQty;
+                                        _context.Update(soDet);
+
                                         _context.Add(det);
                                         _context.SaveChanges();
 
@@ -247,9 +253,7 @@ namespace NMVS.Controllers.Api
                                     });
 
                                 }
-                                var soDet = _context.SoDetails.Find(reDet.SodId);
-
-                                soDet.Shipped += issueQty;
+                                
                                 order.ConfirmedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
                                 order.MovedQty += issueQty;
                                 if (order.MovedQty >= order.ExpOrdQty)
@@ -257,7 +261,7 @@ namespace NMVS.Controllers.Api
                                     order.Confirm = true;
                                 }
                                 pt.MovementNote += itemNote;
-                                _context.Update(soDet);
+                                
                                 _context.Update(pt);
                                 _context.Update(order);
                                 _context.SaveChanges();
@@ -388,7 +392,7 @@ namespace NMVS.Controllers.Api
                         // 1. decrease request qty
                         // 2. add note
                         rqDet.MovementNote += "**Issue order " + report.OrId + ": report quantity of " + report.Qty + ". Message:" + report.Note + ", By " + _httpContextAccessor.HttpContext.User.Identity.Name + "; ";
-                        rqDet.Quantity -= report.Qty;
+                        
                         rqDet.Picked -= report.Qty;
 
                         // decrease item master hold qty
@@ -572,6 +576,10 @@ namespace NMVS.Controllers.Api
             }
             else
             {
+                if (rqd.accepted == false)
+                {
+                    request.SoConfirm = false;
+                }
                 request.ConfirmationNote = rqd.loc;
                 request.Confirmed = rqd.accepted;
                 request.ConfirmedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
@@ -586,15 +594,89 @@ namespace NMVS.Controllers.Api
                     }
                     else
                     {
-                        so.RequestConfirmed = rqd.accepted;
-                        so.RequestConfirmedBy = request.ConfirmedBy;
+                        if (rqd.accepted == false)
+                        {
+                            so.Confirm = null;
+                            so.ConfirmBy = "Un-confirmed by WH reject";
+                            so.Closed = false;
+                        }
+
                         so.ConfirmationNote = rqd.loc;
+                        so.RequestConfirmedBy = request.ConfirmedBy;
+                        so.RequestConfirmed = rqd.accepted;
+                        _context.Update(so);
+                    }
+                }
+               
+                _context.Update(request);
+                await _context.SaveChangesAsync();
+                common.status = 1;
+                common.message = "success!";
+                return Ok(common);
+            }
+        }
+
+        [Route("ReportRequest")]
+        [HttpPost]
+        public async Task<IActionResult> ReportRequest(JsPickingData rqd)
+        {
+            var common = new CommonResponse<int>();
+            var request = await _context.InvRequests.FindAsync(rqd.whcd);
+            if (request == null)
+            {
+                common.status = 0;
+                common.message = "not found!";
+                return Ok(common);
+            }
+            else
+            {
+                request.ReportedNote = "By " + _httpContextAccessor.HttpContext.User.Identity.Name + ": " + rqd.loc;
+                request.Reported = true;
+                if (request.RqType == "Issue")
+                {
+                    var so = await _context.SalesOrders.FindAsync(request.RqID);
+                    if (so == null)
+                    {
+                        common.status = -1;
+                        common.message = "Unable to find SO";
+                        return Ok(common);
+                    }
+                    else
+                    {
+                        so.ReqReported = true;
+                        so.ReqReportedNote = request.ReportedNote;
                         so.Confirm = null;
-                        so.ConfirmBy = "Un-confirmed by WH reject";
+                        so.Closed = false;
+                        request.SoConfirm = false;
+                        request.Confirmed = null;
+                        so.ConfirmBy = "Un-confirmed by WH report";
                         so.Closed = false;
                         _context.Update(so);
                     }
                 }
+                _context.Update(request);
+                await _context.SaveChangesAsync();
+                common.status = 1;
+                common.message = "success!";
+                return Ok(common);
+            }
+        }
+        
+        [Route("FinhishedRequest")]
+        [HttpPost]
+        public async Task<IActionResult> FinhishedRequest(JsPickingData rqd)
+        {
+            var common = new CommonResponse<int>();
+            var request = await _context.InvRequests.FindAsync(rqd.whcd);
+            if (request == null)
+            {
+                common.status = 0;
+                common.message = "not found!";
+                return Ok(common);
+            }
+            else
+            {
+                request.Closed = true;
                 _context.Update(request);
                 await _context.SaveChangesAsync();
                 common.status = 1;

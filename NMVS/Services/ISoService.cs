@@ -14,6 +14,7 @@ namespace NMVS.Services
 
         public List<ItemAvailVm> GetItemNAvail();
 
+        public string GetSoNbr(string input, string soType);
         
     }
 }

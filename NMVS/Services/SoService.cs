@@ -43,7 +43,9 @@ namespace NMVS.Services
                              WhConfirmed = so.RequestConfirmed,
                              WhConfirmedBy = so.RequestConfirmedBy,
                              ConfirmationNote = so.ConfirmationNote,
-                             Closed = so.Closed
+                             Closed = so.Closed,
+                             ReqReported = so.ReqReported,
+                             ReqReportedNote = so.ReqReportedNote
                          }).ToList();
 
             return model;
@@ -85,6 +87,61 @@ namespace NMVS.Services
                 SoDets = soDets,
                 SoVm = soVm
             };
+        }
+
+        public string GetSoNbr(string input, string soType)
+        {
+            string nbr = input[2..];
+            string header = input.Substring(0, 2);
+            if (soType == "Sale")
+            {
+                if (header == "WT" || header == "WR")
+                {
+                    return "SO" + nbr;
+                }
+                else if (header != "SO")
+                {
+                    return "SO" + input;
+                }
+                else
+                {
+                    return input;
+                }
+            }
+            else if (soType == "WH Transfer")
+            {
+                if (header == "SO" || header == "WR")
+                {
+                    return "WT" + nbr;
+                }
+                else if (header != "WT")
+                {
+                    return "WT" + input;
+                }
+                else
+                {
+                    return input;
+                }
+            }
+            else if (soType == "Warranty return")
+            {
+                if (header == "SO" || header == "WR")
+                {
+                    return "WR" + nbr;
+                }
+                else if (header != "WR")
+                {
+                    return "WR" + input;
+                }
+                else
+                {
+                    return input;
+                }
+            }
+            else
+            {
+                return "";
+            }
         }
     }
 }

@@ -68,6 +68,8 @@ namespace NMVS.Models.DbModels
         public DateTime UpdatedOn { set; get; }
 
         public bool Warning { set; get; }
+        public bool ReqReported { set; get; }
+        public string ReqReportedNote { set; get; }
 
         public bool? RequestConfirmed { set; get; }
         public string ConfirmationNote { set; get; }

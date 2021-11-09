@@ -16,5 +16,7 @@ namespace NMVS.Services
         public List<ItemAvailVm> GetItemAvails(string id);
 
         public List<ItemMasterVm> GetItemMasterVms(RequestDet rq);
+
+        //public Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user);
     }
 }

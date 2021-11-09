@@ -20,6 +20,7 @@
                         <form asp-action="UpdateSodet">
                             <input type="hidden" asp-for="SodId" />
                             <input type="hidden" asp-for="RqDetId" />
+                            <input type="hidden" asp-for="Shipped" />
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <table class="col-12">
                                 <thead>
@@ -91,16 +92,16 @@
                                         <div class="form-group">
                                             <input type="submit" value="Save" class="btn btn-outline-success" />
                                             <span class="btn btn-outline-danger" onclick="deleteLine()">Delete</span>
-                                            <a class="btn btn-outline-secondary" href="/SalesOrders/Details/@Model.SodId">
+                                            <a class="btn btn-outline-secondary" href="/SalesOrders/Details/@Model.SoNbr">
                                                 Back
                                             </a>
                                         </div>
-                                        
+
                                     </td>
                                 </tr>
                             </table>
 
-                           
+
                         </form>
                     </div>
                 </div>

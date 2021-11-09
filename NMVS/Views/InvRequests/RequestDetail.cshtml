@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Request: " + Model.Rq.Id;
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var correctIssued = Model.Dets.Sum(x => x.Arranged - x.Quantity) == 0;
 }
 
 <div class="row mt-4">
@@ -103,10 +104,18 @@
                 }
 
                 <a asp-action="History" class="btn btn-outline-secondary">History</a>
-                @if (Model.Rq.SoConfirm == true && Model.Rq.Confirmed == null)
+                @if (Model.Rq.SoConfirm == true && Model.Rq.Confirmed != true)
                 {
                     <span class="btn btn-outline-success" onclick="confirmRequest(true)">Confirm</span>
                     <span class="btn btn-outline-danger" onclick="confirmRequest(false)">Reject</span>
+                }
+                @if (Model.Rq.SoConfirm == true && Model.Rq.Confirmed == true && !correctIssued)
+                {
+                    <span class="btn btn-outline-danger" onclick="reportRequest()">Report</span>
+                }
+                @if (correctIssued)
+                {
+                    <span class="btn btn-outline-primary" onclick="finhishedRequest()">Mark as finish</span>
                 }
 
             </div>
@@ -141,10 +150,10 @@
                                     Spec date
                                 </th>
                                 <th>
-                                    Quantity
+                                    Requested quantity
                                 </th>
                                 <th>
-                                    Picked
+                                    Selected
                                 </th>
                                 <th>
                                     Arranged
@@ -161,11 +170,12 @@
                         <tbody>
                             @foreach (var item in Model.Dets)
                             {
+                                
                                 <tr>
                                     <td>
                                         @if (Model.Rq.SoConfirm == true && Model.Rq.Confirmed == true)
                                         {
-                                            if (item.Quantity > item.Picked || item.Picked == 0)
+                                            if (item.Quantity > item.Picked)
                                             {
                                                 @if (Model.Rq.RqType == "MFG")
                                                 {
@@ -185,7 +195,7 @@
                                         }
                                         else
                                         {
-                                            @if (Model.Rq.RqType == "MFG")
+                                            @if (Model.Rq.RqType == "MFG" && Model.Rq.SoConfirm == false)
                                             {
                                                 <a class="btn btn-outline-info btn-sm" href="/InvRequests/UpdateDet/@item.DetId">Edit</a>
                                             }
@@ -198,7 +208,7 @@
                                         @item.ItemNo
                                     </td>
                                     <td>
-                                        @*@item.ItemDesc*@
+                                        
                                     </td>
                                     <td>
                                         @Html.DisplayFor(m => item.SpecDate)
@@ -243,6 +253,7 @@
                                     </td>
                                 </tr>
                             }
+                            
                         </tbody>
 
                     </table>
@@ -260,77 +271,185 @@
 
     var routeURL = location.protocol + "//" + location.host;
 
-    function confirmRequest(accept) {
-         Swal.fire({
-                title: 'Do you want to save the changes?',
-                showDenyButton: true,
-                showCancelButton: true,
-                confirmButtonText: 'Save',
-                denyButtonText: `Don't save`,
-                input: 'text',
-                inputAttributes: {
-                    autocapitalize: 'off',
-                    placeholder: 'Add some note'
-                },
-                showLoaderOnConfirm: true,
-                preConfirm: (dt) => {
-                    if (!accept) {
-                        if (dt.trim() == "") {
-                            Swal.showValidationMessage(
-                                `Please add some note`
-                            )
+    function finhishedRequest() {
+        Swal.fire({
+            title: 'Is all the information correct?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Yes, close this case',
+            denyButtonText: `No`,
+            
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+
+                var shpr = {
+                    whcd: '@Html.Raw(Model.Rq.Id)'
+                };
+                var postData = JSON.stringify(shpr);
+                $.ajax({
+                    url: routeURL + '/api/InvRequest/FinhishedRequest',
+                    method: "POST",
+                    contentType: "application/json; charset=utf8",
+                    data: postData,
+                    success: function (dt) {
+                        if (dt.status == 1) {
+                            Swal.fire('Report sent!', '', 'success')
+                                .then((r) => {
+                                    if (r.isConfirmed) {
+                                        window.location.reload();
+                                    }
+                                });
+                        } else {
+
+                            Swal.fire('An error occurred', '', 'error')
                         }
+
                     }
-                    return { valid: true, mess: dt };
 
+                });
 
-                },
-                allowOutsideClick: () => !Swal.isLoading()
+            } else if (result.isDenied) {
+                Swal.fire('Changes are not saved', '', 'info')
+            }
+        });
+    }
 
-            }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result.value.valid == true) {
+    function reportRequest() {
+        Swal.fire({
+            title: 'By report this request, you can no longer process this, until the requester response. Are you sure?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Yes, send report',
+            denyButtonText: `No`,
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off',
+                placeholder: 'Add some note'
+            },
+            showLoaderOnConfirm: true,
+            preConfirm: (dt) => {
 
-                    var shpr;
-                    if (accept) {
-                        shpr = {
-                            whcd: '@Html.Raw(Model.Rq.Id)',
-                            accepted: accept
-                        };
-                    } else {
-                        shpr = {
-                            whcd: '@Html.Raw(Model.Rq.Id)',
-                            accepted: accept,
-                            loc: result.value.mess
-                        };
-                    }
-                        var postData = JSON.stringify(shpr);
-                        $.ajax({
-                            url: routeURL + '/api/InvRequest/ConfirmRequest',
-                            method: "POST",
-                            contentType: "application/json; charset=utf8",
-                            data: postData,
-                            success: function (dt) {
-                                if (dt.status == 1) {
-                                    Swal.fire('Saved!', '', 'success')
-                                        .then((r) => {
-                                            if (r.isConfirmed) {
-                                                window.location.reload();
-                                            }
-                                        });
-                                } else {
-
-                                    Swal.fire('An error occurred', '', 'error')
-                                }
-
-                            }
-
-                        });
-
-                } else if (result.isDenied) {
-                    Swal.fire('Changes are not saved', '', 'info')
+                if (dt.trim() == "") {
+                    Swal.showValidationMessage(
+                        `Please add some note`
+                    )
                 }
-            })
+
+                return { valid: true, mess: dt };
+
+
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.value.valid == true) {
+
+                var shpr = {
+                    whcd: '@Html.Raw(Model.Rq.Id)',
+                    loc: result.value.mess
+                };
+                var postData = JSON.stringify(shpr);
+                $.ajax({
+                    url: routeURL + '/api/InvRequest/ReportRequest',
+                    method: "POST",
+                    contentType: "application/json; charset=utf8",
+                    data: postData,
+                    success: function (dt) {
+                        if (dt.status == 1) {
+                            Swal.fire('Report sent!', '', 'success')
+                                .then((r) => {
+                                    if (r.isConfirmed) {
+                                        window.location.reload();
+                                    }
+                                });
+                        } else {
+
+                            Swal.fire('An error occurred', '', 'error')
+                        }
+
+                    }
+
+                });
+
+            } else if (result.isDenied) {
+                Swal.fire('Changes are not saved', '', 'info')
+            }
+        });
+    }
+
+    function confirmRequest(accept) {
+        Swal.fire({
+            title: 'Do you want to save the changes?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            denyButtonText: `Don't save`,
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off',
+                placeholder: 'Add some note'
+            },
+            showLoaderOnConfirm: true,
+            preConfirm: (dt) => {
+                if (!accept) {
+                    if (dt.trim() == "") {
+                        Swal.showValidationMessage(
+                            `Please add some note`
+                        )
+                    }
+                }
+                return { valid: true, mess: dt };
+
+
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.value.valid == true) {
+
+                var shpr;
+                if (accept) {
+                    shpr = {
+                        whcd: '@Html.Raw(Model.Rq.Id)',
+                        accepted: accept
+                    };
+                } else {
+                    shpr = {
+                        whcd: '@Html.Raw(Model.Rq.Id)',
+                        accepted: accept,
+                        loc: result.value.mess
+                    };
+                }
+                var postData = JSON.stringify(shpr);
+                $.ajax({
+                    url: routeURL + '/api/InvRequest/ConfirmRequest',
+                    method: "POST",
+                    contentType: "application/json; charset=utf8",
+                    data: postData,
+                    success: function (dt) {
+                        if (dt.status == 1) {
+                            Swal.fire('Saved!', '', 'success')
+                                .then((r) => {
+                                    if (r.isConfirmed) {
+                                        window.location.reload();
+                                    }
+                                });
+                        } else {
+
+                            Swal.fire('An error occurred', '', 'error')
+                        }
+
+                    }
+
+                });
+
+            } else if (result.isDenied) {
+                Swal.fire('Changes are not saved', '', 'info')
+            }
+        });
 
     }
 

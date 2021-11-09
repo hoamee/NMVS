@@ -266,7 +266,7 @@ namespace NMVS.Controllers
 
             ViewBag.RqId = det.RqID;
 
-            return View();
+            return View(det);
         }
 
         public IActionResult GetItemMaster(string id)

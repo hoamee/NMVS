@@ -28,8 +28,9 @@
                             <div class="form-group col-md-4">
                                 <label asp-for="SoType" class="control-label">Type</label>
                                 <select class="form-control" asp-for="SoType">
-                                    <option value="WH Transfer" >WH transfer</option>
+                                    <option value="WH Transfer">WH transfer</option>
                                     <option value="Sale" selected>Sale</option>
+                                    <option value="Warranty return">Warranty return</option>
                                 </select>
                                 <span asp-validation-for="SoNbr" class="text-danger"></span>
                             </div>
@@ -133,8 +134,10 @@
                 $('#so-type').html("SO");
             }
             else if ($(this).val() == "WH Transfer") {
-                $('#for-so-div').hide();
                 $('#so-type').html("WT");
+            }
+            else if ($(this).val() == "Warranty return") {
+                $('#so-type').html("WR");
             }
 
         });

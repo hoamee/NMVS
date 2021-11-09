@@ -67,42 +67,25 @@ namespace NMVS.Controllers
             {
                 try
                 {
-                    string nbr = salesOrder.SoNbr;
-                    if (salesOrder.SoType == "Sale")
+                    salesOrder.SoNbr = _soService.GetSoNbr(salesOrder.SoNbr, salesOrder.SoType);
+                    if (salesOrder.SoNbr == "")
                     {
-                        var header = nbr.Substring(0, 2);
-                        if (header != "SO")
+                        ModelState.AddModelError("", "An error occurred...");
+                    }
+                    else
+                    {
+                        var so = await _context.SalesOrders.FindAsync(salesOrder.SoNbr);
+                        if (so != null)
                         {
-                            if (header == "WT")
-                            {
-                                nbr = nbr[2..];
-                            }
-                            salesOrder.SoNbr = "SO" + nbr;
+                            return RedirectToAction(nameof(Details), new { id = salesOrder.SoNbr });
                         }
-                    }
-                    if (salesOrder.SoType == "WH Transfer")
-                    {
-                        var header = nbr.Substring(0, 2);
-                        if (header != "WT")
-                        {
-                            if (header == "SO")
-                            {
-                                nbr = nbr[2..];
-                            }
-                            salesOrder.SoNbr = "WT" + nbr;
-                        }
-                    }
-                    var so = await _context.SalesOrders.FindAsync(salesOrder.SoNbr);
-                    if (so != null)
-                    {
-                        return RedirectToAction(nameof(Details), new { id = salesOrder.SoNbr });
-                    }
 
-                    salesOrder.UpdatedBy = User.Identity.Name;
-                    salesOrder.UpdatedOn = DateTime.Now;
-                    _context.Add(salesOrder);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Browse));
+                        salesOrder.UpdatedBy = User.Identity.Name;
+                        salesOrder.UpdatedOn = DateTime.Now;
+                        _context.Add(salesOrder);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Browse));
+                    }
                 }
                 catch
                 {
@@ -168,7 +151,7 @@ namespace NMVS.Controllers
             return View(salesOrder);
         }
 
-        
+
 
         // GET: SalesOrders/Delete/5
         public async Task<IActionResult> Delete(string id)
@@ -315,7 +298,7 @@ namespace NMVS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> UpdateSodet([Bind("SodId,SoNbr,SpecDate,ItemNo,Quantity,Discount,RequiredDate,NetPrice,RqDetId,Tax")] SoDetail soDet)
+        public async Task<ActionResult> UpdateSodet([Bind("SodId,SoNbr,SpecDate,ItemNo,Quantity,Discount,RequiredDate,NetPrice,RqDetId,Tax,Shipped")] SoDetail soDet)
         {
             var soId = soDet.SoNbr;
             if (ModelState.IsValid)
@@ -343,23 +326,27 @@ namespace NMVS.Controllers
 
                     var rqDet = _context.RequestDets.Find(soDet.RqDetId);
                     var invRq = await _context.InvRequests.FindAsync(soId);
-                    if(invRq.Confirmed == null)
-                    {
-                        {
-                            soDet.Shipped = rqDet.Arranged;
-                            rqDet.Quantity = soDet.Quantity;
-                            _context.Update(rqDet);
-                            _context.Update(soDet);
-                            await _context.SaveChangesAsync();
-                            return RedirectToAction("Details", new { id = soId });
-                        }
-                    }
-                    else if (soDet.Quantity < rqDet.Arranged && invRq.Confirmed == false)
+
+                    if (soDet.Quantity < soDet.Shipped && (invRq.Confirmed == false || invRq.Reported == true))
                     {
                         ModelState.AddModelError("", "New quantity should greater than or equal to issued quantity");
                     }
-                    
+                    else if (invRq.Confirmed == null)
+                    {
+
+                        soDet.Shipped = rqDet.Arranged;
+                        rqDet.Quantity = soDet.Quantity;
+                        _context.Update(rqDet);
+                        _context.Update(soDet);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction("Details", new { id = soId });
+                    }
                 }
+            }
+            else
+            {
+                var allErrors = ModelState.Values.SelectMany(v => v.Errors);
+                ModelState.AddModelError("", string.Join(", ", allErrors));
             }
 
             ViewBag.ItemList = _soService.GetItemNAvail();
