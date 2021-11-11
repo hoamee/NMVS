@@ -104,19 +104,12 @@
                 }
 
                 <a asp-action="History" class="btn btn-outline-secondary">History</a>
-                @if (Model.Rq.SoConfirm == true && Model.Rq.Confirmed != true)
+                @if (Model.Rq.SoConfirm == true && Model.Rq.Confirmed != true && User.IsInRole("Handle request"))
                 {
                     <span class="btn btn-outline-success" onclick="confirmRequest(true)">Confirm</span>
                     <span class="btn btn-outline-danger" onclick="confirmRequest(false)">Reject</span>
                 }
-                @if (Model.Rq.SoConfirm == true && Model.Rq.Confirmed == true && !correctIssued)
-                {
-                    <span class="btn btn-outline-danger" onclick="reportRequest()">Report</span>
-                }
-                @if (correctIssued)
-                {
-                    <span class="btn btn-outline-primary" onclick="finhishedRequest()">Mark as finish</span>
-                }
+                
 
             </div>
         </div>
@@ -170,10 +163,10 @@
                         <tbody>
                             @foreach (var item in Model.Dets)
                             {
-                                
+
                                 <tr>
                                     <td>
-                                        @if (Model.Rq.SoConfirm == true && Model.Rq.Confirmed == true)
+                                        @if (Model.Rq.SoConfirm == true && Model.Rq.Confirmed == true && User.IsInRole("Handle request"))
                                         {
                                             if (item.Quantity > item.Picked)
                                             {
@@ -208,7 +201,6 @@
                                         @item.ItemNo
                                     </td>
                                     <td>
-                                        
                                     </td>
                                     <td>
                                         @Html.DisplayFor(m => item.SpecDate)
@@ -232,6 +224,10 @@
                                 </tr>
 
                             }
+
+
+                        </tbody>
+                        <tfoot>
                             @if (Model.Rq.RqType == "MFG" && Model.Rq.SoConfirm != true)
                             {
                                 <tr>
@@ -243,7 +239,7 @@
                                             </span>
                                         </a>
 
-                                        <div class="btn btn-outline-success" id="close-btn">
+                                        <div class="btn btn-outline-success" onclick="submitRequest()">
                                             <span><i class="fa fa-check" style="color: green"></i></span>
                                             <span>
                                                 Close
@@ -253,9 +249,7 @@
                                     </td>
                                 </tr>
                             }
-                            
-                        </tbody>
-
+                        </tfoot>
                     </table>
 
                 </div>
@@ -271,6 +265,51 @@
 
     var routeURL = location.protocol + "//" + location.host;
 
+    function submitRequest() {
+        Swal.fire({
+                title: 'Is all information correct?',
+                showDenyButton: true,
+                confirmButtonText: 'Yes, submit',
+                denyButtonText: `No`,
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    var rowCount = $('#datatable-search > tbody  > tr').length;
+                    if (rowCount <= 0) {
+                        return "err";
+                    }
+                    return true;
+
+
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.value == true) {
+
+                    ajaxSubmitRequest(true);
+
+                }
+                if (result.value == "err") {
+                    Swal.fire({
+                        title: 'There is no data in request list, are you sure want to remove this request?',
+                        showDenyButton: true,
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes',
+                        denyButtonText: `No`,
+                    }).then((t) => {
+
+                        if (t.isConfirmed) {
+                            ajaxSubmitRequest(false);
+                        } else {
+                            Swal.fire('Changes are not saved', '', 'info')
+                        }
+                    })
+                }
+            })
+
+    }
+
     function finhishedRequest() {
         Swal.fire({
             title: 'Is all the information correct?',
@@ -278,7 +317,7 @@
             showCancelButton: true,
             confirmButtonText: 'Yes, close this case',
             denyButtonText: `No`,
-            
+
         }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
@@ -453,23 +492,8 @@
 
     }
 
-    $(document).ready(function () {
-        $('.nav-request').addClass('active');
-        $('.nav-rq-his').addClass('active');
-        $('#navRequest').addClass('show');
-
-        $('#close-btn').click(function () {
-
-            Swal.fire({
-                title: 'Do you want to save the changes?',
-                showDenyButton: true,
-                showCancelButton: true,
-                confirmButtonText: 'Save',
-                denyButtonText: `Don't save`,
-            }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
-                    var shpr = {
+    function ajaxSubmitRequest(del) {
+        var shpr = {
                             whcd: '@Html.Raw(Model.Rq.Id)',
                             qty: 0,
                             id: 0,
@@ -487,7 +511,12 @@
                                     Swal.fire('Saved!', '', 'success')
                                         .then((result) => {
                                             if (result.isConfirmed) {
-                                                window.location.reload();
+                                                if (del) {
+                                                    window.location.reload();
+                                                }
+                                                else {
+                                                    window.location.href = "/InvRequests/History";
+                                                }
                                             }
                                         });
                                 } else {
@@ -497,14 +526,16 @@
                             }
 
                         });
+    }
 
-                } else if (result.isDenied) {
-                    Swal.fire('Changes are not saved', '', 'info')
-                }
-            })
+    $(document).ready(function () {
+        $('.nav-request').addClass('active');
+        $('.nav-rq-his').addClass('active');
+        $('#navRequest').addClass('show');
 
 
-        })
 
     });
+
+
 </script>

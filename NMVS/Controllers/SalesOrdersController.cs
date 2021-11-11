@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -68,9 +71,13 @@ namespace NMVS.Controllers
                 try
                 {
                     salesOrder.SoNbr = _soService.GetSoNbr(salesOrder.SoNbr, salesOrder.SoType);
-                    if (salesOrder.SoNbr == "")
+                    if (salesOrder.SoNbr == "" && salesOrder.SoType == "Warranty return")
                     {
-                        ModelState.AddModelError("", "An error occurred...");
+                        ModelState.AddModelError("", "System coundn't found related SO");
+                    }
+                    else if (salesOrder.SoNbr == "uc")
+                    {
+                        ModelState.AddModelError("", "Parent SO is unclosed");
                     }
                     else
                     {
@@ -303,44 +310,43 @@ namespace NMVS.Controllers
             var soId = soDet.SoNbr;
             if (ModelState.IsValid)
             {
-                var dataReady = true;
-                if (soDet.SpecDate != null)
+                var rqDet = _context.RequestDets.Find(soDet.RqDetId);
+                var invRq = await _context.InvRequests.FindAsync(soId);
+                while (true)
                 {
-                    soDet.SpecDate = Convert.ToDateTime(soDet.SpecDate);
-                    var availItem = _context.ItemMasters.Where(x => x.ItemNo == soDet.ItemNo && x.PtDateIn.Date == soDet.SpecDate).Sum(x => x.PtQty - x.PtHold);
-                    if (availItem < soDet.Quantity)
-                    {
-                        ModelState.AddModelError("", "Input quantity couldn't be greater than available! (" + availItem + ")");
-                        dataReady = false;
-                    }
-                }
-                if (dataReady)
-                {
-                    var sod = await _context.SoDetails.Where(x => x.ItemNo == soDet.ItemNo
-                                                                                 && x.Discount == soDet.Discount &&
-                                                                                 soDet.NetPrice == x.NetPrice
-                                                                                 && x.Tax == soDet.Tax
-                                                                                 && x.SpecDate == soDet.SpecDate
-                                                                                 && x.SodId != soDet.SodId
-                                                                                 ).FirstOrDefaultAsync();
 
-                    var rqDet = _context.RequestDets.Find(soDet.RqDetId);
-                    var invRq = await _context.InvRequests.FindAsync(soId);
-
-                    if (soDet.Quantity < soDet.Shipped && (invRq.Confirmed == false || invRq.Reported == true))
+                    //if spec date specified, check if input quantity > available
+                    if (soDet.SpecDate != null)
                     {
-                        ModelState.AddModelError("", "New quantity should greater than or equal to issued quantity");
+                        soDet.SpecDate = Convert.ToDateTime(soDet.SpecDate);
+                        var availItem = _context.ItemMasters.Where(x => x.ItemNo == soDet.ItemNo && x.PtDateIn.Date == soDet.SpecDate).Sum(x => x.PtQty - x.PtHold);
+                        if (availItem < (soDet.Quantity - rqDet.Picked))
+                        {
+                            ModelState.AddModelError("", "Input quantity couldn't be greater than available! (" + availItem + ")");
+                            break;
+                        }
                     }
-                    else if (invRq.Confirmed == null)
-                    {
 
-                        soDet.Shipped = rqDet.Arranged;
-                        rqDet.Quantity = soDet.Quantity;
-                        _context.Update(rqDet);
-                        _context.Update(soDet);
-                        await _context.SaveChangesAsync();
-                        return RedirectToAction("Details", new { id = soId });
+                    //Case 1: Request is rejected or denied:
+                    //Compare & check if input quantity < Issued quantity: Rerturn an error
+
+                    if (invRq.Confirmed == false || invRq.Reported == true)
+                    {
+                        if (soDet.Quantity < soDet.Shipped)
+                        {
+                            ModelState.AddModelError("", "New quantity should greater than or equal to issued quantity");
+                            break;
+                        }
                     }
+
+                    //Case 2: Request is unconfirmed: No compare needed
+
+                    soDet.Shipped = rqDet.Arranged;
+                    rqDet.Quantity = soDet.Quantity;
+                    _context.Update(rqDet);
+                    _context.Update(soDet);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Details", new { id = soId });
                 }
             }
             else
@@ -351,6 +357,35 @@ namespace NMVS.Controllers
 
             ViewBag.ItemList = _soService.GetItemNAvail();
             return View(soDet);
+        }
+
+        
+        public async Task<JsonResult> UploadList(IList<IFormFile> files)
+        {
+            var common = new CommonResponse<UploadReport>();
+            foreach (IFormFile source in files)
+            {
+                string filename = ContentDispositionHeaderValue.Parse(source.ContentDisposition).FileName.Trim('"');
+
+                filename = EnsureCorrectFilename(filename);
+
+                using (FileStream output = System.IO.File.Create("uploads/" + filename))
+                    await source.CopyToAsync(output);
+
+                common = await _soService.ImportWarranty("uploads/" + filename, filename, User.Identity.Name);
+
+            }
+
+
+            return Json(common);
+        }
+
+        private string EnsureCorrectFilename(string filename)
+        {
+            if (filename.Contains("\\"))
+                filename = filename.Substring(filename.LastIndexOf("\\") + 1);
+
+            return filename;
         }
 
     }

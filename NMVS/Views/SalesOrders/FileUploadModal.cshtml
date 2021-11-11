@@ -3,7 +3,7 @@
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Upload incoming list<i class="fa fa-cloud-upload"></i></h5>
+                <h5 class="modal-title">Upload Sales order<i class="fa fa-cloud-upload"></i></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -48,7 +48,7 @@
            
             $.ajax(
                 {
-                    url: "/IncomingLists/UploadList",
+                    url: "/SalesOrders/UploadList",
                     data: formData,
                     processData: false,
                     contentType: false,

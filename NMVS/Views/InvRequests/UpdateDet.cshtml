@@ -107,11 +107,11 @@
                 url: "/InvRequests/GetItemMaster/?id=" + pt,
                 method: "GET",
                 success: function (res) {
-
+                    tb.empty();
                     if (res.status == 1) {
                         var i;
                         for (i = 0; i < res.dataenum.length; ++i) {
-                            tb.empty();
+                            
                             tb.append('<tr><td>' + res.dataenum[i].itemNo + '</td>' + '<td>' + res.dataenum[i].desc + '</td>' + '<td> <span class="btn btn-sm btn-outline-primary" onclick="setDate(\'' + res.dataenum[i].sDateIn + '\')">' + res.dataenum[i].sDateIn + '</span></td>' + '<td>' + res.dataenum[i].quantity + '</td></tr>')
                         }
                         $('#spec-modal').modal('toggle');

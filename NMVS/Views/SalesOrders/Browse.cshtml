@@ -145,7 +145,7 @@
                     </span>
 
                     <span class="col-auto">
-                        <button class="btn btn-sm btn-outline-info" id="new-cust">
+                        <button class="btn btn-sm btn-outline-info" id="upload-so">
                             <span class="fa fa-cloud-upload"></span>
                             <span>Upload</span>
                         </button>
@@ -156,11 +156,18 @@
     </div>
 </div>
 <script src="~/assets/datatable/datatables.min.js"></script>
+<partial name="FileUploadModal" />
 <script>
 
     $(document).ready(function () {
         $('.nav-sale').addClass('active');
         $('.nav-sale div span').css('color', 'white');
-        $('#datatable-search').DataTable();
+        $('#datatable-search').DataTable({
+        });
+        $('#upload-so').click(function () {
+            $('#file-modal').modal('toggle');
+
+        });
+
     });
 </script>

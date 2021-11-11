@@ -13,6 +13,7 @@ namespace NMVS.Models.ViewModels
         public int PtId { set; get; }
         public double Qty { set; get; }
         public double Moved { set; get; }
+        public double Reported { set; get; }
         public string AlcFrom { set; get; }
         public string AlcToCode { set; get; }
         public string AlcToDesc { set; get; }

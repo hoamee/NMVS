@@ -90,7 +90,8 @@ namespace NMVS.Services
                              OrderId = or.AlcOrdId,
                              PtId = or.PtId,
                              Qty = or.AlcOrdQty,
-                             Moved = or.MovedQty
+                             Moved = or.MovedQty,
+                             Reported = or.Reported
                          }).ToList();
 
             return model;
@@ -175,7 +176,8 @@ namespace NMVS.Services
                              MovementTime = al.MovementTime,
                              Note = al.AlcCmmt,
                              PtId = al.PtId,
-                             Item = dt.ItemName
+                             Item = dt.ItemName,
+                             Reported = al.Reported
                          }).ToList();
 
             return model;

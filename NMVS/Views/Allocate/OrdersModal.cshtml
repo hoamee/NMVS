@@ -25,6 +25,9 @@
                                 Moved
                             </th>
                             <th>
+                                Reported
+                            </th>
+                            <th>
                                 From
                             </th>
                             <th>
@@ -99,6 +102,9 @@
                                 Moved
                             </th>
                             <th>
+                                Reported
+                            </th>
+                            <th>
                                 From
                             </th>
                             <th>
@@ -113,7 +119,9 @@
                             <th>
                                 Moved by
                             </th>
-                            
+                            <th>
+                                Confirmation
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -160,7 +168,9 @@
 
             var desCode = $('#table2 .to-code').text().trim();
             var qty = $('#moved-qty').val();
-            var oQty = parseFloat($('#table2 #t2-tr').children('.td-qty').text().trim()) - parseFloat($('#table2 #t2-tr').children('.td-moved').text().trim());
+            var oQty = parseFloat($('#table2 #t2-tr').children('.td-qty').text().trim())
+                - parseFloat($('#table2 #t2-tr').children('.td-moved').text().trim())
+                - parseFloat($('#table2 #t2-tr').children('.td-reported').text().trim());
 
             if (qty > oQty) {
                 $('#moved-qty').notify('Report quantity couldn\'t be larger than order quantity');
@@ -247,7 +257,9 @@
             var desCode = $('#table2 .to-code').text().trim();
             var qty = $('#moved-qty').val();
             desInput = $('#loc-code').val().trim();
-            var oQty = parseFloat($('#table2 #t2-tr').children('.td-qty').text().trim()) - parseFloat($('#table2 #t2-tr').children('.td-moved').text().trim());
+            var oQty = parseFloat($('#table2 #t2-tr').children('.td-qty').text().trim())
+                - parseFloat($('#table2 #t2-tr').children('.td-moved').text().trim())
+                - parseFloat($('#table2 #t2-tr').children('.td-reported').text().trim());
 
             if (qty > oQty) {
                 $('#moved-qty').notify('Report quantity couldn\'t be larger than order quantity');
@@ -256,7 +268,7 @@
                 $('#moved-qty').notify('Report quantity couldn\'t be less than or equal to 0');
             } else {
 
-                
+
                 if (desInput !== desCode) {
                     $('#confirm-lbl input').notify('Incorrect destination! Please check your destination again! ' + desInput + ' - ' + desCode);
                 }
@@ -324,7 +336,7 @@
                     })
 
 
-                   
+
                 }
 
             }
@@ -344,7 +356,7 @@
             var qty = $('#input-qty').val();
             var note = cmmt.val().trim();
             var moved = parseFloat($('#table3 #t3-tr').children('.td-moved').text().trim());
-            var remainQty = oQty - moved;
+            var remainQty = oQty - moved - parseFloat($('#table3 #t3-tr').children('.td-reported').text().trim());;
 
             if (qty > remainQty) {
                 $('#input-qty').notify('Report quantity couldn\'t be larger than remain quantity');
@@ -420,7 +432,7 @@
                             }
 
                         });
-                        
+
                     }
                 })
 

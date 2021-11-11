@@ -14,12 +14,14 @@ namespace NMVS.Controllers
     {
 
         private readonly ISoService _soService;
+        private readonly IInquiryService _inquiryService;
         private readonly ApplicationDbContext _db;
 
-        public InquiryController(ApplicationDbContext context, ISoService soService)
+        public InquiryController(ApplicationDbContext context, ISoService soService, IInquiryService inquiryService)
         {
             _db = context;
             _soService = soService;
+            _inquiryService = inquiryService;
         }
 
         public IActionResult Inventory()
@@ -60,6 +62,45 @@ namespace NMVS.Controllers
                                   Parent = item.ParentId
                               }).FirstOrDefault()
             };
+            return View(model);
+        }
+
+        public IActionResult Warehouses()
+        {
+            var model = _inquiryService.GetWarehouseData();
+            ViewBag.WhName = model.Select(x => x.WhName).ToArray();
+            ViewBag.Remain = model.Select(x=>x.Remain).ToArray();
+            ViewBag.Hold = model.Select(x => x.Hold).ToArray();
+            ViewBag.Used = model.Select(x => x.Used).ToArray();
+            ViewBag.OutGo = model.Select(x => x.OutGo).ToArray();
+            return View(model);
+        }
+
+        public IActionResult WhDetail(string id)
+        {
+            var model = _inquiryService.GetWarehouseDetail(id);
+            ViewBag.WhName = model.Locs.Select(x => x.WhName).ToArray();
+            ViewBag.Remain = model.Locs.Select(x => x.Remain).ToArray();
+            ViewBag.Hold = model.Locs.Select(x => x.Hold).ToArray();
+            ViewBag.Used = model.Locs.Select(x => x.Used).ToArray();
+            ViewBag.OutGo = model.Locs.Select(x => x.OutGo).ToArray();
+            return View(model);
+        }
+
+        public IActionResult LocDetail(string id)
+        {
+            var model = _inquiryService.GetItemByLoc(id);
+            return View(model);
+        }
+
+        public IActionResult MovementReport(string id)
+        {
+            ViewBag.SearchValue = " ";
+            if (!string.IsNullOrEmpty(id))
+            {
+                ViewBag.SearchValue = id;
+            }
+            var model = _inquiryService.GetMovementReport();
             return View(model);
         }
     }

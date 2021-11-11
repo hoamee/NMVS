@@ -129,21 +129,12 @@ namespace NMVS.Controllers.Api
                         _context.Update(pt);
 
 
-                        //check location
+                        //check FROM-location
                         commonResponse.message = "From loc not found!";
                         var fromLoc = await _context.Locs.FindAsync(pt.LocCode);
                         if (fromLoc != null)
                         {
-                            //fromLoc.LocOutgo -= issueQty;
                             fromLoc.LocRemain += issueQty;
-
-                            //if (fromLoc.LocOutgo < 0 || fromLoc.LocRemain < 0)
-                            //{
-                            //    commonResponse.message = "Location capacity error";
-                            //    return Ok(commonResponse);
-                            //}
-                            //_context.Update(fromLoc);
-
 
                             //Check request det
                             var reDet = _context.RequestDets.Find(order.DetId);
@@ -187,6 +178,10 @@ namespace NMVS.Controllers.Api
                                         IsDisposed = false,
                                         MovementTime = DateTime.Now
                                     });
+                                    var soDet = _context.SoDetails.Find(reDet.SodId);
+
+                                    soDet.Shipped += issueQty;
+                                    _context.Update(soDet);
                                 }
                                 else
                                 {
@@ -211,10 +206,7 @@ namespace NMVS.Controllers.Api
                                             Quantity = issueQty
                                         };
 
-                                        var soDet = _context.SoDetails.Find(reDet.SodId);
-
-                                        soDet.Shipped += issueQty;
-                                        _context.Update(soDet);
+                                        
 
                                         _context.Add(det);
                                         _context.SaveChanges();
@@ -256,9 +248,10 @@ namespace NMVS.Controllers.Api
                                 
                                 order.ConfirmedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
                                 order.MovedQty += issueQty;
-                                if (order.MovedQty >= order.ExpOrdQty)
+                                if (order.ExpOrdQty <= (order.MovedQty + order.Reported))
                                 {
                                     order.Confirm = true;
+                                    order.CompletedTime = DateTime.Now;
                                 }
                                 pt.MovementNote += itemNote;
                                 
@@ -386,14 +379,12 @@ namespace NMVS.Controllers.Api
                     var rqDet = await _context.RequestDets.FindAsync(order.DetId);
                     if (rqDet != null)
                     {
-                        // decrease order qty
-                        order.ExpOrdQty -= report.Qty;
 
-                        // 1. decrease request qty
+                        // 1. increase report qty
+                        order.Reported += report.Qty;
+                        order.Note += report.Note;
                         // 2. add note
-                        rqDet.MovementNote += "**Issue order " + report.OrId + ": report quantity of " + report.Qty + ". Message:" + report.Note + ", By " + _httpContextAccessor.HttpContext.User.Identity.Name + "; ";
-                        
-                        rqDet.Picked -= report.Qty;
+
 
                         // decrease item master hold qty
                         var pt = await _context.ItemMasters.FindAsync(order.PtId);
@@ -452,10 +443,11 @@ namespace NMVS.Controllers.Api
 
 
 
-                        if (order.ExpOrdQty <= order.MovedQty)
+                        if (order.ExpOrdQty <= (order.MovedQty + order.Reported))
                         {
                             order.Confirm = true;
                             order.ConfirmedBy = User.Identity.Name;
+                            order.CompletedTime = DateTime.Now;
                         }
                         _context.Update(order);
                         _context.Update(pt);
@@ -531,8 +523,18 @@ namespace NMVS.Controllers.Api
             }
             else
             {
-                request.SoConfirm = true;
-                _context.Update(request);
+                var requestDet = _context.RequestDets.Where(x => x.RqID == request.RqID);
+                if (!requestDet.Any())
+                {
+                    
+                    _context.Remove(request);
+                }
+                else
+                {
+                    request.SoConfirm = true;
+                    _context.Update(request);
+                }
+
                 await _context.SaveChangesAsync();
                 common.status = 1;
                 common.message = "success!";

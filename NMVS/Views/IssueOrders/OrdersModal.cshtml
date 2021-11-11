@@ -196,7 +196,9 @@
 
 
             var qty = parseFloat($('#moving-qty').val());
-            var remainQty = parseFloat($('#table2 #t2-tr').find('.exp-qty').text().trim()) - parseFloat($('#table2 #t2-tr').find('.exp-moved').text().trim());
+            var remainQty = parseFloat($('#table2 #t2-tr').find('.exp-qty').text().trim())
+                - parseFloat($('#table2 #t2-tr').find('.exp-moved').text().trim())
+                - parseFloat($('#table2 #t2-tr').find('.exp-reported').text().trim());
 
 
             if (qty > remainQty) {
@@ -287,7 +289,9 @@
 
 
             var qty = parseFloat($('#moving-qty').val());
-            var remainQty = parseFloat($('#table2 #t2-tr').find('.exp-qty').text().trim()) - parseFloat($('#table2 #t2-tr').find('.exp-moved').text().trim());
+            var remainQty = parseFloat($('#table2 #t2-tr').find('.exp-qty').text().trim())
+                - parseFloat($('#table2 #t2-tr').find('.exp-moved').text().trim())
+                - parseFloat($('#table2 #t2-tr').find('.exp-reported').text().trim());
             
 
             if (qty > remainQty) {
@@ -351,10 +355,10 @@
             var unq = $('#unqualified').is(":checked");
             var oQty = parseFloat($('#table3 #t3-tr').find('.exp-qty').text().trim());
             var moved = parseFloat($('#table3 #t3-tr').find('.exp-moved').text().trim());
+            var reported = parseFloat($('#table3 #t3-tr').find('.exp-reported').text().trim());
             var qty = $('#input-qty').val();
             var note = cmmt.val().trim();
-            var remain = oQty - moved;
-
+            var remain = oQty - moved - reported;
             if (qty > remain) {
                 $('#input-qty').notify('Report quantity couldn\'t be larger than order quantity');
             }

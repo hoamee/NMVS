@@ -64,5 +64,7 @@ namespace NMVS.Models.ViewModels
         public bool ReqReported { set; get; }
         public string ReqReportedNote { set; get; }
 
+        public string ApprovalNote { set; get; }
+
     }
 }

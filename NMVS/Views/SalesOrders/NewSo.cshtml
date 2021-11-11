@@ -18,22 +18,28 @@
                         <form asp-action="NewSo">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <div class="form-group col-md-4">
-                                <label asp-for="SoNbr" class="control-label"></label>
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text" id="so-type">SO</span>
-                                    <input asp-for="SoNbr" class="form-control" placeholder="SO/Transfer number" />
-                                </div>
-                                <span asp-validation-for="SoNbr" class="text-danger"></span>
-                            </div>
-                            <div class="form-group col-md-4">
                                 <label asp-for="SoType" class="control-label">Type</label>
                                 <select class="form-control" asp-for="SoType">
                                     <option value="WH Transfer">WH transfer</option>
                                     <option value="Sale" selected>Sale</option>
                                     <option value="Warranty return">Warranty return</option>
                                 </select>
+                                <span asp-validation-for="SoType" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label asp-for="SoNbr" class="control-label"></label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" id="so-type">
+                                        
+                                            <span>SO</span>
+                                        
+                                    </span>
+                                    <input asp-for="SoNbr" class="form-control" placeholder="SO/Transfer number" />
+                                </div>
                                 <span asp-validation-for="SoNbr" class="text-danger"></span>
                             </div>
+
                             <div class="form-group">
                                 <label asp-for="CustCode" class="control-label">Sold-To</label>
                                 <div class="row col-md-12">

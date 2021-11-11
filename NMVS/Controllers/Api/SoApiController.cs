@@ -49,8 +49,8 @@ namespace NMVS.Controllers.Api
         }
 
         [HttpGet]
-        [Route("SoConfirm/{id}")]
-        public async Task<ActionResult> SoConfirm(string id)
+        [Route("SoConfirm/{id}/{ap}")]
+        public async Task<ActionResult> SoConfirm(string id, int ap)
         {
             if (id == null)
             {
@@ -62,35 +62,88 @@ namespace NMVS.Controllers.Api
             {
                 return NotFound();
             }
-            saleOrder.Confirm = true;
-            saleOrder.ConfirmBy = _httpContextAccessor.HttpContext.User.Identity.Name;
-
-            _context.Update(saleOrder);
-            var invRequest = await _context.InvRequests.FindAsync(id);
-            if (invRequest != null)
+            if (ap == 1)
             {
-                invRequest.SoConfirm = true;
-                _context.Update(invRequest);
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                invRequest = new InvRequest()
+                saleOrder.Confirm = true;
+                _context.Update(saleOrder);
+                var invRequest = await _context.InvRequests.FindAsync(id);
+                if (invRequest != null)
                 {
-                    RqType = "Issue",
-                    Ref = id,
-                    RqCmt = saleOrder.Comment,
-                    RqBy = saleOrder.UpdatedBy,
-                    SoConfirm = true,
-                    RqDate = DateTime.Now,
-                    RqID = id
-                };
-                _context.InvRequests.Add(invRequest);
-                await _context.SaveChangesAsync();
+                    invRequest.SoConfirm = true;
+                    _context.Update(invRequest);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    invRequest = new InvRequest()
+                    {
+                        RqType = "Issue",
+                        Ref = id,
+                        RqCmt = saleOrder.Comment,
+                        RqBy = saleOrder.UpdatedBy,
+                        SoConfirm = true,
+                        RqDate = DateTime.Now,
+                        RqID = id
+                    };
+                    _context.InvRequests.Add(invRequest);
+                }
+            }
+            saleOrder.ConfirmBy = _httpContextAccessor.HttpContext.User.Identity.Name;
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("SoReject")]
+        public async Task<ActionResult> SoReject(JsPickingData data)
+        {
+            SalesOrder saleOrder = await _context.SalesOrders.FindAsync(data.whcd);
+            CommonResponse<int> common = new();
+            if (saleOrder == null)
+            {
+                return NotFound();
+            }
+            
+                saleOrder.Confirm = false;
+                _context.Update(saleOrder);
+                var invRequest = await _context.InvRequests.FindAsync(data.whcd);
+                if (invRequest != null)
+                {
+                    _context.Remove(invRequest);
+                }
+            var rqDet = _context.RequestDets.Where(x => x.RqID == saleOrder.SoNbr);
+            if (rqDet.Any())
+            {
+                _context.RemoveRange(rqDet);
+            }
+            saleOrder.ApprovalNote = data.loc;
+            saleOrder.ConfirmBy = _httpContextAccessor.HttpContext.User.Identity.Name;
+            saleOrder.Closed = false;
+            await _context.SaveChangesAsync();
+            common.status = 1;
+            return Ok(common);
+        }
+
+        [HttpPost]
+        [Route("ForceComplete")]
+        public async Task<ActionResult> ForceComplete(JsPickingData data)
+        {
+            SalesOrder saleOrder = await _context.SalesOrders.FindAsync(data.whcd);
+            CommonResponse<int> common = new();
+            if (saleOrder == null)
+            {
+                return NotFound();
             }
 
-
-            return Ok();
+            var rq = _context.InvRequests.Find(data.whcd);
+            rq.Closed = true;
+            saleOrder.ApprovalNote = data.loc;
+            saleOrder.ConfirmBy = _httpContextAccessor.HttpContext.User.Identity.Name;
+            _context.Update(saleOrder);
+            _context.Update(rq);
+            await _context.SaveChangesAsync();
+            common.status = 1;
+            return Ok(common);
         }
 
         [HttpGet]

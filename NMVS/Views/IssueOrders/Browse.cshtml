@@ -84,6 +84,7 @@
                                     <span class="exp-to-ve" hidden> @item.ToVehicle</span>
                                     <span class="exp-to-loc" hidden> @item.ToLoc</span>
                                     <span class="exp-type" hidden> @item.IssueType</span>
+                                    <span class="exp-reported" hidden> @item.Reported</span>
                                 </th>
                                 <td>
 
@@ -121,7 +122,11 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="badge bg-@classColor">Issued @item.MovedQty/@item.ExpOrdQty</span>
+                                    <a class="badge bg-@classColor" href="/Inquiry/MovementReport/I.@item.ExpOrdId">@item.MovedQty/@item.ExpOrdQty</a>
+                                    @if (item.Reported > 0)
+                                    {
+                                        <span class="badge bg-danger"> @item.Reported </span>
+                                    }
 
                                 </td>
                                 <td>

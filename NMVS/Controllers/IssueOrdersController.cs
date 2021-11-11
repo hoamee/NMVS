@@ -30,8 +30,6 @@ namespace NMVS.Controllers
                          from all in vo.DefaultIfEmpty()
                          join loc2 in _context.Locs on o.ToLoc equals loc2.LocCode into oloc2
                          from all2 in oloc2.DefaultIfEmpty()
-
-
                          select new IssueOrder
                          {
                              ItemNo = o.ItemNo,
@@ -50,7 +48,8 @@ namespace NMVS.Controllers
                              IssueType = o.IssueType,
                              ToLoc = o.ToLoc,
                              ToVehicle = o.ToVehicle,
-                             FromLoc = ol.LocDesc
+                             FromLoc = ol.LocDesc,
+                             Reported = o.Reported
                              
                          }).ToList();
 

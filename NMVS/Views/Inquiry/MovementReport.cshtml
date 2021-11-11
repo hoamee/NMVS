@@ -1,0 +1,133 @@
+﻿@model IEnumerable<NMVS.Models.ViewModels.MovementVm>
+
+@{
+    ViewData["Title"] = "Movement report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-flush" id="datatable-search">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Search value</th>
+                                <th>Request no</th>
+                                <th>Type</th>
+                                <th>Item</th>
+                                <th>Order quantity</th>
+                                <th>Completed Qty</th>
+                                <th>Reported Qty</th>
+                                <th>Finished</th>
+                                <th>Note</th>
+                                <th>Required Time</th>
+                                <th>Completed on</th>
+                                <th>Transporter</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Order By</th>
+                                <th>Inventory Id</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                            <tr>
+                                @if (item.OrderType == "Allocate")
+                                {
+                                    <td class="text-sm font-weight-normal">A.@Html.DisplayFor(m => item.Id)</td>
+                }
+                else
+                {
+                            <td class="text-sm font-weight-normal">I.@Html.DisplayFor(m => item.Id)</td>
+                }
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Id)</td>
+                                <td class="text-sm font-weight-normal">
+
+                                    @if (item.OrderType == "Allocate")
+                                    {
+                                        <span class="fa fa-retweet" style="color: limegreen">@item.OrderType</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="fa fa-sign-out" style="color: red">@item.OrderType</span>
+                                    }
+                                </td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.ItemName)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.OrderQty)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.CompletedQty)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.ReportedQty)</td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.Completed != null)
+                                    {
+                                        if (item.Completed == true)
+                                        {
+                                            <p class="badge bg-success">Completed</p>
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        <p class="badge bg-secondary">Not yet</p>
+                                    }
+                                </td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (!string.IsNullOrEmpty(item.Note))
+                                    {
+                                        var notes = item.Note.Split("**");
+
+                                        <ul>
+                                            @foreach (var note in notes)
+                                            {
+                                                if (!string.IsNullOrEmpty(note))
+                                                {
+                                                    <li>@note</li>
+                                                }
+                                            }
+                                        </ul>
+                                    }
+                                </td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.MovementTime)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.CompletedTime)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.MoveBy)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.From)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.To)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.OrderBy)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.PtId)</td>
+
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('.nav-inquiry').addClass('active');
+        $('.nav-item-movement').addClass('active');
+        $('#navInquiry').addClass('show');
+
+        $('#datatable-search').DataTable({
+            columnDefs: [
+                {
+                    targets: 0,
+                    searchable: true,
+                    visible: false
+                }
+            ],
+            "oSearch": { "sSearch": '@Html.Raw(ViewBag.SearchValue)' }
+        });
+    });
+</script>

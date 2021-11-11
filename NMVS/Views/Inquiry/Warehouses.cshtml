@@ -1,0 +1,206 @@
+﻿@inject IJsonHelper Json;
+@model IEnumerable<NMVS.Models.ViewModels.WarehouseVm>
+
+@{
+    ViewData["Title"] = "Warehouse inquiry";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/assets/js/apexcharts/apexcharts.js"></script>
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div id="chart-capacity" class="col-md-9"></div>
+                <hr />
+                <h3>Information</h3>
+                <table class="table table-flush" id="datatable-search">
+                    <thead>
+                        <tr>
+                            <th>
+                                ID
+                            </th>
+                            <th>
+                                Name
+                            </th>
+                            <th>
+                                Site
+                            </th>
+                            <th>
+                                Capacity
+                            </th>
+                            <th>
+                                Remain
+                            </th>
+                            <th>
+                                Used
+                            </th>
+                            <th>
+                                Booked
+                            </th>
+                            <th>
+                                Active
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var sumUsed = item.OutGo + item.Used;
+                            <tr>
+                                <td>
+                                    <a class="btn btn-sm btn-outline-primary" asp-action="WhDetail" asp-route-id="@item.WhCode">@item.WhCode</a>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.WhName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Site)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Cap)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Remain)
+                                </td>
+                                <td>
+                                    @if (sumUsed != 0)
+                                    {
+                                        <span>
+                                            @Html.DisplayFor(modelItem => sumUsed)
+                                            <span>
+                                                @if (item.OutGo != 0)
+                                                {
+                                                    <span>(include out go:</span><span> @Html.DisplayFor(modelItem => item.OutGo))</span>
+                                                }
+                                            </span>
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>0</span>
+                                    }
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Hold)
+                                </td>
+                                <td class="text-sm font-weight-normal">
+                                    @if (item.Status)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('.nav-inquiry').addClass('active');
+        $('.nav-item-warehouse').addClass('active');
+        $('#navInquiry').addClass('show');
+    });
+</script>
+
+
+
+<script>
+        var options = {
+            series: [{
+                        name: 'Used',
+                        data: @Html.Raw(Json.Serialize(ViewBag.Used))
+                    },
+                    {
+                        name: 'Out go',
+                        data: @Html.Raw(Json.Serialize(ViewBag.OutGo))
+                    },
+                    {
+                        name: 'Available',
+                        data: @Html.Raw(Json.Serialize(ViewBag.Remain))
+                    },
+                    {
+                        name: 'Holding',
+                        data: @Html.Raw(Json.Serialize(ViewBag.Hold))
+                    }],
+
+            chart: {
+                type: 'bar',
+                height: 440,
+                stacked: true
+            },
+            colors: ['#FF4560', '#f76363', '#008FFB', '#29b9f2'],
+            plotOptions: {
+                bar: {
+                    horizontal: true,
+                    barHeight: '80%',
+                },
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                width: 1,
+                colors: ["#fff"]
+            },
+
+            grid: {
+                xaxis: {
+                    lines: {
+                        show: false
+                    }
+                }
+            },
+            yaxis: {
+                title: {
+                    // text: 'Age',
+                }
+            },
+            tooltip: {
+                shared: false,
+                x: {
+                    formatter: function (val) {
+                        return val;
+                    }
+                },
+                y: {
+                    formatter: function (val) {
+                        return val;
+                    }
+                }
+            },
+            title: {
+                text: 'Warehouse capacity report (@DateTime.Today.Date.ToString("yyyy/MM/dd"))',
+                align: 'center'
+            },
+            xaxis: {
+                categories:  @Html.Raw(Json.Serialize(ViewBag.WhName)),
+                title: {
+                    text: 'Warehouse capacity'
+                },
+                labels: {
+                    formatter: function (val) {
+                        return val;
+                    }
+                }
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#chart-capacity"), options);
+        chart.render();
+</script>

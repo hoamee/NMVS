@@ -1,0 +1,183 @@
+﻿@model NMVS.Models.ViewModels.LocDetailVm
+
+@{
+    ViewData["Title"] = "Warehouse inquiry";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var sumUsed = Model.Loc.Used + Model.Loc.OutGo;
+}
+<script src="~/assets/js/apexcharts/apexcharts.js"></script>
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                ID
+                            </th>
+                            <th>
+                                Name
+                            </th>
+                            <th>
+                                Site
+                            </th>
+                            <th>
+                                Capacity
+                            </th>
+                            <th>
+                                Remain
+                            </th>
+                            <th>
+                                Used
+                            </th>
+                            <th>
+                                Booked
+                            </th>
+                            <th>
+                                Active
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td>
+                                @Model.Loc.WhCode
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => Model.Loc.WhName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => Model.Loc.Site)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => Model.Loc.Cap)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => Model.Loc.Remain)
+                            </td>
+                            <td>
+                                @if (sumUsed != 0)
+                                {
+                                    <span>
+                                        @Html.DisplayFor(modelItem => sumUsed)
+                                        <span>
+                                            @if (Model.Loc.OutGo != 0)
+                                            {
+                                                <span>(include out go:</span><span> @Html.DisplayFor(modelItem => Model.Loc.OutGo))</span>
+                                            }
+                                        </span>
+
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>0</span>
+                                }
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => Model.Loc.Hold)
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (Model.Loc.Status)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+                <br />
+                <hr />
+                <div id="chart-capacity" class="col-md-9"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">Location</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-flush" id="datatable-search">
+                    <thead>
+                        <tr>
+                            <th>
+                                ID
+                            </th>
+                            <th>
+                                Item no.
+                            </th>
+                            <th>
+                                Item name
+                            </th>
+                            <th>
+                                Quantity
+                            </th>
+                            <th>
+                                Booked
+                            </th>
+                            <th>
+                                Supplier
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Inv)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Ptid)
+                                </td>
+                                <td>
+
+                                    @Html.DisplayFor(modelItem => item.No)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Qty)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Booked)
+                                </td>
+                                <td class="text-sm font-weight-normal">
+
+                                    @Html.DisplayFor(modelItem => item.Sup)
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('.nav-inquiry').addClass('active');
+        $('.nav-item-warehouse').addClass('active');
+        $('#navInquiry').addClass('show');
+    });
+</script>

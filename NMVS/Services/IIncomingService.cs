@@ -17,5 +17,7 @@ namespace NMVS.Services
         public List<TypeVm> GetSupplier();
 
         public Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user);
+
+        public Task<CommonResponse<UploadReport>> ImportWarranty(string filepath, string fileName, string user);
     }
 }

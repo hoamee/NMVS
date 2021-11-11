@@ -74,6 +74,7 @@ namespace NMVS.Models.DbModels
         public bool? RequestConfirmed { set; get; }
         public string ConfirmationNote { set; get; }
         public string RequestConfirmedBy { set; get; }
+        public string ApprovalNote { set; get; }
         public bool Closed { set; get; }
         public ICollection<SoDetail> SoDets { set; get; }
     }

@@ -21,6 +21,9 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Quantity")]
         public double AlcQty { set; get; }
 
+        [Display(Name = "Reported quantity")]
+        public double Reported { set; get; }
+
         [StringLength(50)]
         [Display(Name = "Allocate From")]
         public string AlcFrom { get; set; }
@@ -36,8 +39,9 @@ namespace NMVS.Models.DbModels
 
         [Display(Name = "Status")]
         public bool? IsClosed { set; get; }
-
         [Display(Name = "Movement time")]
         public DateTime MovementTime { set; get; }
+        [Display(Name = "Completed time")]
+        public DateTime? CompletedTime { set; get; }
     }
 }

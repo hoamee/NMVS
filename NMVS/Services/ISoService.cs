@@ -1,4 +1,5 @@
-﻿using NMVS.Models.ViewModels;
+﻿using NMVS.Models.DbModels;
+using NMVS.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,9 @@ namespace NMVS.Services
         public List<ItemAvailVm> GetItemNAvail();
 
         public string GetSoNbr(string input, string soType);
-        
+
+        public Task<CommonResponse<UploadReport>> ImportWarranty(string filepath, string fileName, string user);
+
+
     }
 }

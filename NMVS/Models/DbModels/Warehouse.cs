@@ -31,9 +31,10 @@ namespace NMVS.Models.DbModels
         public string SiCode { get; set; }
         public virtual Site Site { get; set; }
 
-        //Foreign key for Site
         [Display(Name = "Type")]
         public string Type { get; set; }
+
+        //Foreign key for Site
         //public virtual GeneralizedCode Generalized { get; set; }
         //public virtual ICollection<WarehouseLoc> WarehouseLocs { set; get; }
     }

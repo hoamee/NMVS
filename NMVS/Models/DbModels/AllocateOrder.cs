@@ -23,6 +23,9 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Moved quantity")]
         public double MovedQty { set; get; }
 
+        [Display(Name = "Reported quantity")]
+        public double Reported { set; get; }
+
         [Display(Name = "Allocate From")]
         public string AlcOrdFrom { get; set; }
 
@@ -47,5 +50,10 @@ namespace NMVS.Models.DbModels
 
         [Display(Name = "Movement time")]
         public DateTime MovementTime { set; get; }
+
+        [Display(Name = "Completed time")]
+        public DateTime? CompletedTime { get; set; }
+
+        public string MovementNote { set; get; }
     }
 }

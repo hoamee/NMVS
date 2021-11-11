@@ -295,7 +295,7 @@ namespace NMVS.Controllers
 
             ViewBag.DetId = id;
             ViewBag.RqId = rq.RqID;
-            ViewBag.qty = rq.Quantity - rq.Picked;
+            ViewBag.qty = rq.Quantity - rq.Arranged;
             ViewBag.History = _db.IssueOrders.Where(x => x.DetId == id).ToList();
 
             ViewBag.LocList = new SelectList(_db.Shippers
@@ -368,7 +368,22 @@ namespace NMVS.Controllers
         }
 
 
-        public IActionResult IssueNoteSo() => View(_db.Shippers.ToList());
+        public IActionResult IssueNoteSo() {
+            var model = _db.Shippers.ToList();
+            foreach (var item in model)
+            {
+                try
+                {
+                    var ldp = string.Join(", ", _db.ShipperDets.Where(x => x.ShpId == item.ShpId).Select(x => x.RqId).ToArray());
+                    item.Loc = ldp;
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+            return View(model);
+        }
 
         public IActionResult SoNoteDetails(int id)
         {

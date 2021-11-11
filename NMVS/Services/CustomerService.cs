@@ -104,7 +104,7 @@ namespace NMVS.Services
                 UploadBy = user,
                 UploadTime = DateTime.Now,
                 UploadId = user + DateTime.Now.ToString("yyyyMMddHHmmss"),
-                UploadFunction = "Upload supplier"
+                UploadFunction = "Customer Upload"
 
             };
 

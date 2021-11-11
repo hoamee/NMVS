@@ -11,6 +11,7 @@ namespace NMVS.Models.ViewModels
         public double AlcQty { set; get; }
         public string AlcFrom { set; get; }
         public string AlcTo { set; get; }
+        public double Reported { set; get; }
         public DateTime MovementTime { set; get; }
         public string Note { set; get; }
         public bool? IsClosed { set; get; }

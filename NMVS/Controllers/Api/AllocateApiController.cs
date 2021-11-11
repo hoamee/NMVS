@@ -267,9 +267,10 @@ namespace NMVS.Controllers.Api
                 var order = await _context.AllocateOrders.FindAsync(alo.AlcOrdId);
                 var pt = await _context.ItemMasters.FindAsync(order.PtId);
                 order.MovedQty += alo.MovedQty;
-                if (order.MovedQty >= order.AlcOrdQty)
+                if ((order.MovedQty + order.Reported) >= order.AlcOrdQty)
                 {
                     order.Confirm = true;
+                    order.CompletedTime = DateTime.Now;
                 }
                 //   Set confirmedBy = logged user
                 var loggedUser = User.Identity.Name;
@@ -383,13 +384,13 @@ namespace NMVS.Controllers.Api
                     var request = await _context.AllocateRequests.FindAsync(order.RequestID);
                     if (request != null)
                     {
-                        // decrease order qty
-                        order.AlcOrdQty -= report.Qty;
 
                         // 1. decrease request qty
                         // 2. add note
                         request.AlcCmmt += "**Order " + report.OrId + ": report quantity of " + report.Qty + ". Message:" + report.Note + ", By " + _httpContextAccessor.HttpContext.User.Identity.Name + "; ";
-                        request.AlcQty -= report.Qty;
+                        request.Reported += report.Qty;
+                        order.Reported += report.Qty;
+                        order.MovementNote = request.AlcCmmt;
 
                         // decrease item master hold qty
                         var pt = await _context.ItemMasters.FindAsync(order.PtId);
@@ -437,10 +438,11 @@ namespace NMVS.Controllers.Api
                             });
                         }
 
-                        if (order.AlcOrdQty <= order.MovedQty)
+                        if (order.AlcOrdQty <= (order.MovedQty + order.Reported))
                         {
                             order.Confirm = true;
                             order.ConfirmedBy = User.Identity.Name;
+                            order.CompletedTime = DateTime.Now;
                         }
 
                         _context.AllocateOrders.Update(order);
