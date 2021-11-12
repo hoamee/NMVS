@@ -52,6 +52,7 @@ namespace NMVS.Controllers
                         ModelState.AddModelError("", "Access Denied");
                         return View();
                     case 2:
+                        ModelState.AddModelError("", "Customer id existed");
                         return View(); //Incomplete: return to edit if exist
                     case -1:
                         ModelState.AddModelError("", "An error occured, please try again later.");

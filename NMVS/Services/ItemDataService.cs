@@ -92,7 +92,7 @@ namespace NMVS.Services
                 WorksheetPart wsPart =
                     (WorksheetPart)(wbPart.GetPartById(theSheet.Id));
 
-                var headerCorrect = _eHelper.VefiryHeader(wsPart, wbPart, "A2", "B2", "C2", "D2", "E2", "F2", "A1", "G2", "G2", "G2",
+                var headerCorrect = _eHelper.VefiryHeader(wsPart, wbPart, "A2", "B2", "C2", "D2", "E2", "F2", "A1", "", "", "",
                     "Item code", "Item name", "Unit", "Packing type", "Quantity per pack", "Warehouse space (per 1 pack)", "Document No.: IDL01", "","","");
 
                 int readingRow = 2;

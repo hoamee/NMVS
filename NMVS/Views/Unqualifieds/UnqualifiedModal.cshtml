@@ -1,5 +1,4 @@
-﻿
-<!-- Modal report -->
+﻿<!-- Modal report -->
 <div class="modal fade modal-dialog-scrollable" id="exampleModal" tabindex="-1" aria-labelledby="exampleModal" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -24,25 +23,20 @@
                             <th>
                                 Disposed Quantity
                             </th>
-                            
+
                         </tr>
                     </thead>
                     <tbody>
                         <tr id="t3-tr">
                             <td id="t3-id">
-
                             </td>
                             <td id="t3-item">
-
                             </td>
                             <td id="t3-tt-qty">
-
                             </td>
                             <td id="t3-rec-qty">
-
                             </td>
                             <td id="t3-dis-qty">
-
                             </td>
                         </tr>
                     </tbody>
@@ -70,9 +64,9 @@
         </div>
     </div>
 </div>
-<script src="~/assets/js/bootbox/bootbox.min.js"></script>
-<script src="~/assets/js/notify.js"></script>
 
+<script src="~/assets/js/notify.js"></script>
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
 <script>
     function takeAction(unqId) {
         var tr = $('#tr-' + unqId);
@@ -88,7 +82,7 @@
 
     var routeURL = location.protocol + "//" + location.host;
     $(document).ready(function () {
-      
+
         $('#send-report').click(function () {
             var cmmt = $("#report-input");
             var uId = parseInt($('#t3-id').text().trim());
@@ -117,21 +111,13 @@
                     Note: note,
                     OrId: uId
                 };
-
-                bootbox.confirm({
-                    message: '<h5 >Is all information correct?</h5>',
-                    closeButton: false,
-                    buttons: {
-                        confirm: {
-                            label: 'Yes',
-                            className: 'btn-success'
-                        },
-                        cancel: {
-                            label: 'No',
-                            className: 'btn-danger'
-                        }
-                    },
-                    callback: function (cf) {
+                Swal.fire({
+                    title: '<h5>Is all information correct?</h5>',
+                    showDenyButton: true,
+                    confirmButtonText: 'Save',
+                    denyButtonText: `Don't save`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
                         $.ajax({
                             contentType: 'application/json; charset=utf-8',
                             dataType: 'json',
@@ -140,7 +126,11 @@
                             data: JSON.stringify(postData),
                             success: function (data) {
                                 if (data.status == 1) {
-                                    $.notify(data.message, 'success');
+                                    Swal.fire(
+                                        'Process completed',
+                                        'success'
+                                    )
+                                    window.location.reload();
                                 }
 
                                 if (data.status == 0) {
@@ -154,16 +144,20 @@
 
                             },
                             failure: function (response) {
-                                bootbox.alert(response);
+                                Swal.fire(
+                                    'Process completed',
+                                    response
+                                )
                             },
                             complete: function () {
-                                window.location.reload();
+                                
                             }
 
                         });
                     }
-
                 });
+
+
 
 
             }
