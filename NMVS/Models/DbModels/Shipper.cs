@@ -25,8 +25,9 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Driver contact")]
         public string DrContact { set; get; }
 
+        [Display(Name = "Remember shipper")]
+        public bool RememberMe { set; get; }
 
-        [Required]
         [Display(Name = "Ship To")]
         public string ShpTo { set; get; }
 

@@ -23,7 +23,12 @@ namespace NMVS.Controllers
         // GET: Shippers
         public async Task<IActionResult> Browse()
         {
-            return View(await _context.Shippers.ToListAsync());
+            var model = await _context.Shippers.ToListAsync();
+            foreach(var item in model)
+            {
+                item.IssueConfirmed = _context.ShipperDets.Where(x => x.ShpId == item.ShpId).Any();
+            }
+            return View(model);
         }
 
         // GET: Shippers/Details/5
@@ -56,7 +61,7 @@ namespace NMVS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Register([Bind("ShpId,ShpDesc,Driver,DrContact,ShpTo,ShpVia,DateIn,ActualIn,ActualOut,CheckInBy,CheckOutBy,Loc,RegisteredBy")] Shipper shipper)
+        public IActionResult Register([Bind("ShpId,RememberMe,ShpDesc,Driver,DrContact,ShpTo,ShpVia,DateIn,ActualIn,ActualOut,CheckInBy,CheckOutBy,Loc,RegisteredBy")] Shipper shipper)
         {
             if (ModelState.IsValid)
             {
@@ -70,6 +75,7 @@ namespace NMVS.Controllers
                     ModelState.AddModelError("", e.ToString());
                 }
             }
+            ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
             return View(shipper);
         }
 
@@ -86,6 +92,7 @@ namespace NMVS.Controllers
             {
                 return NotFound();
             }
+            ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
             return View(shipper);
         }
 
@@ -94,7 +101,7 @@ namespace NMVS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ShpId,ShpDesc,Driver,DrContact,ShpFrom,ShpTo,ShpVia,DateIn,ActualIn,ActualOut,CheckInBy,CheckOutBy,Loc,RegisteredBy")] Shipper shipper)
+        public async Task<IActionResult> Edit(int id, [Bind("ShpId,RememberMe,ShpDesc,Driver,DrContact,ShpFrom,ShpTo,ShpVia,DateIn,ActualIn,ActualOut,CheckInBy,CheckOutBy,Loc,RegisteredBy")] Shipper shipper)
         {
             if (id != shipper.ShpId)
             {
@@ -121,6 +128,7 @@ namespace NMVS.Controllers
                 }
                 return RedirectToAction(nameof(Browse));
             }
+            ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
             return View(shipper);
         }
 
@@ -213,33 +221,6 @@ namespace NMVS.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        public IActionResult ConfirmCheckOut(Shipper shp)
-        {
-            CommonResponse<int> common = new();
-            try
-            {
-                var shipper = _context.Shippers.Find(shp.ShpId);
-                if (shipper == null)
-                {
-                    common.message = "System coundn't find this shipper";
-                    common.status = 0;
-                    return Ok(common);
-                }
-                shipper.CheckOutBy = User.Identity.Name;
-                shipper.ActualOut = DateTime.Now;
-
-
-                _context.Update(shipper);
-                _context.SaveChanges();
-                common.message = "Success";
-                common.status = 1;
-            }catch(Exception e)
-            {
-                common.message = e.ToString();
-                common.status = -1;
-            }
-            return Ok(common);
-        }
+       
     }
 }

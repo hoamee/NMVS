@@ -18,9 +18,15 @@
                         <form asp-action="Register" asp-controller="Shippers">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <div class="form-group">
-                                <label asp-for="ShpDesc" class="control-label">Vehicle</label>
+                                <label asp-for="ShpDesc" class="control-label">Vehicle description</label>
                                 <input asp-for="ShpDesc" class="form-control" />
                                 <span asp-validation-for="ShpDesc" class="text-danger"></span>
+                            </div>
+                            <div class="form-group form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" asp-for="RememberMe" />
+                                    Regularly
+                                </label>
                             </div>
                             <div class="form-group">
                                 <label asp-for="ShpVia" class="control-label">Vehicle type</label>

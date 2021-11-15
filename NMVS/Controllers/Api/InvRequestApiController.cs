@@ -494,7 +494,23 @@ namespace NMVS.Controllers.Api
                 }
                 shipper.CheckOutBy = User.Identity.Name;
                 shipper.ActualOut = DateTime.Now;
+                if (shipper.RememberMe)
+                {
+                    _context.Add(new Shipper
+                    {
+                        RememberMe = shipper.RememberMe,
+                        DateIn = DateTime.Now.AddDays(1),
+                        DrContact = shipper.DrContact,
+                        Driver = shipper.Driver,
+                        IssueConfirmed = false,
+                        ShpDesc = shipper.ShpDesc,
+                        Loc = shipper.Loc,
+                        ShpVia = shipper.ShpVia,
+                        ShpTo = shipper.ShpTo,
+                        RegisteredBy = User.Identity.Name
 
+                    });
+                }
 
                 _context.Update(shipper);
                 _context.SaveChanges();

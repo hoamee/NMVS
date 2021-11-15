@@ -348,25 +348,37 @@ namespace NMVS.Services
                     return common;
                 }
 
-
-
-
+                //Get issued time
                 var date = (DateTime)shipper.IssueConfirmedTime;
-                var shipperInfo = shipper.ShpDesc + " - " + shipper.Driver + (string.IsNullOrEmpty(shipper.DrContact) ? "" : " - " + shipper.DrContact);
+                
+                //Init download file name
                 common.message = user + "_Issue note_" + (date).ToString("yyyyMMdd") + ".xlsx";
+
+                //Get template
                 string templatePath = "xlsx/IN01_Issue note.xlsx";
                 FileInfo fileInfo = new(templatePath);
                 ExcelPackage excel = new(fileInfo);
 
-
-                var listSo = noteDet.Select(x => x.RqId).Distinct();
+                var listSoNbr = noteDet.Select(x => x.RqId).Distinct();
 
                 int createdPages = 1;
                 var dataRows = 7;
 
-                foreach (var so in listSo)
+                //add sheet when row count > 7
+                foreach (var so in listSoNbr)
                 {
-                    var itemCount = noteDet.Where(x => x.RqId == so).Count();
+                    var itemCount = 0;
+                    foreach(var line in noteDet.Where(x => x.RqId == so))
+                    {
+                        if (line.Quantity % line.PkgQty != 0)
+                        {
+                            itemCount++;
+                        }
+                        else
+                        {
+                            itemCount += 2;
+                        }
+                    }
                     var detCount = ((itemCount + dataRows - 1) / dataRows);
 
                     for (int i = 0; i < detCount; i++)

@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<NMVS.Models.DbModels.Shipper>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Shipper browse";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -22,6 +22,9 @@
                                 </th>
                                 <th>
                                     Vehicle
+                                </th>
+                                <th>
+                                    Auto save
                                 </th>
                                 <th>
                                     Driver
@@ -53,43 +56,59 @@
                         <tbody>
                             @foreach (var item in Model)
                             {
-                                <tr>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.ShpId)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.ShpDesc)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Driver) (@Html.DisplayFor(modelItem => item.DrContact))
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Loc)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.ShpTo)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.ShpVia)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.DateIn)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.ActualIn)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.ActualOut)
-                                    </td>
-                                   <td>
-                                        @Html.DisplayFor(modelItem => item.RegisteredBy)
-                                    </td>
-                                    <td>
-                                        <a asp-action="Edit" asp-route-id="@item.ShpId">Edit</a> |
-                                        <a asp-action="Details" asp-route-id="@item.ShpId">Details</a> |
-                                        <a asp-action="Delete" asp-route-id="@item.ShpId">Delete</a>
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ShpId)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ShpDesc)
+                                </td>
+                                <td>
+                                    @if (item.RememberMe)
+                                    {
+                                        <span class="badge bg-gradient-success">Auto saved</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-gradient-secondary">Once</span>
+                                    }
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Driver) (@Html.DisplayFor(modelItem => item.DrContact))
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Loc)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ShpTo)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ShpVia)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DateIn)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ActualIn)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ActualOut)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.RegisteredBy)
+                                </td>
+                                <td>
+                                    @if (string.IsNullOrEmpty(item.CheckOutBy))
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@item.ShpId" class="btn btn-sm">Edit</a>
+                                    }
+                                    <a asp-action="Details" asp-route-id="@item.ShpId" class="btn btn-sm">Details</a>
+                                    @if (!item.IssueConfirmed)
+                                    {
+                                        <a asp-action="Delete" class="btn btn-sm" asp-route-id="@item.ShpId">Delete</a>
+                                    }
+                                </td>
+                            </tr>
                             }
                         </tbody>
                     </table>

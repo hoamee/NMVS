@@ -1,87 +1,100 @@
 ﻿@model NMVS.Models.DbModels.Shipper
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit shipper";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Edit</h1>
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-5">
+                        <form asp-action="Edit">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="ShpId" />
+                            <input type="hidden" asp-for="CheckInBy" />
+                            <input type="hidden" asp-for="ActualIn" />
+                            <input type="hidden" asp-for="IssueConfirmed" />
+                            <input type="hidden" asp-for="IssueConfirmedTime" />
+                            <input type="hidden" asp-for="CheckOutBy" />
+                            <input type="hidden" asp-for="ActualOut" />
+                            <div class="form-group">
+                                <label asp-for="ShpDesc" class="control-label"></label>
+                                <input asp-for="ShpDesc" class="form-control" />
+                                <span asp-validation-for="ShpDesc" class="text-danger"></span>
+                            </div>
+                            <div class="form-group form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" asp-for="RememberMe" /> @Html.DisplayNameFor(model => model.RememberMe)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ShpVia" class="control-label">Vehicle type</label>
+                                <input asp-for="ShpVia" class="form-control" />
+                                <span asp-validation-for="ShpVia" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Driver" class="control-label"></label>
+                                <input asp-for="Driver" class="form-control" />
+                                <span asp-validation-for="Driver" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="DrContact" class="control-label"></label>
+                                <input asp-for="DrContact" class="form-control" />
+                                <span asp-validation-for="DrContact" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Loc" class="control-label"></label>
+                                <div class="row col-md-12">
+                                    <span class="col-md-4">
 
-<h4>Shipper</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ShpId" />
-            <div class="form-group">
-                <label asp-for="ShpDesc" class="control-label"></label>
-                <input asp-for="ShpDesc" class="form-control" />
-                <span asp-validation-for="ShpDesc" class="text-danger"></span>
+                                        <input asp-for="Loc" class="form-control" readonly onclick="$('#loc-modal').modal('toggle')" />
+                                    </span>
+                                    <div class="col-md-6">
+                                        <p id="loc-name"></p>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="Loc" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ShpTo" class="control-label"></label>
+                                <input asp-for="ShpTo" class="form-control" />
+                                <span asp-validation-for="ShpTo" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="DateIn" class="control-label"></label>
+                                <input asp-for="DateIn" class="form-control" />
+                                <span asp-validation-for="DateIn" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="RegisteredBy" class="control-label"></label>
+                                <input asp-for="RegisteredBy" class="form-control" readonly value="@User.Identity.Name" />
+                                <span asp-validation-for="RegisteredBy" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Save" class="btn btn-primary" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Driver" class="control-label"></label>
-                <input asp-for="Driver" class="form-control" />
-                <span asp-validation-for="Driver" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DrContact" class="control-label"></label>
-                <input asp-for="DrContact" class="form-control" />
-                <span asp-validation-for="DrContact" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ShpTo" class="control-label"></label>
-                <input asp-for="ShpTo" class="form-control" />
-                <span asp-validation-for="ShpTo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ShpVia" class="control-label"></label>
-                <input asp-for="ShpVia" class="form-control" />
-                <span asp-validation-for="ShpVia" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DateIn" class="control-label"></label>
-                <input asp-for="DateIn" class="form-control" />
-                <span asp-validation-for="DateIn" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ActualIn" class="control-label"></label>
-                <input asp-for="ActualIn" class="form-control" />
-                <span asp-validation-for="ActualIn" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ActualOut" class="control-label"></label>
-                <input asp-for="ActualOut" class="form-control" />
-                <span asp-validation-for="ActualOut" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CheckInBy" class="control-label"></label>
-                <input asp-for="CheckInBy" class="form-control" />
-                <span asp-validation-for="CheckInBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CheckOutBy" class="control-label"></label>
-                <input asp-for="CheckOutBy" class="form-control" />
-                <span asp-validation-for="CheckOutBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Loc" class="control-label"></label>
-                <input asp-for="Loc" class="form-control" />
-                <span asp-validation-for="Loc" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RegisteredBy" class="control-label"></label>
-                <input asp-for="RegisteredBy" class="form-control" />
-                <span asp-validation-for="RegisteredBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+
+        </div>
     </div>
 </div>
+<partial name="_ValidationScriptsPartial" />
+<partial name="LocModal" />
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
+<script>
+    $(document).ready(function () {
+        $('.nav-ship').addClass('active');
+    });
+</script>

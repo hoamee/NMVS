@@ -98,7 +98,7 @@
                                         }
                                         else if (string.IsNullOrEmpty(item.CheckOutBy))
                                         {
-                                            <a class="btn btn-outline-danger" asp-action="CheckOut" asp-route-id="@item.ShpId" > Check out</a>
+                                            <a class="btn btn-outline-danger" asp-action="CheckOut" asp-route-id="@item.ShpId"> Check out</a>
                                         }
                                         else
                                         {
@@ -125,18 +125,38 @@
         </div>
     </div>
 </div>
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
 <script src="~/assets/datatable/datatables.min.js"></script>
 <script>
 
     function approve(s) {
-        $.ajax({
-            url: '/Shippers/ApproveCheckIn/?id=' + s,
-            method: 'GET',
-            success: function () {
-                window.location.href = window.location.href;
-            }
+        Swal.fire({
+            title: 'Is all information correct?',
+            icon: 'question',
+            showDenyButton: true,
+            confirmButtonText: 'Yes',
+            denyButtonText: `No`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/Shippers/ApproveCheckIn/?id=' + s,
+                    method: 'GET',
+                    success: function () {
+                        Swal.fire('Vehicle checked in!',
+                            '',
+                            'success')
+                            .then((cf) => {
+                                window.location.reload();
 
+                            });
+                    }
+
+                })
+            } else if (result.isDenied) {
+                Swal.fire('Changes are not saved', '', 'info')
+            }
         })
+        
 
     };
 
