@@ -42,15 +42,15 @@
                 </dl>
             </div>
             <div class="card-footer">
+
                 @if (!Model.Shp.IssueConfirmed)
                 {
-                    <span class="btn btn-outline-primary" onclick="closeNote(@Model.Shp.ShpId)">Confirm and Close</span>
 
+                    <span class="btn btn-outline-primary" onclick="closeNote(@Model.Shp.ShpId)">Confirm and Close</span>
                 }
                 else
                 {
                     <a asp-action="DownloadShipperNote" class="btn btn-outline-info" asp-route-id="@Model.Shp.ShpId">
-
                         <span class="fa fa-cloud-download"></span>
                         Download shipper note
                     </a>

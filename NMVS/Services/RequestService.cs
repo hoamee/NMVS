@@ -21,6 +21,292 @@ namespace NMVS.Services
             _db = db;
         }
 
+        public async Task<CommonResponse<int>> CloseShipperNote(MfgIssueNote issueNote, string user)
+        {
+            CommonResponse<int> common = new();
+            try
+            {
+
+                var shipper = await _db.Shippers.FindAsync(issueNote.IsNId);
+                if (shipper != null)
+                {
+                    int orderCount = _db.IssueOrders.Where(x => x.ToVehicle == shipper.ShpId && x.Confirm != true).Count();
+                    if (orderCount > 0)
+                    {
+                        var many = orderCount > 1 ? "Unable to finish. There are " + orderCount + " unfinished movements to this vehicle"
+                            : "Unable to finish. There is an unfinished movement to this vehicle";
+                        common.message = many;
+                        common.status = -1;
+                        return common;
+                    }
+                    shipper.IssueConfirmedTime = DateTime.Now;
+                    shipper.IssueConfirmed = true;
+
+                    var noteDet = (from d in _db.ShipperDets.Where(x => x.ShpId == shipper.ShpId)
+                                   join p in _db.ItemMasters on d.InventoryId equals p.PtId into ptmstr
+                                   from pt in ptmstr.DefaultIfEmpty()
+                                   join i in _db.ItemDatas on d.ItemNo equals i.ItemNo into all
+                                   from a in all.DefaultIfEmpty()
+                                   join s in _db.SalesOrders on d.RqId equals s.SoNbr into sOrder
+                                   from so in sOrder.DefaultIfEmpty()
+                                   join c in _db.Customers on so.CustCode equals c.CustCode into soldTo
+                                   from soto in soldTo.DefaultIfEmpty()
+                                   join c2 in _db.Customers on so.ShipTo equals c2.CustCode into shipTo
+                                   from shto in shipTo.DefaultIfEmpty()
+                                   select new In01Vm
+                                   {
+                                       InventoryId = d.InventoryId,
+                                       DetId = d.DetId,
+                                       ItemName = a.ItemName,
+                                       ItemNo = a.ItemNo,
+                                       Quantity = d.Quantity,
+                                       RqId = d.RqId,
+                                       ShpId = shipper.ShpId,
+                                       SoldTo = soto.CustCode,
+                                       SoldToName = soto.CustName,
+                                       ShipToId = shto.CustCode,
+                                       ShipToAddr = shto.Addr + (!string.IsNullOrEmpty(shto.City) ? ", " + shto.City : "") + (!string.IsNullOrEmpty(shto.Ctry) ? ", " + shto.Ctry : ""),
+                                       ShipToName = shto.CustName,
+                                       ShipToTax = shto.TaxCode,
+                                       SoldToTax = soto.TaxCode,
+                                       SoltToAddr = soto.Addr + (!string.IsNullOrEmpty(soto.City) ? ", " + soto.City : "") + (!string.IsNullOrEmpty(soto.Ctry) ? ", " + soto.Ctry : ""),
+                                       PkgType = a.ItemPkg,
+                                       PkgQty = a.ItemPkgQty,
+                                       ItemUnit = a.ItemUm,
+                                       BatchNo = pt.BatchNo
+
+                                   }).OrderBy(x => x.RqId).ToList();
+
+                    var listSoNbr = noteDet.Select(x => x.RqId).Distinct();
+
+                    foreach (var so in listSoNbr)
+                    {
+                        var noteNbr = 0;
+                        var salesOrder = _db.SalesOrders.Find(so);
+                        noteNbr = GetNewIssueNoteId(salesOrder, user, shipper);
+                        if (noteNbr == 0)
+                        {
+                            common.message = "An error occurred with note creation";
+                            common.status = -1;
+                            return common;
+                        }
+
+                        var itemCount = 1;
+                        foreach (var line in noteDet.Where(x => x.RqId == so))
+                        {
+                            var packCount = Convert.ToInt32(Math.Floor(line.Quantity / line.PkgQty));
+                            double remainder = line.Quantity % line.PkgQty;
+
+                            if (itemCount > 7)
+                            {
+                                noteNbr = GetNewIssueNoteId(salesOrder, user, shipper);
+                                if (noteNbr == 0)
+                                {
+                                    common.message = "An error occurred with note creation";
+                                    common.status = -1;
+                                    return common;
+                                }
+                                itemCount = 1;
+                            }
+
+                            if (packCount > 0)
+                            {
+                                AddNoteLine(salesOrder.SoType, noteNbr, line.ItemNo, line.InventoryId, line.Quantity - remainder, packCount);
+                                itemCount++;
+                            }
+
+                            if (itemCount > 7)
+                            {
+                                noteNbr = GetNewIssueNoteId(salesOrder, user, shipper);
+                                if (noteNbr == 0)
+                                {
+                                    common.message = "An error occurred with note creation";
+                                    common.status = -1;
+                                    return common;
+                                }
+                                itemCount = 1;
+                            }
+
+                            if (remainder > 0)
+                            {
+                                if (packCount > 0)
+                                {
+                                    AddNoteLine(salesOrder.SoType, noteNbr, line.ItemNo, line.InventoryId, remainder, 1);
+                                    itemCount++;
+                                }
+                                
+                            }
+
+
+                            
+                        }
+
+                    }
+
+
+                    _db.Update(shipper);
+                    _db.SaveChanges();
+                    common.message = "Success!";
+                    common.status = 1;
+                }
+                else
+                {
+                    common.status = 0;
+                    common.message = "Shipper not found!";
+                }
+            }
+            catch (Exception e)
+            {
+                common.status = -1;
+                common.message = e.ToString();
+            }
+
+            return common;
+        }
+
+
+        public async Task<CommonResponse<int>> FinishIssueToVehicle(AllocateOrder alo, string user)
+        {
+            CommonResponse<int> commonResponse = new();
+
+            try
+            {
+                var order = await _db.IssueOrders.FindAsync(alo.AlcOrdId);
+                if (order != null)
+                {
+                    //amount of movement
+                    var issueQty = alo.AlcOrdQty;
+
+                    //Check if shipper is checked out
+                    var shp = await _db.Shippers.FindAsync(order.ToVehicle);
+                    if (shp != null)
+                    {
+                        if (!string.IsNullOrEmpty(shp.CheckOutBy))
+                        {
+                            commonResponse.message = "hipper is already checked out! (Msg no: 400)";
+                            commonResponse.status = -1;
+                            return commonResponse;
+                        }
+
+                    }
+
+                    //Check item exist
+                    commonResponse.message = "Inventory id not found (Msg no: 401)";
+                    var pt = await _db.ItemMasters.FindAsync(order.PtId);
+                    if (pt != null)
+                    {
+                        //Check if error with inventory quantity
+                        //Case movement quantity > available quantity (available = ptQty - ptHold)
+                        //If the number after movement is negative. throw an error
+                        pt.PtHold -= issueQty;
+                        pt.PtQty -= issueQty;
+                        if (pt.PtHold < 0 || pt.PtQty < 0)
+                        {
+                            commonResponse.message = "Item quantity error (Msg no: 402)";
+                            commonResponse.status = -1;
+                            return commonResponse;
+                        }
+                        _db.Update(pt);
+
+
+                        //check FROM-location
+                        commonResponse.message = "From loc not found! (Msg no: 403)";
+                        var fromLoc = await _db.Locs.FindAsync(pt.LocCode);
+                        if (fromLoc != null)
+                        {
+                            fromLoc.LocRemain += issueQty;
+
+                            //Check request det
+                            var reDet = _db.RequestDets.Find(order.DetId);
+                            commonResponse.message = "Request not found! (Msg no: 404)";
+                            var itemNote = "";
+                            if (reDet != null)
+                            {
+                                reDet.Arranged += issueQty;
+                                _db.Update(reDet);
+                                // case order type = Issue
+                                if (order.IssueType == "Issue")
+                                {
+                                    var shpDet = _db.ShipperDets.FirstOrDefault(x => x.DetId == order.DetId && x.ShpId == order.ToVehicle);
+                                    if (shpDet == null)
+                                    {
+                                        _db.Add(new ShipperDet
+                                        {
+                                            InventoryId = order.PtId,
+                                            DetId = order.DetId,
+                                            ItemNo = pt.ItemNo,
+                                            Quantity = issueQty,
+                                            RqId = order.RqID,
+                                            ShpId = (int)order.ToVehicle
+                                        });
+
+                                    }
+                                    else
+                                    {
+                                        shpDet.Quantity += issueQty;
+                                        _db.Update(shpDet);
+                                    }
+
+                                    _db.Add(new InventoryTransac
+                                    {
+                                        From = pt.LocCode,
+                                        To = "Shipper Id: " + shp.ShpId,
+                                        LastId = pt.PtId,
+                                        NewId = null,
+                                        OrderNo = order.ExpOrdId,
+                                        IsAllocate = false,
+                                        IsDisposed = false,
+                                        MovementTime = DateTime.Now
+                                    });
+                                    var soDet = _db.SoDetails.Find(reDet.SodId);
+
+                                    soDet.Shipped += issueQty;
+                                    _db.Update(soDet);
+                                }
+                                else
+                                {
+                                    commonResponse.status = -1;
+                                    commonResponse.message = "System error! Incorrect direction (Msg no: 200)";
+                                }
+
+
+                                order.ConfirmedBy = user;
+                                order.MovedQty += issueQty;
+                                if (order.ExpOrdQty <= (order.MovedQty + order.Reported))
+                                {
+                                    order.Confirm = true;
+                                    order.CompletedTime = DateTime.Now;
+                                }
+                                pt.MovementNote += itemNote;
+
+                                _db.Update(pt);
+                                _db.Update(order);
+                                _db.SaveChanges();
+                                commonResponse.message = "Success"!;
+                                commonResponse.status = 1;
+                            }
+
+
+                        }
+
+                    }
+
+
+                }
+                else
+                {
+                    commonResponse.message = "ERROR! Order is not found!";
+                    commonResponse.status = -1;
+                }
+            }
+            catch (Exception e)
+            {
+                commonResponse.message = e.ToString();
+            }
+
+            return commonResponse;
+        }
+
         public List<ItemAvailVm> GetItemAvails(string id)
         {
             var s = (from i in _db.ItemMasters.Where(x => x.ItemNo == id)
@@ -108,6 +394,97 @@ namespace NMVS.Services
             return model;
         }
 
+        private int GetNewIssueNoteId(SalesOrder salesOrder, string user, Shipper shipper)
+        {
+            if (salesOrder.SoType == "Warranty return")
+            {
+                var note = new WrIssueNote
+                {
+                    IssuedBy = user,
+                    IssuedOn = DateTime.Now,
+                    Shipper = shipper.ShpId,
+                    ShipTo = salesOrder.ShipTo,
+                    SoldTo = salesOrder.CustCode,
+                    SoNbr = salesOrder.SoNbr
+                };
+                _db.Add(note);
+                _db.SaveChanges();
+                return note.InId;
+
+            }
+            else if (salesOrder.SoType == "Sale")
+            {
+                var note = new SoIssueNote
+                {
+                    IssuedBy = user,
+                    IssuedOn = DateTime.Now,
+                    Shipper = shipper.ShpId,
+                    ShipTo = salesOrder.ShipTo,
+                    SoldTo = salesOrder.CustCode,
+                    SoNbr = salesOrder.SoNbr
+                };
+                _db.Add(note);
+                _db.SaveChanges();
+                return note.InId;
+
+            }
+            else if (salesOrder.SoType == "WH Transfer")
+            {
+                var note = new WtIssueNote
+                {
+                    IssuedBy = user,
+                    IssuedOn = DateTime.Now,
+                    Shipper = shipper.ShpId,
+                    ShipTo = salesOrder.ShipTo,
+                    SoldTo = salesOrder.CustCode,
+                    SoNbr = salesOrder.SoNbr
+                };
+                _db.Add(note);
+                _db.SaveChanges();
+                return note.InId;
+
+            }
+
+            return 0;
+        }
+
+        private void AddNoteLine(string soType, int noteNbr, string itemNo, int ptId, double quantity, int packCount)
+        {
+            if (soType == "Sale")
+            {
+                _db.Add(new SoIssueNoteDet
+                {
+                    InId = noteNbr,
+                    ItemNo = itemNo,
+                    PtId = ptId,
+                    Quantity = quantity,
+                    PackCount = packCount
+                });
+            }
+            else if (soType == "Warranty return")
+            {
+                _db.Add(new SoIssueNoteDet
+                {
+                    InId = noteNbr,
+                    ItemNo = itemNo,
+                    PtId = ptId,
+                    Quantity = quantity,
+                    PackCount = packCount
+                });
+            }
+            else if (soType == "WH Transfer")
+            {
+                _db.Add(new WtIssueNoteDet
+                {
+                    InId = noteNbr,
+                    ItemNo = itemNo,
+                    PtId = ptId,
+                    Quantity = quantity,
+                    PackCount = packCount
+                });
+            }
+        }
+
         //public async Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user)
         //{
         //    CommonResponse<UploadReport> common = new();
@@ -188,8 +565,8 @@ namespace NMVS.Services
         //            return common;
         //        }
 
-                    
-                    
+
+
 
         //        if (headerCorrect)
         //        {

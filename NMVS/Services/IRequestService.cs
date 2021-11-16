@@ -17,6 +17,8 @@ namespace NMVS.Services
 
         public List<ItemMasterVm> GetItemMasterVms(RequestDet rq);
 
+        public Task<CommonResponse<int>> CloseShipperNote(MfgIssueNote issueNote, string user);
+
         //public Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user);
     }
 }

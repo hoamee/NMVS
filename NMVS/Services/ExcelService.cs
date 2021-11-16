@@ -414,7 +414,7 @@ namespace NMVS.Services
                         sheet.Name = rqId;
                         sheetDuplicate = 1;
                     }
-                    
+                    //Set header
                     sheet.Cells["A8"].Value += " " + noteDet[ptIndex].RqId;
                     sheet.Cells["G8"].Value += " " + date;
                     sheet.Cells["A10"].Value += " " + noteDet[ptIndex].SoldToName;
@@ -427,15 +427,35 @@ namespace NMVS.Services
 
                     for (int i = ptIndex; i < noteDet.Count; i++)
                     {
+                        var packCount = Convert.ToInt32(Math.Floor(noteDet[i].Quantity / noteDet[i].PkgQty));
+                        double remainder = noteDet[i].Quantity % noteDet[i].PkgQty;
 
-
-                        sheet.Cells["B" + writingRow].Value = noteDet[i].ItemName;
-                        sheet.Cells["C" + writingRow].Value = noteDet[i].ItemUnit;
-                        sheet.Cells["D" + writingRow].Value = noteDet[i].PkgQty;
-                        sheet.Cells["E" + writingRow].Value = noteDet[i].Quantity;
-                        sheet.Cells["F" + writingRow].Value = noteDet[i].Quantity * noteDet[i].PkgQty;
-                        sheet.Cells["G" + writingRow].Value = noteDet[i].RqId;
-                        sheet.Cells["H" + writingRow].Value = noteDet[i].BatchNo;
+                        if (packCount > 0)
+                        {
+                            sheet.Cells["B" + writingRow].Value = noteDet[i].ItemName;
+                            sheet.Cells["C" + writingRow].Value = noteDet[i].ItemUnit;
+                            sheet.Cells["D" + writingRow].Value = noteDet[i].PkgQty;
+                            sheet.Cells["E" + writingRow].Value = packCount;
+                            sheet.Cells["F" + writingRow].Value = noteDet[i].Quantity - remainder;
+                            sheet.Cells["G" + writingRow].Value = noteDet[i].RqId;
+                            sheet.Cells["H" + writingRow].Value = noteDet[i].BatchNo;
+                        }
+                        
+                        if (remainder > 0)
+                        {
+                            if (packCount > 0)
+                            {
+                                writingRow++;
+                            }
+                            sheet.Cells["B" + writingRow].Value = noteDet[i].ItemName;
+                            sheet.Cells["C" + writingRow].Value = noteDet[i].ItemUnit;
+                            sheet.Cells["D" + writingRow].Value = noteDet[i].PkgQty;
+                            sheet.Cells["E" + writingRow].Value = 1;
+                            sheet.Cells["F" + writingRow].Value = remainder;
+                            sheet.Cells["G" + writingRow].Value = noteDet[i].RqId;
+                            sheet.Cells["H" + writingRow].Value = noteDet[i].BatchNo;
+                        }
+                        
 
                         ptIndex++;
 

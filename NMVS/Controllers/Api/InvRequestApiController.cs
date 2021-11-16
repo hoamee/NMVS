@@ -19,11 +19,13 @@ namespace NMVS.Controllers.Api
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         ApplicationDbContext _context;
+        IRequestService _service;
 
-        public InvRequestApiController(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context)
+        public InvRequestApiController(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context, IRequestService service)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
+            _service = service;
         }
 
         [HttpPost]
@@ -160,7 +162,7 @@ namespace NMVS.Controllers.Api
                                             ShpId = (int)order.ToVehicle
                                         });
 
-                                        
+
                                     }
                                     else
                                     {
@@ -170,7 +172,7 @@ namespace NMVS.Controllers.Api
                                     _context.Add(new InventoryTransac
                                     {
                                         From = pt.LocCode,
-                                        To = "Shipper Id: "+shp.ShpId,
+                                        To = "Shipper Id: " + shp.ShpId,
                                         LastId = pt.PtId,
                                         NewId = null,
                                         OrderNo = order.ExpOrdId,
@@ -206,7 +208,7 @@ namespace NMVS.Controllers.Api
                                             Quantity = issueQty
                                         };
 
-                                        
+
 
                                         _context.Add(det);
                                         _context.SaveChanges();
@@ -245,7 +247,7 @@ namespace NMVS.Controllers.Api
                                     });
 
                                 }
-                                
+
                                 order.ConfirmedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
                                 order.MovedQty += issueQty;
                                 if (order.ExpOrdQty <= (order.MovedQty + order.Reported))
@@ -254,7 +256,7 @@ namespace NMVS.Controllers.Api
                                     order.CompletedTime = DateTime.Now;
                                 }
                                 pt.MovementNote += itemNote;
-                                
+
                                 _context.Update(pt);
                                 _context.Update(order);
                                 _context.SaveChanges();
@@ -287,9 +289,9 @@ namespace NMVS.Controllers.Api
                 var note = _context.MfgIssueNotes.Find(issueNote.IsNId);
                 if (note != null)
                 {
-                    var requestDets = _context.RequestDets.Where(x => x.RqID == note.RqId).Select(x=>x.DetId).ToList();
+                    var requestDets = _context.RequestDets.Where(x => x.RqID == note.RqId).Select(x => x.DetId).ToList();
                     var remainOrder = 0;
-                    foreach (var order in _context.IssueOrders.Where(x=> requestDets.Contains(x.DetId) && x.Confirm == null))
+                    foreach (var order in _context.IssueOrders.Where(x => requestDets.Contains(x.DetId) && x.Confirm == null))
                     {
                         remainOrder++;
                     }
@@ -326,41 +328,8 @@ namespace NMVS.Controllers.Api
         [Route("CloseSoNote")]
         public async Task<IActionResult> CloseSoNote(MfgIssueNote issueNote)
         {
-
-            CommonResponse<int> common = new();
-            try
-            {
-
-                var note = await _context.Shippers.FindAsync(issueNote.IsNId);
-                if (note != null)
-                {
-                    int orderCount = _context.IssueOrders.Where(x => x.ToVehicle == note.ShpId && x.Confirm != true).Count();
-                    if (orderCount > 0)
-                    {
-                        var many = orderCount > 1 ? "Unable to finish. There are " + orderCount + " unfinished movements to this vehicle"
-                            : "Unable to finish. There is an unfinished movement to this vehicle";
-                        common.message = many;
-                        common.status = -1;
-                        return Ok(common);
-                    }
-                    note.IssueConfirmedTime = DateTime.Now;
-                    note.IssueConfirmed = true;
-                    _context.Update(note);
-                    _context.SaveChanges();
-                    common.message = "Success!";
-                    common.status = 1;
-                }
-                else
-                {
-                    common.status = 0;
-                    common.message = "Not found!";
-                }
-            }
-            catch (Exception e)
-            {
-                common.status = -1;
-                common.message = e.ToString();
-            }
+            CommonResponse<int> common =
+                await _service.CloseShipperNote(issueNote, _httpContextAccessor.HttpContext.User.Identity.Name);
 
             return Ok(common);
         }
@@ -542,7 +511,7 @@ namespace NMVS.Controllers.Api
                 var requestDet = _context.RequestDets.Where(x => x.RqID == request.RqID);
                 if (!requestDet.Any())
                 {
-                    
+
                     _context.Remove(request);
                 }
                 else
@@ -625,7 +594,7 @@ namespace NMVS.Controllers.Api
                         _context.Update(so);
                     }
                 }
-               
+
                 _context.Update(request);
                 await _context.SaveChangesAsync();
                 common.status = 1;
@@ -679,7 +648,7 @@ namespace NMVS.Controllers.Api
                 return Ok(common);
             }
         }
-        
+
         [Route("FinhishedRequest")]
         [HttpPost]
         public async Task<IActionResult> FinhishedRequest(JsPickingData rqd)

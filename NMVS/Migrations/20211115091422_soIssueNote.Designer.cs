@@ -3,20 +3,22 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NMVS.Models;
 
 namespace NMVS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211115091422_soIssueNote")]
+    partial class soIssueNote
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.12")
+                .HasAnnotation("ProductVersion", "5.0.11")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1247,14 +1249,11 @@ namespace NMVS.Migrations
                     b.Property<string>("ItemNo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PackCount")
-                        .HasColumnType("int");
-
                     b.Property<int>("PtId")
                         .HasColumnType("int");
 
-                    b.Property<double>("Quantity")
-                        .HasColumnType("float");
+                    b.Property<string>("Quantity")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("IndID");
 
@@ -1315,23 +1314,6 @@ namespace NMVS.Migrations
                     b.HasKey("SupCode");
 
                     b.ToTable("Suppliers");
-                });
-
-            modelBuilder.Entity("NMVS.Models.DbModels.SystemMessage", b =>
-                {
-                    b.Property<int>("MsgNo")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("MsgNo");
-
-                    b.ToTable("SystemMessages");
                 });
 
             modelBuilder.Entity("NMVS.Models.DbModels.Unqualified", b =>
@@ -1572,120 +1554,6 @@ namespace NMVS.Migrations
                     b.HasIndex("ProdLinePrLnId");
 
                     b.ToTable("WorkOrders");
-                });
-
-            modelBuilder.Entity("NMVS.Models.DbModels.WrIssueNote", b =>
-                {
-                    b.Property<int>("InId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("IssuedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("IssuedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ShipTo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Shipper")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SoNbr")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SoldTo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("InId");
-
-                    b.ToTable("WrIssueNotes");
-                });
-
-            modelBuilder.Entity("NMVS.Models.DbModels.WrIssueNoteDet", b =>
-                {
-                    b.Property<int>("IndID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("InId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ItemNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PackCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PtId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Quantity")
-                        .HasColumnType("float");
-
-                    b.HasKey("IndID");
-
-                    b.ToTable("WrIssueNoteDets");
-                });
-
-            modelBuilder.Entity("NMVS.Models.DbModels.WtIssueNote", b =>
-                {
-                    b.Property<int>("InId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("IssuedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("IssuedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ShipTo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Shipper")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SoNbr")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SoldTo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("InId");
-
-                    b.ToTable("WtIssueNotes");
-                });
-
-            modelBuilder.Entity("NMVS.Models.DbModels.WtIssueNoteDet", b =>
-                {
-                    b.Property<int>("IndID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("InId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ItemNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PackCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PtId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Quantity")
-                        .HasColumnType("float");
-
-                    b.HasKey("IndID");
-
-                    b.ToTable("WtIssueNoteDets");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
