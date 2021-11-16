@@ -20,16 +20,4 @@ namespace NMVS.Models.DbModels
         public int Shipper { set; get; }
     }
 
-    public class WtIssueNoteDet
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int IndID { set; get; }
-        public string ItemNo { set; get; }
-        public int PtId { set; get; }
-        public int PackCount { set; get; }
-        public double Quantity { set; get; }
-        public int InId { set; get; }
-
-    }
 }

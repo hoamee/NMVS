@@ -73,7 +73,7 @@ namespace NMVS.Controllers
                     salesOrder.SoNbr = _soService.GetSoNbr(salesOrder.SoNbr, salesOrder.SoType);
                     if (salesOrder.SoNbr == "" && salesOrder.SoType == "Warranty return")
                     {
-                        ModelState.AddModelError("", "System coundn't found related SO");
+                        ModelState.AddModelError("", "System coundn't found related SO. " + salesOrder.SoNbr);
                     }
                     else if (salesOrder.SoNbr == "uc")
                     {

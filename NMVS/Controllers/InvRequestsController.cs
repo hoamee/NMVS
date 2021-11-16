@@ -367,8 +367,18 @@ namespace NMVS.Controllers
             return View(model);
         }
 
+        public IActionResult IssueNoteList() {
+            var model = _service.GetListIssueNote();
+            return View(model);
+        }
 
-        public IActionResult IssueNoteSo() {
+        public IActionResult IssueNoteDetails(int id, int so)
+        {
+            return View(_service.GetIssueNoteDetail(id, so));
+        }
+
+        public IActionResult IssueNoteVehicle()
+        {
             var model = _db.Shippers.ToList();
             foreach (var item in model)
             {
@@ -385,42 +395,9 @@ namespace NMVS.Controllers
             return View(model);
         }
 
-        public IActionResult SoNoteDetails(int id)
+        public IActionResult IssueNoteVehicleDetails(int id)
         {
-
-            var shp = _db.Shippers.Find(id);
-
-            var noteDet = (from d in _db.ShipperDets.Where(x=>x.ShpId == id)
-                           join i in _db.ItemDatas on d.ItemNo equals i.ItemNo into all
-                           from a in all.DefaultIfEmpty()                           
-                           join s in _db.SalesOrders on d.RqId equals s.SoNbr into sOrder
-                           from so in sOrder.DefaultIfEmpty()
-                           join c in _db.Customers on so.CustCode equals c.CustCode into soldTo
-                           from soto in soldTo.DefaultIfEmpty()
-                           join c2 in _db.Customers on so.ShipTo equals c2.CustCode into shipTo
-                           from shto in shipTo.DefaultIfEmpty()
-                           select new ShipperDet
-                           {
-                               InventoryId = d.InventoryId,
-                               DetId = d.DetId,
-                               ItemName = a.ItemName,
-                               ItemNo = a.ItemNo,
-                               Quantity = d.Quantity,
-                               RqId = d.RqId,
-                               ShpId = id,
-                               SoldTo = soto.CustCode,
-                               SoldToName = soto.CustName,
-                               ShipToId = shto.CustCode,
-                               ShipToAddr = shto.Addr,
-                               ShipToName = shto.CustName
-                           }).ToList();
-
-            var model = new IssueNoteShipperVm
-            {
-                Det = noteDet,
-                Shp = shp
-            };
-            return View(model);
+            return View(_service.GetVehicleNoteDetail(id));
         }
 
         public async Task<IActionResult> DownloadShipperNote(int id)
@@ -439,10 +416,10 @@ namespace NMVS.Controllers
             }
         }
 
-        public async Task<IActionResult> DownloadIssueNoteSo(int id)
+        public async Task<IActionResult> DownloadIssueNoteByShipper(int id, int so)
         {
 
-            var common = await _excelService.GetIssueNoteSo(id, User.Identity.Name);
+            var common = await _excelService.GetIssueNoteSo(id, User.Identity.Name, 0, so);
             if (common.status == 1)
             {
                 var filePath = common.dataenum;
@@ -469,7 +446,22 @@ namespace NMVS.Controllers
                 return RedirectToAction("Error", "Home", new { common.message });
             }
         }
+        public async Task<IActionResult> DownloadIssueNoteSO(int id, int so)
+        {
 
-       
+            var common = await _excelService.GetIssueNoteSo(0, User.Identity.Name, id, so);
+            if (common.status == 1)
+            {
+                var filePath = common.dataenum;
+                var fs = System.IO.File.OpenRead(filePath);
+                return File(fs, "application /vnd.ms-excel", common.message);
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home", new { common.message });
+            }
+        }
+
+
     }
 }

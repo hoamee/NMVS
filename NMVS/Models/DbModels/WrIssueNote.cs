@@ -21,16 +21,4 @@ namespace NMVS.Models.DbModels
 
     }
 
-    public class WrIssueNoteDet
-    {
-
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int IndID { set; get; }
-        public string ItemNo { set; get; }
-        public int PtId { set; get; }
-        public int PackCount { set; get; }
-        public double Quantity { set; get; }
-        public int InId { set; get; }
-    }
 }

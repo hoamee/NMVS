@@ -31,5 +31,6 @@ namespace NMVS.Models.DbModels
         public int PackCount { set; get; }
         public double Quantity { set; get; }
         public int InId { set; get; }
+        public int InType { set; get; }
     }
 }

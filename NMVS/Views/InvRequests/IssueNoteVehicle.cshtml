@@ -110,7 +110,7 @@
                                     @Html.DisplayFor(modelItem => item.RegisteredBy)
                                 </td>
                                 <td>
-                                    <a asp-action="SoNoteDetails" class="btn btn-outline-primary btn-sm" asp-route-id="@item.ShpId">Details</a>
+                                    <a asp-action="IssueNoteVehicleDetails" class="btn btn-outline-primary btn-sm" asp-route-id="@item.ShpId">Details</a>
                                 </td>
                             </tr>
                             }
@@ -118,16 +118,7 @@
                     </table>
                 </div>
             </div>
-            <div class="card-footer">
-
-                <div class="row col-12">
-                    <span class="col-auto">
-                        <a asp-action="Register" class="btn btn-sm btn-outline-info">
-                            Register
-                        </a>
-                    </span>
-                </div>
-            </div>
+            
         </div>
     </div>
 </div>
@@ -136,7 +127,7 @@
 
     $(document).ready(function () {
         $('.nav-request').addClass('active');
-        $('.nav-rq-in-so').addClass('active');
+        $('.nav-rq-in-ve').addClass('active');
         $('#navRequest').addClass('show');
         $('#datatable-search').DataTable();
     });

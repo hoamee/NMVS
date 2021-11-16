@@ -1,0 +1,187 @@
+﻿@model NMVS.Models.ViewModels.IssueNoteSoDetail
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-2">
+                        No.
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Isn.Id)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Type
+                    </dt>
+                    <dd class="col-sm-10">
+                        @if (Model.Isn.NoteType == 0)
+                        {
+                            <span>Sale</span>
+                        }
+                        @if (Model.Isn.NoteType == 1)
+                        {
+                            <span>Warranty return</span>
+                        }
+                        @if (Model.Isn.NoteType == 2)
+                        {
+                            <span>Warehouse transfer</span>
+                        }
+                    </dd>
+                    <dt class="col-sm-2">
+                        Sold-to
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Isn.SoldTo)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Ship-to
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Isn.ShipTo)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Vehicle
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Isn.Vehicle)
+                    </dd>
+                    <dt class="col-sm-2">
+                        Driver
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Isn.DriverInfo)
+                    </dd>
+
+                </dl>
+            </div>
+            <div class="card-footer">
+
+                <a asp-action="DownloadIssueNoteSO" class="btn btn-outline-info" asp-route-id="@Model.Isn.Id" asp-route-so="@Model.Isn.NoteType">
+                    <span class="fa fa-cloud-download"></span>
+                    Download Issue note
+                </a>
+
+                <a asp-action="IssueNoteList" class="btn btn-secondary">Back to browse</a>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">Items</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-flush table-bordered" id="datatable-search">
+                        <thead>
+                            <tr>
+                                
+                                <th>
+                                    Inventory Id
+                                </th>
+                                <th>
+                                    Item No.
+                                </th>
+                                <th>
+                                    Item name
+                                </th>
+                                <th>
+                                    Quantity
+                                </th>
+                                
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var t in Model.Dets)
+                            {
+                                <tr>
+                                    
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.InventoryId)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.ItemNo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.ItemName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.Quantity)
+                                    </td>
+                                    
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="~/assets/js/bootbox/bootbox.min.js"></script>
+<script>
+
+    function closeNote(isId) {
+        var routeURL = location.protocol + "//" + location.host;
+        var isNId = parseInt(isId);
+        bootbox.confirm({
+            message: '<div class="text-danger">Is all the information correct? </div>',
+            callback: function (rs) {
+                if (rs) {
+                    var postData = {
+                        IsNId: isNId
+                    };
+                    var routeURL = location.protocol + "//" + location.host;
+                    $.ajax({
+                        method: "POST",
+                        url: routeURL + '/api/InvRequest/CloseSoNote',
+                        contentType: "application/json; charset=utf8",
+                        data: JSON.stringify(postData),
+                        success: function (common) {
+                            if (common.status == 1) {
+                                bootbox.alert({
+                                    message: common.message
+                                });
+                                setTimeout(function () {
+                                    window.location.href = window.location.href;
+                                }, 1000);
+                            } else if (common.status == 0) {
+                                bootbox.alert('<div class="text-danger">Failed! ' + common.message + '</div>');
+                            }
+                            else {
+                                bootbox.alert('<div class="text-danger">Failed! ' + common.message + '</div>');
+                            }
+                        }
+
+                    });
+                }
+            }
+        });
+
+
+    }
+
+    $(document).ready(function () {
+        $('.nav-request').addClass('active');
+        $('.nav-rq-in').addClass('active');
+        $('#navRequest').addClass('show');
+    });
+</script>

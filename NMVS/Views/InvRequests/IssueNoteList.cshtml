@@ -1,0 +1,105 @@
+﻿@model IEnumerable<NMVS.Models.ViewModels.IssueNoteVm>
+
+@{
+    ViewData["Title"] = "Issue notes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-flush" id="datatable-search">
+                        <thead>
+                            <tr>                                
+                                <th>
+                                    No.
+                                </th>
+                                <th>
+                                    Sales order
+                                </th>
+                                <th>
+                                    Type
+                                </th>
+                                <th>
+                                    Sold-to
+                                </th>
+                                <th>
+                                    Ship-to
+                                </th>
+                                <th>
+                                    Vehicle
+                                </th>
+                                <th>
+                                    Driver info
+                                </th>
+                                <th>
+                                    Issued on
+                                </th>
+                                <th>
+                                    By
+                                </th>
+
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Id)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.SoNbr)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.NoteType)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.SoldTo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ShipTo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Vehicle)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DriverInfo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.IssuedOn)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.IssuedBy)
+                                    </td>
+                                    <td>
+                                        <a asp-action="IssueNoteDetails" class="btn btn-outline-primary btn-sm" asp-route-id="@item.Id" asp-route-so="@item.NoteType">Details</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>            
+        </div>
+    </div>
+</div>
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('.nav-request').addClass('active');
+        $('.nav-rq-in-so').addClass('active');
+        $('#navRequest').addClass('show');
+        $('#datatable-search').DataTable({
+        });
+    });
+</script>

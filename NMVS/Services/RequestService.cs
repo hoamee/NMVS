@@ -134,11 +134,11 @@ namespace NMVS.Services
                                     AddNoteLine(salesOrder.SoType, noteNbr, line.ItemNo, line.InventoryId, remainder, 1);
                                     itemCount++;
                                 }
-                                
+
                             }
 
 
-                            
+
                         }
 
                     }
@@ -458,7 +458,8 @@ namespace NMVS.Services
                     ItemNo = itemNo,
                     PtId = ptId,
                     Quantity = quantity,
-                    PackCount = packCount
+                    PackCount = packCount,
+                    InType = 0
                 });
             }
             else if (soType == "Warranty return")
@@ -469,20 +470,241 @@ namespace NMVS.Services
                     ItemNo = itemNo,
                     PtId = ptId,
                     Quantity = quantity,
-                    PackCount = packCount
+                    PackCount = packCount,
+                    InType = 1
                 });
             }
             else if (soType == "WH Transfer")
             {
-                _db.Add(new WtIssueNoteDet
+                _db.Add(new SoIssueNoteDet
                 {
                     InId = noteNbr,
                     ItemNo = itemNo,
                     PtId = ptId,
                     Quantity = quantity,
-                    PackCount = packCount
+                    PackCount = packCount,
+                    InType = 2
                 });
             }
+        }
+
+        public List<IssueNoteVm> GetListIssueNote()
+        {
+            var soNote = (from d in _db.SoIssueNotes
+                          join s in _db.SalesOrders on d.SoNbr equals s.SoNbr into sOrder
+                          from so in sOrder.DefaultIfEmpty()
+                          join c in _db.Customers on so.CustCode equals c.CustCode into soldTo
+                          from soto in soldTo.DefaultIfEmpty()
+                          join c2 in _db.Customers on so.ShipTo equals c2.CustCode into shipTo
+                          from shto in shipTo.DefaultIfEmpty()
+                          join shp in _db.Shippers on d.Shipper equals shp.ShpId into shps
+                          from shipper in shps.DefaultIfEmpty()
+                          select new IssueNoteVm
+                          {
+                              SoNbr = d.SoNbr,
+                              IssuedBy = d.IssuedBy,
+                              IssuedOn = d.IssuedOn,
+                              Id = d.InId,
+                              SearchId = "so." + d.InId,
+                              ShipTo = shto.CustName,
+                              SoldTo = soto.CustName,
+                              Vehicle = shipper.ShpDesc,
+                              DriverInfo = shipper.Driver + (string.IsNullOrEmpty(shipper.DrContact) ? "" : " (" + shipper.DrContact + ")"),
+                              NoteType = 0,
+                              ShipperId = d.Shipper
+
+                          }).ToList();
+            var wrNote = (from d in _db.WrIssueNotes
+                          join s in _db.SalesOrders on d.SoNbr equals s.SoNbr into sOrder
+                          from so in sOrder.DefaultIfEmpty()
+                          join c in _db.Customers on so.CustCode equals c.CustCode into soldTo
+                          from soto in soldTo.DefaultIfEmpty()
+                          join c2 in _db.Customers on so.ShipTo equals c2.CustCode into shipTo
+                          from shto in shipTo.DefaultIfEmpty()
+                          join shp in _db.Shippers on d.Shipper equals shp.ShpId into shps
+                          from shipper in shps.DefaultIfEmpty()
+                          select new IssueNoteVm
+                          {
+                              SoNbr = d.SoNbr,
+                              IssuedBy = d.IssuedBy,
+                              IssuedOn = d.IssuedOn,
+                              Id = d.InId,
+                              SearchId = "wr." + d.InId,
+                              ShipTo = shto.CustName,
+                              SoldTo = soto.CustName,
+                              Vehicle = shipper.ShpDesc,
+                              DriverInfo = shipper.Driver + (string.IsNullOrEmpty(shipper.DrContact) ? "" : " (" + shipper.DrContact + ")"),
+                              NoteType = 1,
+                              ShipperId = d.Shipper
+
+
+                          }).ToList();
+            var wtNote = (from d in _db.WtIssueNotes
+                          join s in _db.SalesOrders on d.SoNbr equals s.SoNbr into sOrder
+                          from so in sOrder.DefaultIfEmpty()
+                          join c in _db.Customers on so.CustCode equals c.CustCode into soldTo
+                          from soto in soldTo.DefaultIfEmpty()
+                          join c2 in _db.Customers on so.ShipTo equals c2.CustCode into shipTo
+                          from shto in shipTo.DefaultIfEmpty()
+                          join shp in _db.Shippers on d.Shipper equals shp.ShpId into shps
+                          from shipper in shps.DefaultIfEmpty()
+                          select new IssueNoteVm
+                          {
+                              SoNbr = d.SoNbr,
+                              IssuedBy = d.IssuedBy,
+                              IssuedOn = d.IssuedOn,
+                              Id = d.InId,
+                              SearchId = "wt." + d.InId,
+                              ShipTo = shto.CustName,
+                              SoldTo = soto.CustName,
+                              Vehicle = shipper.ShpDesc,
+                              DriverInfo = shipper.Driver + (string.IsNullOrEmpty(shipper.DrContact) ? "" : " (" + shipper.DrContact + ")"),
+                              NoteType = 2,
+                              ShipperId = d.Shipper
+
+
+                          }).ToList();
+            return soNote.Concat(wrNote).Concat(wtNote).ToList();
+        }
+
+        public IssueNoteSoDetail GetIssueNoteDetail(int id, int sot)
+        {
+            IssueNoteVm soNote;
+
+            if (sot == 0)
+            {
+                soNote = (from d in _db.SoIssueNotes.Where(x => x.InId == id)
+                   join s in _db.SalesOrders on d.SoNbr equals s.SoNbr into sOrder
+                   from sor in sOrder.DefaultIfEmpty()
+                   join c in _db.Customers on sor.CustCode equals c.CustCode into soldTo
+                   from soto in soldTo.DefaultIfEmpty()
+                   join c2 in _db.Customers on sor.ShipTo equals c2.CustCode into shipTo
+                   from shto in shipTo.DefaultIfEmpty()
+                   join shp in _db.Shippers on d.Shipper equals shp.ShpId into shps
+                   from shipper in shps.DefaultIfEmpty()
+                   select new IssueNoteVm
+                   {
+                       SoNbr = d.SoNbr,
+                       IssuedBy = d.IssuedBy,
+                       IssuedOn = d.IssuedOn,
+                       Id = d.InId,
+                       SearchId = "so." + d.InId,
+                       ShipTo = shto.CustName,
+                       SoldTo = soto.CustName,
+                       Vehicle = shipper.ShpDesc,
+                       DriverInfo = shipper.Driver + (string.IsNullOrEmpty(shipper.DrContact) ? "" : " (" + shipper.DrContact + ")"),
+                       NoteType = 0
+
+                   }).FirstOrDefault();
+            }else if (sot == 1)
+            {
+                soNote = (from d in _db.WrIssueNotes.Where(x => x.InId == id)
+                          join s in _db.SalesOrders on d.SoNbr equals s.SoNbr into sOrder
+                          from sor in sOrder.DefaultIfEmpty()
+                          join c in _db.Customers on sor.CustCode equals c.CustCode into soldTo
+                          from soto in soldTo.DefaultIfEmpty()
+                          join c2 in _db.Customers on sor.ShipTo equals c2.CustCode into shipTo
+                          from shto in shipTo.DefaultIfEmpty()
+                          join shp in _db.Shippers on d.Shipper equals shp.ShpId into shps
+                          from shipper in shps.DefaultIfEmpty()
+                          select new IssueNoteVm
+                          {
+                              SoNbr = d.SoNbr,
+                              IssuedBy = d.IssuedBy,
+                              IssuedOn = d.IssuedOn,
+                              Id = d.InId,
+                              SearchId = "so." + d.InId,
+                              ShipTo = shto.CustName,
+                              SoldTo = soto.CustName,
+                              Vehicle = shipper.ShpDesc,
+                              DriverInfo = shipper.Driver + (string.IsNullOrEmpty(shipper.DrContact) ? "" : " (" + shipper.DrContact + ")"),
+                              NoteType = 1
+
+                          }).FirstOrDefault();
+            }
+            else
+            {
+                soNote = (from d in _db.WtIssueNotes.Where(x => x.InId == id)
+                          join s in _db.SalesOrders on d.SoNbr equals s.SoNbr into sOrder
+                          from sor in sOrder.DefaultIfEmpty()
+                          join c in _db.Customers on sor.CustCode equals c.CustCode into soldTo
+                          from soto in soldTo.DefaultIfEmpty()
+                          join c2 in _db.Customers on sor.ShipTo equals c2.CustCode into shipTo
+                          from shto in shipTo.DefaultIfEmpty()
+                          join shp in _db.Shippers on d.Shipper equals shp.ShpId into shps
+                          from shipper in shps.DefaultIfEmpty()
+                          select new IssueNoteVm
+                          {
+                              SoNbr = d.SoNbr,
+                              IssuedBy = d.IssuedBy,
+                              IssuedOn = d.IssuedOn,
+                              Id = d.InId,
+                              SearchId = "so." + d.InId,
+                              ShipTo = shto.CustName,
+                              SoldTo = soto.CustName,
+                              Vehicle = shipper.ShpDesc,
+                              DriverInfo = shipper.Driver + (string.IsNullOrEmpty(shipper.DrContact) ? "" : " (" + shipper.DrContact + ")"),
+                              NoteType = 2
+
+                          }).FirstOrDefault();
+            }
+
+            var noteDet = (from d in _db.SoIssueNoteDets.Where(x => x.InId == id)
+                           join i in _db.ItemDatas on d.ItemNo equals i.ItemNo into all
+                           from a in all.DefaultIfEmpty()
+                           select new ShipperDet
+                           {
+                               InventoryId = d.PtId,
+                               ItemName = a.ItemName,
+                               ItemNo = a.ItemNo,
+                               Quantity = d.Quantity,
+                              
+                           }).ToList();
+            
+
+
+            return new IssueNoteSoDetail
+            {
+                Dets = noteDet,
+                Isn = soNote
+            };
+        }
+
+        public IssueNoteShipperVm GetVehicleNoteDetail(int id)
+        {
+            var shp = _db.Shippers.Find(id);
+
+            var noteDet = (from d in _db.ShipperDets.Where(x => x.ShpId == id)
+                           join i in _db.ItemDatas on d.ItemNo equals i.ItemNo into all
+                           from a in all.DefaultIfEmpty()
+                           join s in _db.SalesOrders on d.RqId equals s.SoNbr into sOrder
+                           from so in sOrder.DefaultIfEmpty()
+                           join c in _db.Customers on so.CustCode equals c.CustCode into soldTo
+                           from soto in soldTo.DefaultIfEmpty()
+                           join c2 in _db.Customers on so.ShipTo equals c2.CustCode into shipTo
+                           from shto in shipTo.DefaultIfEmpty()
+                           select new ShipperDet
+                           {
+                               InventoryId = d.InventoryId,
+                               DetId = d.DetId,
+                               ItemName = a.ItemName,
+                               ItemNo = a.ItemNo,
+                               Quantity = d.Quantity,
+                               RqId = d.RqId,
+                               ShpId = id,
+                               SoldTo = soto.CustCode,
+                               SoldToName = soto.CustName,
+                               ShipToId = shto.CustCode,
+                               ShipToAddr = shto.Addr,
+                               ShipToName = shto.CustName
+                           }).ToList();
+
+            var model = new IssueNoteShipperVm
+            {
+                Det = noteDet,
+                Shp = shp
+            };
+            return model;
         }
 
         //public async Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user)
