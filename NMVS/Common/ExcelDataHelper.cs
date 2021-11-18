@@ -78,7 +78,7 @@ namespace NMVS.Common
             catch
             {
 
-                value = "";
+                return "";
             }
             if (!string.IsNullOrEmpty(value))
                 value = value.Trim();

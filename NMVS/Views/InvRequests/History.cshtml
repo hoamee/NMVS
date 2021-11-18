@@ -88,6 +88,7 @@
     </div>
 </div>
 <script src="~/assets/datatable/datatables.min.js"></script>
+<partial name="FileUploadModal" />
 <script>
 
     $(document).ready(function () {
@@ -98,5 +99,6 @@
             $('#file-modal').modal('toggle');
         });
         $('#datatable-search').DataTable();
+        
     });
 </script>

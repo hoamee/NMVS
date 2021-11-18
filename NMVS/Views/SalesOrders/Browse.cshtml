@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Sales order";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
 }
 
 <div class="row mt-4">
@@ -70,12 +71,13 @@
                         <tbody>
                             @foreach (var item in Model)
                             {
+                                var soType = item.SoType == 0 ? "Sale" : item.SoType == 1 ? "Warranty return" : "Warehouse Transfer";
                                 <tr>
                                     <td>
                                         <a class="btn btn-outline-info btn-sm" href="/SalesOrders/Details/@item.SoNbr">@Html.DisplayFor(modelItem => item.SoNbr)</a>
                                     </td>
                                     <td>
-                                        @Html.DisplayFor(modelItem => item.SoType)
+                                        @Html.DisplayFor(modelItem => soType)
                                     </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.CustCode)

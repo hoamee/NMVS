@@ -14,7 +14,7 @@ namespace NMVS.Models.DbModels
         [Key]
         public string SoNbr { get; set; }
 
-        public string SoType { set; get; }
+        public int SoType { set; get; }
 
         [Required]
         [StringLength(50)]

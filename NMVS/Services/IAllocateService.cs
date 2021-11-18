@@ -21,6 +21,6 @@ namespace NMVS.Services
 
         public List<ItemMasterVm> GetUnAllocated();
 
-        public CommonResponse<int> ConfirmSelectLoc(JsPickingData jsArr);
+        public CommonResponse<int> ConfirmSelectLoc(List<JsPickingData> jsArr);
     }
 }

@@ -60,7 +60,18 @@
                                         @Html.DisplayFor(modelItem => item.SoNbr)
                                     </td>
                                     <td>
-                                        @Html.DisplayFor(modelItem => item.NoteType)
+                                        @if (item.NoteType == 0)
+                                        {
+                                            <span class="badge bg-gradient-success">Sale</span>
+                                        }
+                                        else if (item.NoteType == 1)
+                                        {
+                                            <span class="badge bg-gradient-secondary">Warranty return</span>
+                                        }
+                                        else
+                                        {
+                                        <span class="badge bg-gradient-warning">Warehouse transfer</span>
+                                        }
                                     </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.SoldTo)

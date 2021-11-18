@@ -11,7 +11,9 @@ namespace NMVS.Models.ViewModels
         [Display(Name = "SO Number")]
         public string SoNbr { get; set; }
 
-        public string SoType { set; get; }
+        public int SoType { set; get; }
+
+        public string SoTypeDesc { set; get; }
 
         public bool Closed { set; get; }
 

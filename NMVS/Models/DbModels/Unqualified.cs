@@ -16,6 +16,7 @@ namespace NMVS.Models.DbModels
         public string ItemNo { set; get; }
 
         public int PtId { set; get; }
+        public string SoNbr { set; get; }
 
         public double Quantity { set; get; }
 

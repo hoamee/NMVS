@@ -154,7 +154,7 @@ namespace NMVS.Controllers.Api
 
         [HttpPost]
         [Route("ConfirmSelectLoc")]
-        public IActionResult ConfirmSelectLoc(JsPickingData jsArr)
+        public IActionResult ConfirmSelectLoc(List<JsPickingData> jsArr)
         {
             return Ok(_alcService.ConfirmSelectLoc(jsArr));
         }

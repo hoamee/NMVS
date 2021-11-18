@@ -30,8 +30,13 @@ namespace NMVS.Services
             common.dataenum = @"D:\Temp download\";
             try
             {
-                //Check icoming list exist
-                var shipper = await _db.Shippers.FindAsync(shpId);
+                Shipper shipper;
+                List<IssueNoteVm> issueNotes;
+
+                //shpId == 0 mean we are downloading from issue note page
+                //issue note is defined by noteId
+
+                shipper = await _db.Shippers.FindAsync(shpId);
                 if (shipper == null)
                 {
                     common.message = "List not found";
@@ -39,29 +44,31 @@ namespace NMVS.Services
                     return common;
 
                 }
+                issueNotes = GetIssueNoteVmByShipper(shpId);
+                List<In01Vm> noteDet = new();
+                foreach(var item in issueNotes)
+                {
+                    var customer = _db.Customers.Find(item.ShipTo);
+                    var issueLines = (from d in _db.SoIssueNoteDets.Where(x => x.InId == item.Id && x.InType == item.NoteType)
+                                      join p in _db.ItemMasters on d.PtId equals p.PtId into pd
+                                      from pt in pd.DefaultIfEmpty()
+                                      join i in _db.ItemDatas on d.ItemNo equals i.ItemNo into all
+                                      from a in all.DefaultIfEmpty()
+                                      select new In01Vm
+                                      {
+                                          ItemName = a.ItemName,
+                                          Quantity = d.Quantity,
+                                          PkgQty = a.ItemPkgQty,
+                                          ItemUnit = a.ItemUm,
+                                          BatchNo = pt.BatchNo,
+                                          PkgType = a.ItemPkg,
+                                          Um = a.ItemUm,
+                                          PackCount = d.PackCount,
+                                          ShipToName = customer.CustName
 
-                var noteDet = (from d in _db.ShipperDets.Where(x => x.ShpId == shpId)
-                               join p in _db.ItemMasters on d.InventoryId equals p.PtId into ptmstr
-                               from pt in ptmstr.DefaultIfEmpty()
-                               join i in _db.ItemDatas on d.ItemNo equals i.ItemNo into all
-                               from a in all.DefaultIfEmpty()
-                               join s in _db.SalesOrders on d.RqId equals s.SoNbr into sOrder
-                               from so in sOrder.DefaultIfEmpty()
-                               join c in _db.Customers on so.CustCode equals c.CustCode into soldTo
-                               from soto in soldTo.DefaultIfEmpty()
-                               join c2 in _db.Customers on so.ShipTo equals c2.CustCode into shipTo
-                               from shto in shipTo.DefaultIfEmpty()
-                               select new Spn01Vm
-                               {
-                                   ItemName = a.ItemName,
-                                   Batch = pt.BatchNo,
-                                   CustomerName = shto.CustName,
-                                   PkgType = a.ItemPkg,
-                                   PkgQty = a.ItemPkgQty,
-                                   Qty = d.Quantity,
-                                   Total = a.ItemPkgQty * d.Quantity
-
-                               }).ToList();
+                                      }).ToList();
+                    noteDet = noteDet.Concat(issueLines).ToList();
+                }
 
                 if (!noteDet.Any())
                 {
@@ -114,13 +121,13 @@ namespace NMVS.Services
                     }
                     for (int i = ptIndex; i < noteDet.Count; i++)
                     {
-                        sheet.Cells["B" + writingRow].Value = noteDet[i].CustomerName;
+                        sheet.Cells["B" + writingRow].Value = noteDet[i].ShipToName;
                         sheet.Cells["C" + writingRow].Value = noteDet[i].ItemName;
                         sheet.Cells["D" + writingRow].Value = noteDet[i].PkgQty;
                         sheet.Cells["E" + writingRow].Value = noteDet[i].PkgType;
-                        sheet.Cells["F" + writingRow].Value = noteDet[i].Qty;
-                        sheet.Cells["G" + writingRow].Value = noteDet[i].Total;
-                        sheet.Cells["H" + writingRow].Value = noteDet[i].Batch;
+                        sheet.Cells["F" + writingRow].Value = noteDet[i].PackCount;
+                        sheet.Cells["G" + writingRow].Value = noteDet[i].Quantity;
+                        sheet.Cells["H" + writingRow].Value = noteDet[i].BatchNo;
 
 
                         ptIndex++;
@@ -305,7 +312,7 @@ namespace NMVS.Services
 
                 if (shpId == 0)
                 {
-                    issueNotes = getIssueNoteVmById(noteId, sot);
+                    issueNotes = GetIssueNoteVmById(noteId, sot);
                     shipper = await _db.Shippers.FindAsync(issueNotes.First().ShipperId);
                     if (shipper == null)
                     {
@@ -325,7 +332,7 @@ namespace NMVS.Services
                         return common;
 
                     }
-                    issueNotes = getIssueNoteVmByShipper(shpId);
+                    issueNotes = GetIssueNoteVmByShipper(shpId);
                 }
 
                 //Get issued time
@@ -359,10 +366,22 @@ namespace NMVS.Services
                     var note = issueNotes[ptIndex];
                     var soto = _db.Customers.Find(note.SoldTo);
                     var shipTo = _db.Customers.Find(note.ShipTo);
-
+                    string idNbr = "";
+                    if (note.NoteType == 0)
+                    {
+                        idNbr = "SO";
+                    }
+                    else if (note.NoteType == 1)
+                    {
+                        idNbr = "WR";
+                    }
+                    else
+                    {
+                        idNbr = "WT";
+                    }
 
                     //Set header
-                    sheet.Cells["A8"].Value += " " + note.Id;
+                    sheet.Cells["A8"].Value += " " + idNbr + note.Id;
                     sheet.Cells["G8"].Value += " " + date;
                     sheet.Cells["A10"].Value += " " + soto.CustName;
                     sheet.Cells["A11"].Value += " " + soto.Addr + (!string.IsNullOrEmpty(soto.City) ? ", " + soto.City : "") + (!string.IsNullOrEmpty(soto.Ctry) ? ", " + soto.Ctry : "");
@@ -407,8 +426,8 @@ namespace NMVS.Services
                         }
                     }
 
-                    sheet.Name = "PXK " + note.Id;
-                    ptIndex++; 
+                    sheet.Name = idNbr + note.Id;
+                    ptIndex++;
                     writingRow = 21;
                 }
 
@@ -418,7 +437,7 @@ namespace NMVS.Services
                 excel.SaveAs(outputInfo);
 
                 common.status = 1;
-                
+
             }
             catch (Exception e)
             {
@@ -536,13 +555,14 @@ namespace NMVS.Services
 
                     for (int i = ptIndex; i < noteDet.Count; i++)
                     {
-
+                        var packCount = Convert.ToInt32(Math.Ceiling(noteDet[i].Quantity / noteDet[i].PkgQty));
+                        
 
                         sheet.Cells["B" + writingRow].Value = noteDet[i].ItemName;
                         sheet.Cells["C" + writingRow].Value = noteDet[i].ItemUnit;
                         sheet.Cells["D" + writingRow].Value = noteDet[i].PkgQty;
-                        sheet.Cells["E" + writingRow].Value = noteDet[i].Quantity;
-                        sheet.Cells["F" + writingRow].Value = noteDet[i].Quantity * noteDet[i].PkgQty;
+                        sheet.Cells["E" + writingRow].Value = packCount;
+                        sheet.Cells["F" + writingRow].Value = noteDet[i].Quantity;
 
                         ptIndex++;
 
@@ -565,124 +585,6 @@ namespace NMVS.Services
 
                     }
 
-                }
-
-                common.dataenum = @"D:\Temp download\" + common.message;
-                var outputInfo = new FileInfo(common.dataenum);
-                // save changes
-                excel.SaveAs(outputInfo);
-
-                common.status = 1;
-            }
-            catch (Exception e)
-            {
-                common.message = e.ToString();
-                common.status = -1;
-
-            }
-
-
-
-            return common;
-        }
-
-        public async Task<CommonResponse<string>> Test(int shpId, string user)
-        {
-            CommonResponse<string> common = new();
-            ExcelDataHelper _eHelper = new();
-            common.dataenum = @"D:\Temp download\";
-            try
-            {
-                //Check icoming list exist
-                var shipper = await _db.Shippers.FindAsync(shpId);
-                if (shipper == null)
-                {
-                    common.message = "List not found";
-                    common.status = 0;
-                    return common;
-
-                }
-
-                //Get issued time
-                var date = (DateTime)shipper.IssueConfirmedTime;
-
-                //Init download file name
-                common.message = user + "_Issue note_" + (date).ToString("yyyyMMdd") + ".xlsx";
-
-                //Get template
-                string templatePath = "xlsx/IN01_Issue note.xlsx";
-                FileInfo fileInfo = new(templatePath);
-                ExcelPackage excel = new(fileInfo);
-
-                int createdPages = 1;
-                var issueNotes = _db.SoIssueNotes.Where(x => x.Shipper == shpId).ToList();
-
-                //add sheet when row count > 7
-                for (int i = 0; i < issueNotes.Count; i++)
-                {
-                    if (createdPages != 1)
-                    {
-                        excel.Workbook.Worksheets.Copy("PXK", "PXK(" + createdPages + ")");
-                    }
-                    createdPages++;
-
-                }
-
-                int ptIndex = 0;
-                int writingRow = 21;
-
-                foreach (var sheet in excel.Workbook.Worksheets)
-                {
-                    var note = issueNotes[ptIndex];
-                    var soto = _db.Customers.Find(note.SoldTo);
-                    var shipTo = _db.Customers.Find(note.ShipTo);
-
-
-                    //Set header
-                    sheet.Cells["A8"].Value += " " + note.InId;
-                    sheet.Cells["G8"].Value += " " + date;
-                    sheet.Cells["A10"].Value += " " + soto.CustName;
-                    sheet.Cells["A11"].Value += " " + soto.Addr + (!string.IsNullOrEmpty(soto.City) ? ", " + soto.City : "") + (!string.IsNullOrEmpty(soto.Ctry) ? ", " + soto.Ctry : "");
-                    sheet.Cells["A12"].Value += " " + soto.TaxCode;
-                    sheet.Cells["A14"].Value += " " + shipper.ShpDesc + "(" + shipper.Driver + ")";
-                    sheet.Cells["F10"].Value += " " + shipTo.CustName;
-                    sheet.Cells["F11"].Value += " " + shipTo.Addr + (!string.IsNullOrEmpty(shipTo.City) ? ", " + shipTo.City : "") + (!string.IsNullOrEmpty(shipTo.Ctry) ? ", " + shipTo.Ctry : ""); ;
-                    sheet.Cells["F12"].Value += " " + shipTo.TaxCode;
-                    var issueLines = (from d in _db.SoIssueNoteDets.Where(x => x.InId == note.InId)
-                                      join p in _db.ItemMasters on d.PtId equals p.PtId into pd
-                                      from pt in pd.DefaultIfEmpty()
-                                      join i in _db.ItemDatas on d.ItemNo equals i.ItemNo into all
-                                      from a in all.DefaultIfEmpty()
-                                      select new In01Vm
-                                      {
-                                          ItemName = a.ItemName,
-                                          Quantity = d.Quantity,
-                                          PkgQty = a.ItemPkgQty,
-                                          ItemUnit = a.ItemUm,
-                                          BatchNo = pt.BatchNo,
-                                          DetId = d.PackCount
-
-                                      }).ToList();
-
-                    for (int i = 0; i < issueLines.Count; i++)
-                    {
-
-                        sheet.Cells["B" + writingRow].Value = issueLines[i].ItemName;
-                        sheet.Cells["C" + writingRow].Value = issueLines[i].ItemUnit;
-                        sheet.Cells["D" + writingRow].Value = issueLines[i].PkgQty;
-                        sheet.Cells["E" + writingRow].Value = issueLines[i].DetId;
-                        sheet.Cells["F" + writingRow].Value = issueLines[i].Quantity;
-                        sheet.Cells["G" + writingRow].Value = note.SoNbr;
-                        sheet.Cells["H" + writingRow].Value = issueLines[i].BatchNo;
-
-                        writingRow++;
-                        if (writingRow > 27)
-                        {
-                            writingRow = 21;
-                        }
-                    }
-
-                    sheet.Name = "PXK " + note.InId;
                 }
 
                 common.dataenum = @"D:\Temp download\" + common.message;
@@ -844,7 +746,7 @@ namespace NMVS.Services
             return common;
         }
 
-        private List<IssueNoteVm> getIssueNoteVmById(int noteId, int sot)
+        private List<IssueNoteVm> GetIssueNoteVmById(int noteId, int sot)
         {
             if (sot == 0)
             {
@@ -893,7 +795,8 @@ namespace NMVS.Services
 
             }
         }
-        private List<IssueNoteVm> getIssueNoteVmByShipper(int shpId)
+
+        private List<IssueNoteVm> GetIssueNoteVmByShipper(int shpId)
         {
             var issueNotes1 = (from i in _db.SoIssueNotes.Where(x => x.Shipper == shpId)
                                select new IssueNoteVm
@@ -937,7 +840,7 @@ namespace NMVS.Services
             return issueNotes1.Concat(issueNotes2).Concat(issueNotes3).ToList();
         }
 
-        
+
 
     }
 }

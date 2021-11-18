@@ -207,7 +207,6 @@
 
     $(document).ready(function () {
 
-        var jsArr = new Array();
 
 
 
@@ -292,29 +291,32 @@
                 message: '<p class="text-center mb-0"><i class="fa fa-spin fa-spinner"></i> Pushing data...</p>',
                 closeButton: false
             });
+            var jsArr = [];
             $('.modal-body #selected-table > tbody  > tr').each(function () {
                 var code = $(this).children('.whl-code').text();
                 var quantity = parseFloat($(this).children('.qty').text());
                 var record = { id: code, qty: quantity, whcd: "", loc: toLoc, reqTime: rqTime };
 
+                jsArr.push(record);
+                
 
-                $.ajax({
-                    contentType: 'application/json',
-                    type: 'POST',
-                    url: routeURL + '/api/Allocate/ConfirmSelectLoc',
-                    data: JSON.stringify(record),
-                    success: function (data) {
-                        if (data.status == 1) {
-                            i++;
-                        }
+                i++;
+            });
 
-                    },
-                    failure: function (response) {
-                        bootbox.alert(response);
+            $.ajax({
+                contentType: 'application/json',
+                type: 'POST',
+                url: routeURL + '/api/Allocate/ConfirmSelectLoc',
+                data: JSON.stringify(jsArr),
+                success: function (data) {
+                    if (data.status == 1) {
+                       
                     }
 
-                });
-
+                },
+                failure: function (response) {
+                    bootbox.alert(response);
+                }
 
             });
 

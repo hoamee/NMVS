@@ -1,0 +1,100 @@
+﻿<!-- Modal -->
+<div class="modal" tabindex="-1" id="file-modal">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload inventory request<i class="fa fa-cloud-upload"></i></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form" name="form" action="/uploader" enctype="multipart/form-data" method="post">
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Supplier list</label>
+                        <input class="form-control" type="file" accept=".xlsx" id="formFile" name="formFile" >
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="uploadFiles('formFile');">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/assets/js/notify.js"></script>
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
+<script>
+
+    function uploadFiles(inputId) {
+        var input = document.getElementById(inputId);
+        var files = input.files;
+        var formData = new FormData();
+        var valid = true;
+
+        for (var i = 0; i != files.length; i++) {
+            var fileExtension = ['xlsx'];
+            if ($.inArray($('#' + inputId).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                $('#' + inputId).notify('Error: Only Excel (*.xlsx) file is allowed!');
+                valid = false;
+            }
+            formData.append("files", files[i]);
+        }
+
+        if (files.length == 0) {
+            valid = false;
+        }
+
+        if (valid) {
+           
+            $.ajax(
+                {
+                    url: "/InvRequests/UploadList",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function () {
+                        Swal.showLoading();
+                    },
+                    type: "POST",
+                    success: function (common) {
+                        if (common.status == -1) {
+                            
+                            Swal.fire(
+                                'Cancelled',
+                                '<h5 class="text-danger">' + common.message + '</h5>'
+                                + '<a href="/UploadReports/Details/' + common.dataenum.uploadId + '" class="btn btn-outline-primary ">View report</a>',
+                                'error'
+                            )
+                        } else {
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Completed!',
+                                html: '<span>Finished importing file "<b>' + common.dataenum.fileName + '</b>". </span></br>'
+                                    + ' <span class="text-bold">Processed: ' + common.dataenum.totalRecord + '</span></br>'
+                                    + ' <span class="text-success"><b>Added: ' + common.dataenum.inserted + ' </b></span> </br>'
+                                    + ' <span class="text-warning"><b>Updated: ' + common.dataenum.updated + '</b></span> </br>'
+                                    + ' <span class="text-danger"><b>Errors: ' + common.dataenum.errors + ' </b></span> </br>',
+                                footer: '<a href="/UploadReports/Details/'
+                                    + common.dataenum.uploadId
+                                    + '" class="btn btn-outline-primary btn-sm">View report</a>',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            })
+                            
+                           
+
+                        }
+                    }
+
+                }
+            );
+        } else {
+            $('#' + inputId).val('');
+            $('#' + inputId).notify("Please select a file!");
+        }
+    }
+</script>

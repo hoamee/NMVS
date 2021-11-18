@@ -109,7 +109,7 @@
                     <span class="btn btn-outline-success" onclick="confirmRequest(true)">Confirm</span>
                     <span class="btn btn-outline-danger" onclick="confirmRequest(false)">Reject</span>
                 }
-                
+
 
             </div>
         </div>
@@ -215,7 +215,17 @@
                                         @Html.DisplayFor(m => item.Arranged)
                                     </td>
                                     <td class="text-danger">
-                                        @Html.DisplayFor(m => item.MovementNote)
+                                        @if (item.Picked > 0)
+                                        {
+                                            @if (!string.IsNullOrEmpty(item.MovementNote))
+                                            {
+                                                <a href="/Inquiry/MovementReport/@Model.Rq.Id" class="btn btn-outline-danger btn-sm">Movement report</a>
+                                            }
+                                            else
+                                            {
+                                                <a href="/Inquiry/MovementReport/@Model.Rq.Id" class="btn btn-outline-info btn-sm">Movement report</a>
+                                            }
+                                        }
                                     </td>
                                     <td>
                                         @Html.DisplayFor(m => item.RequireDate)

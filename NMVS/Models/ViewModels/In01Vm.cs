@@ -34,6 +34,7 @@ namespace NMVS.Models.ViewModels
         public string ItemUnit { set; get; }
         public string PkgType { set; get; }
         public double PkgQty { set; get; }
+        public int PackCount { set; get; }
         public string Um { set; get; }
         public double Quantity { set; get; }
         public string BatchNo { set; get; }

@@ -1,0 +1,67 @@
+﻿@model NMVS.Models.DbModels.Unqualified
+
+@{
+    ViewData["Title"] = "Input Warranty Item";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class=" card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <form asp-action="InputWarranty">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label asp-for="ItemNo" class="control-label">Item No</label>
+                                <input asp-for="ItemNo" class="form-control" />
+                                <span asp-validation-for="ItemNo" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="SoNbr" class="control-label">Sales order number</label>
+                                <input asp-for="SoNbr" class="form-control" />
+                                <span asp-validation-for="SoNbr" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Quantity" class="control-label"></label>
+                                <input asp-for="Quantity" class="form-control" />
+                                <span asp-validation-for="Quantity" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Description" class="control-label"></label>
+                                <input asp-for="Description" class="form-control" />
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="submit" value="Create" class="btn btn-primary" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div>
+                    <a asp-action="Overview">Back to List</a>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('.side-unq').addClass('active');
+        $('#datatable-search').DataTable();
+    });
+</script>

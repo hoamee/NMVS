@@ -18,7 +18,7 @@
                         <thead class="thead-light">
                             <tr>
                                 <th>Search value</th>
-                                <th>Request no</th>
+                                <th>Order No</th>
                                 <th>Type</th>
                                 <th>Item</th>
                                 <th>Order quantity</th>
@@ -31,6 +31,7 @@
                                 <th>Transporter</th>
                                 <th>From</th>
                                 <th>To</th>
+                                <th>Request No</th>
                                 <th>Order By</th>
                                 <th>Inventory Id</th>
                             </tr>
@@ -42,11 +43,11 @@
                                 @if (item.OrderType == "Allocate")
                                 {
                                     <td class="text-sm font-weight-normal">A.@Html.DisplayFor(m => item.Id)</td>
-                }
-                else
-                {
-                            <td class="text-sm font-weight-normal">I.@Html.DisplayFor(m => item.Id)</td>
-                }
+                                }
+                                else
+                                {
+                                    <td class="text-sm font-weight-normal">I.@Html.DisplayFor(m => item.Id)</td>
+                                }
                                 <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Id)</td>
                                 <td class="text-sm font-weight-normal">
 
@@ -98,6 +99,7 @@
                                 <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.MoveBy)</td>
                                 <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.From)</td>
                                 <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.To)</td>
+                                <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.RequestNo)</td>
                                 <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.OrderBy)</td>
                                 <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.PtId)</td>
 

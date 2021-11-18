@@ -20,9 +20,8 @@
                             <div class="form-group col-md-4">
                                 <label asp-for="SoType" class="control-label">Type</label>
                                 <select class="form-control" asp-for="SoType">
-                                    <option value="WH Transfer">WH transfer</option>
-                                    <option value="Sale" selected>Sale</option>
-                                    <option value="Warranty return">Warranty return</option>
+                                    <option value="2">WH transfer</option>
+                                    <option value="0" selected>Sale</option>
                                 </select>
                                 <span asp-validation-for="SoType" class="text-danger"></span>
                             </div>
@@ -136,14 +135,11 @@
         $('#customer-tb').DataTable();
 
         $('#SoType').on('change', function () {
-            if ($(this).val() == "Sale") {
+            if ($(this).val() == 0) {
                 $('#so-type').html("SO");
             }
-            else if ($(this).val() == "WH Transfer") {
+            else if ($(this).val() == 2) {
                 $('#so-type').html("WT");
-            }
-            else if ($(this).val() == "Warranty return") {
-                $('#so-type').html("WR");
             }
 
         });

@@ -183,7 +183,7 @@ namespace NMVS.Services
                     {
                         if (!string.IsNullOrEmpty(shp.CheckOutBy))
                         {
-                            commonResponse.message = "hipper is already checked out! (Msg no: 400)";
+                            commonResponse.message = "Shipper is already checked out! (Msg no: 400)";
                             commonResponse.status = -1;
                             return commonResponse;
                         }
@@ -396,7 +396,7 @@ namespace NMVS.Services
 
         private int GetNewIssueNoteId(SalesOrder salesOrder, string user, Shipper shipper)
         {
-            if (salesOrder.SoType == "Warranty return")
+            if (salesOrder.SoType == 1)
             {
                 var note = new WrIssueNote
                 {
@@ -412,7 +412,7 @@ namespace NMVS.Services
                 return note.InId;
 
             }
-            else if (salesOrder.SoType == "Sale")
+            else if (salesOrder.SoType == 0)
             {
                 var note = new SoIssueNote
                 {
@@ -428,7 +428,7 @@ namespace NMVS.Services
                 return note.InId;
 
             }
-            else if (salesOrder.SoType == "WH Transfer")
+            else if (salesOrder.SoType == 2)
             {
                 var note = new WtIssueNote
                 {
@@ -448,9 +448,9 @@ namespace NMVS.Services
             return 0;
         }
 
-        private void AddNoteLine(string soType, int noteNbr, string itemNo, int ptId, double quantity, int packCount)
+        private void AddNoteLine(int soType, int noteNbr, string itemNo, int ptId, double quantity, int packCount)
         {
-            if (soType == "Sale")
+            if (soType == 0)
             {
                 _db.Add(new SoIssueNoteDet
                 {
@@ -462,7 +462,7 @@ namespace NMVS.Services
                     InType = 0
                 });
             }
-            else if (soType == "Warranty return")
+            else if (soType == 1)
             {
                 _db.Add(new SoIssueNoteDet
                 {
@@ -474,7 +474,7 @@ namespace NMVS.Services
                     InType = 1
                 });
             }
-            else if (soType == "WH Transfer")
+            else if (soType == 2)
             {
                 _db.Add(new SoIssueNoteDet
                 {
@@ -574,29 +574,30 @@ namespace NMVS.Services
             if (sot == 0)
             {
                 soNote = (from d in _db.SoIssueNotes.Where(x => x.InId == id)
-                   join s in _db.SalesOrders on d.SoNbr equals s.SoNbr into sOrder
-                   from sor in sOrder.DefaultIfEmpty()
-                   join c in _db.Customers on sor.CustCode equals c.CustCode into soldTo
-                   from soto in soldTo.DefaultIfEmpty()
-                   join c2 in _db.Customers on sor.ShipTo equals c2.CustCode into shipTo
-                   from shto in shipTo.DefaultIfEmpty()
-                   join shp in _db.Shippers on d.Shipper equals shp.ShpId into shps
-                   from shipper in shps.DefaultIfEmpty()
-                   select new IssueNoteVm
-                   {
-                       SoNbr = d.SoNbr,
-                       IssuedBy = d.IssuedBy,
-                       IssuedOn = d.IssuedOn,
-                       Id = d.InId,
-                       SearchId = "so." + d.InId,
-                       ShipTo = shto.CustName,
-                       SoldTo = soto.CustName,
-                       Vehicle = shipper.ShpDesc,
-                       DriverInfo = shipper.Driver + (string.IsNullOrEmpty(shipper.DrContact) ? "" : " (" + shipper.DrContact + ")"),
-                       NoteType = 0
+                          join s in _db.SalesOrders on d.SoNbr equals s.SoNbr into sOrder
+                          from sor in sOrder.DefaultIfEmpty()
+                          join c in _db.Customers on sor.CustCode equals c.CustCode into soldTo
+                          from soto in soldTo.DefaultIfEmpty()
+                          join c2 in _db.Customers on sor.ShipTo equals c2.CustCode into shipTo
+                          from shto in shipTo.DefaultIfEmpty()
+                          join shp in _db.Shippers on d.Shipper equals shp.ShpId into shps
+                          from shipper in shps.DefaultIfEmpty()
+                          select new IssueNoteVm
+                          {
+                              SoNbr = d.SoNbr,
+                              IssuedBy = d.IssuedBy,
+                              IssuedOn = d.IssuedOn,
+                              Id = d.InId,
+                              SearchId = "so." + d.InId,
+                              ShipTo = shto.CustName,
+                              SoldTo = soto.CustName,
+                              Vehicle = shipper.ShpDesc,
+                              DriverInfo = shipper.Driver + (string.IsNullOrEmpty(shipper.DrContact) ? "" : " (" + shipper.DrContact + ")"),
+                              NoteType = 0
 
-                   }).FirstOrDefault();
-            }else if (sot == 1)
+                          }).FirstOrDefault();
+            }
+            else if (sot == 1)
             {
                 soNote = (from d in _db.WrIssueNotes.Where(x => x.InId == id)
                           join s in _db.SalesOrders on d.SoNbr equals s.SoNbr into sOrder
@@ -649,7 +650,7 @@ namespace NMVS.Services
                           }).FirstOrDefault();
             }
 
-            var noteDet = (from d in _db.SoIssueNoteDets.Where(x => x.InId == id)
+            var noteDet = (from d in _db.SoIssueNoteDets.Where(x => x.InId == id && x.InType == sot)
                            join i in _db.ItemDatas on d.ItemNo equals i.ItemNo into all
                            from a in all.DefaultIfEmpty()
                            select new ShipperDet
@@ -658,9 +659,9 @@ namespace NMVS.Services
                                ItemName = a.ItemName,
                                ItemNo = a.ItemNo,
                                Quantity = d.Quantity,
-                              
+
                            }).ToList();
-            
+
 
 
             return new IssueNoteSoDetail
@@ -673,31 +674,34 @@ namespace NMVS.Services
         public IssueNoteShipperVm GetVehicleNoteDetail(int id)
         {
             var shp = _db.Shippers.Find(id);
+            var issueNotes = GetIssueNotes(id);
+            List<ShipperDet> noteDet = new();
 
-            var noteDet = (from d in _db.ShipperDets.Where(x => x.ShpId == id)
-                           join i in _db.ItemDatas on d.ItemNo equals i.ItemNo into all
-                           from a in all.DefaultIfEmpty()
-                           join s in _db.SalesOrders on d.RqId equals s.SoNbr into sOrder
-                           from so in sOrder.DefaultIfEmpty()
-                           join c in _db.Customers on so.CustCode equals c.CustCode into soldTo
-                           from soto in soldTo.DefaultIfEmpty()
-                           join c2 in _db.Customers on so.ShipTo equals c2.CustCode into shipTo
-                           from shto in shipTo.DefaultIfEmpty()
-                           select new ShipperDet
-                           {
-                               InventoryId = d.InventoryId,
-                               DetId = d.DetId,
-                               ItemName = a.ItemName,
-                               ItemNo = a.ItemNo,
-                               Quantity = d.Quantity,
-                               RqId = d.RqId,
-                               ShpId = id,
-                               SoldTo = soto.CustCode,
-                               SoldToName = soto.CustName,
-                               ShipToId = shto.CustCode,
-                               ShipToAddr = shto.Addr,
-                               ShipToName = shto.CustName
-                           }).ToList();
+            foreach (var item in issueNotes)
+            {
+                var soto = _db.Customers.Find(item.SoldTo);
+                var shto = _db.Customers.Find(item.ShipTo);
+                var tempList = (from d in _db.SoIssueNoteDets.Where(x => x.InId == item.Id && x.InType == item.NoteType)
+                                join i in _db.ItemDatas on d.ItemNo equals i.ItemNo into all
+                                from a in all.DefaultIfEmpty()
+
+                                select new ShipperDet
+                                {
+                                    InventoryId = d.PtId,
+                                    ItemName = a.ItemName,
+                                    ItemNo = a.ItemNo,
+                                    Quantity = d.Quantity,
+                                    PackCount = d.PackCount,
+                                    RqId = item.SoNbr,
+                                    ShpId = id,
+                                    SoldTo = soto.CustCode,
+                                    SoldToName = soto.CustName,
+                                    ShipToId = shto.CustCode,
+                                    ShipToAddr = shto.Addr,
+                                    ShipToName = shto.CustName
+                                }).ToList();
+                noteDet = noteDet.Concat(tempList).ToList();
+            }
 
             var model = new IssueNoteShipperVm
             {
@@ -707,216 +711,260 @@ namespace NMVS.Services
             return model;
         }
 
-        //public async Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user)
-        //{
-        //    CommonResponse<UploadReport> common = new();
-        //    common.dataenum = new()
-        //    {
-        //        FileName = fileName,
-        //        UploadBy = user,
-        //        UploadTime = DateTime.Now,
-        //        UploadId = user + DateTime.Now.ToString("yyyyMMddHHmmss"),
-        //        UploadFunction = "MFG Request import"
+        private List<IssueNoteVm> GetIssueNotes(int shpId)
+        {
 
-        //    };
-        //    ExcelDataHelper _eHelper = new();
-        //    // Open the spreadsheet document for read-only access.
-        //    using (SpreadsheetDocument document =
-        //        SpreadsheetDocument.Open(filepath, false))
-        //    {
-        //        // Retrieve a reference to the workbook part.
-        //        WorkbookPart wbPart = document.WorkbookPart;
+            var soNote = (from d in _db.SoIssueNotes.Where(x => x.Shipper == shpId)
+                          select new IssueNoteVm
+                          {
+                              SoNbr = d.SoNbr,
+                              IssuedBy = d.IssuedBy,
+                              IssuedOn = d.IssuedOn,
+                              Id = d.InId,
+                              ShipTo = d.ShipTo,
+                              SoldTo = d.SoldTo,
+                              ShipperId = shpId,
+                              NoteType = 0
 
-        //        // Find the sheet with the supplied name, and then use that 
-        //        // Sheet object to retrieve a reference to the first worksheet.
-        //        Sheet theSheet = wbPart.Workbook.Descendants<Sheet>().FirstOrDefault();
+                          }).ToList();
 
-        //        // Throw an exception if there is no sheet.
-        //        if (theSheet == null)
-        //        {
-        //            throw new ArgumentException("sheetName");
-        //        }
+            var wrNote = (from d in _db.WrIssueNotes.Where(x => x.Shipper == shpId)
+                          select new IssueNoteVm
+                          {
+                              SoNbr = d.SoNbr,
+                              IssuedBy = d.IssuedBy,
+                              IssuedOn = d.IssuedOn,
+                              Id = d.InId,
+                              ShipTo = d.ShipTo,
+                              SoldTo = d.SoldTo,
+                              ShipperId = shpId,
+                              NoteType = 1
 
-        //        // Retrieve a reference to the worksheet part.
-        //        WorksheetPart wsPart =
-        //            (WorksheetPart)(wbPart.GetPartById(theSheet.Id));
+                          }).ToList();
 
-        //        int readingRow = 12;
+            var wtNote = (from d in _db.WtIssueNotes.Where(x => x.Shipper == shpId)
+                          select new IssueNoteVm
+                          {
+                              SoNbr = d.SoNbr,
+                              IssuedBy = d.IssuedBy,
+                              IssuedOn = d.IssuedOn,
+                              Id = d.InId,
+                              ShipTo = d.ShipTo,
+                              SoldTo = d.SoldTo,
+                              ShipperId = shpId,
+                              NoteType = 2
 
-        //        var delDate = DateTime.Now.Date;
-        //        bool headerCorrect = true;
+                          }).ToList();
 
-        //        headerCorrect = _eHelper.VefiryHeader(wsPart, wbPart, "A3", "A4", "A6", "B6", "C6", "D6", "", "", "", "",
-        //            "Batch No.", "Note", "No.", "Item code", "Item name", "Date in", "Quantity", "", "", "");
-
-        //        //check header
-        //        string batchRef;
-        //        batchRef = _eHelper.GetCellValue(wsPart, wbPart, "C3");
-        //        var existRequest = await _db.InvRequests.FindAsync("MFG-" + batchRef);
-        //        //if can not find supplier code, break
-        //        if (string.IsNullOrEmpty(batchRef) || !headerCorrect || existRequest != null)
-        //        {
-        //            if (string.IsNullOrEmpty(batchRef))
-        //            {
-        //                common.message += "Batch no. is not found ";
-        //            }
-        //            else if (existRequest != null)
-        //            {
-        //                common.message += "This batch was created before, please choose another batch no.! ";
-        //            }
-        //            if (!headerCorrect)
-        //            {
-        //                common.message += "File header is incorrect! Please check your file";
-        //            }
-        //            common.dataenum.TotalRecord = 0;
-        //            common.dataenum.Updated = 0;
-        //            common.dataenum.Errors = 1;
-        //            common.dataenum.Inserted = 0;
-
-        //            common.status = -1;
+            return soNote.Concat(wrNote).Concat(wtNote).ToList();
+        }
 
 
-        //            _db.Add(new UploadError
-        //            {
-        //                UploadId = common.dataenum.UploadId,
-        //                Error = common.message
-        //            });
+        public async Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user)
+        {
+            CommonResponse<UploadReport> common = new();
+            common.dataenum = new()
+            {
+                FileName = fileName,
+                UploadBy = user,
+                UploadTime = DateTime.Now,
+                UploadId = user + DateTime.Now.ToString("yyyyMMddHHmmss"),
+                UploadFunction = "MFG Request import"
 
-        //            _db.Add(common.dataenum);
-        //            await _db.SaveChangesAsync();
-        //            return common;
-        //        }
+            };
+            ExcelDataHelper _eHelper = new();
+            // Open the spreadsheet document for read-only access.
+            using (SpreadsheetDocument document =
+                SpreadsheetDocument.Open(filepath, false))
+            {
+                // Retrieve a reference to the workbook part.
+                WorkbookPart wbPart = document.WorkbookPart;
 
+                // Find the sheet with the supplied name, and then use that 
+                // Sheet object to retrieve a reference to the first worksheet.
+                Sheet theSheet = wbPart.Workbook.Descendants<Sheet>().FirstOrDefault();
 
+                // Throw an exception if there is no sheet.
+                if (theSheet == null)
+                {
+                    throw new ArgumentException("sheetName");
+                }
 
+                // Retrieve a reference to the worksheet part.
+                WorksheetPart wsPart =
+                    (WorksheetPart)(wbPart.GetPartById(theSheet.Id));
 
-        //        if (headerCorrect)
-        //        {
-        //            var note = _eHelper.GetCellValue(wsPart, wbPart, "C3");
-        //            var rq = new InvRequest()
-        //            {
+                bool headerCorrect = true;
 
-        //            };
-        //            await _db.AddAsync(incomingList);
-        //            await _db.SaveChangesAsync();
-        //            int icId = incomingList.IcId;
+                headerCorrect = _eHelper.VefiryHeader(wsPart, wbPart, "A3", "A4", "A5", "A7", "B7", "C7", "D7", "", "", "",
+                    "Batch No.", "Required Date", "Note", "No.", "Item code", "Item name", "Date in", "Quantity", "", "");
 
-        //            //Read data from table
-        //            while (headerCorrect)
-        //            {
-        //                readingRow++;
-        //                string lot, supRef, note;
-        //                DateTime refDate;
-        //                string itemNo = _eHelper.GetCellValue(wsPart, wbPart, "B" + readingRow).Trim();
-        //                //Check Supplier exist
-        //                ItemData item = await _db.ItemDatas.FindAsync(itemNo);
-        //                var checkQty = double.TryParse(_eHelper.GetCellValue(wsPart, wbPart, "E" + readingRow), out double qty);
-        //                var err = itemNo;
-        //                incomingList = _db.IncomingLists.Find(icId);
+                //check header
+                bool dateCheck;
+                DateTime requiredDate = new();
+                try
+                {
+                    requiredDate = DateTime.FromOADate(double.Parse(_eHelper.GetCellValue(wsPart, wbPart, "C4")));
+                    dateCheck = true;
+                }
+                catch
+                {
+                    dateCheck = false;
+                }
+                string batchRef;
+                batchRef = _eHelper.GetCellValue(wsPart, wbPart, "C3");
+                var existRequest = _db.InvRequests.FirstOrDefault(x=>x.Ref == batchRef);
 
-        //                try
-        //                {
-        //                    lot = _eHelper.GetCellValue(wsPart, wbPart, "D" + readingRow);
-        //                    note = _eHelper.GetCellValue(wsPart, wbPart, "H" + readingRow);
-        //                    supRef = _eHelper.GetCellValue(wsPart, wbPart, "F" + readingRow);
-        //                    var checkDate = DateTime.TryParse(_eHelper.GetCellValue(wsPart, wbPart, "G" + readingRow), out refDate);
-        //                    if (item != null && checkQty)
-        //                    {
+                //if can not find supplier code, break
+                if (string.IsNullOrEmpty(batchRef) || !headerCorrect || existRequest != null)
+                {
+                    if (string.IsNullOrEmpty(batchRef))
+                    {
+                        common.message += " Batch no. is not found.";
+                    }
+                    else if (existRequest != null)
+                    {
+                        common.message += " This batch was created before, please choose another batch no.! ";
+                    }
+                    if (!headerCorrect)
+                    {
+                        common.message += " File layout is incorrect! Please check your file.";
+                    }
+                    if (!dateCheck)
+                    {
+                        common.message += " Required date is not recognized.";
+                    }
+                   
 
-        //                        var pt = _db.ItemMasters
-        //                            .Where(x => x.ItemNo == item.ItemNo
-        //                                && x.IcId == icId
-        //                                && x.PtLotNo == lot
-        //                                && x.RefDate == refDate
-        //                                && x.RefNo == supRef
-        //                                && x.PtCmt == note
-        //                            ).FirstOrDefault();
-        //                        //if existed: add quantity and rec user. Update
-        //                        if (pt != null)
-        //                        {
-        //                            pt.RecQty += qty;
-        //                            pt.RecBy = user;
-        //                            _db.Update(item);
-        //                            common.dataenum.Updated++;
-        //                            await _db.SaveChangesAsync();
-        //                        }
-        //                        //if NOT exist: Create new
-        //                        else
-        //                        {
-        //                            var newPt = new ItemMaster
-        //                            {
-        //                                ItemNo = itemNo,
-        //                                IcId = icId,
-        //                                LocCode = "",
-        //                                PtCmt = note,
-        //                                PtDateIn = delDate,
-        //                                PtHold = 0,
-        //                                PtLotNo = lot,
-        //                                PtQty = 0,
-        //                                Accepted = 0,
-        //                                Qc = "",
-        //                                RecBy = user,
-        //                                RecQty = qty,
-        //                                RefDate = refDate,
-        //                                SupCode = batchRef,
-        //                                RefNo = supRef
+                    common.dataenum.TotalRecord = 0;
+                    common.dataenum.Updated = 0;
+                    common.dataenum.Errors = 1;
+                    common.dataenum.Inserted = 0;
 
-        //                            };
-        //                            incomingList.ItemCount++;
-        //                            await _db.AddAsync(newPt);
-        //                            await _db.SaveChangesAsync();
-        //                            newPt.ParentId = newPt.PtId;
-        //                            _db.Update(newPt);
-        //                            await _db.SaveChangesAsync();
-        //                            common.dataenum.Inserted++;
-        //                            common.dataenum.TotalRecord++;
-
-        //                        }
-
-        //                    }
-        //                    else
-        //                    {
-        //                        if (string.IsNullOrEmpty(lot)
-        //                            && string.IsNullOrEmpty(note)
-        //                            && string.IsNullOrEmpty(supRef))
-        //                        {
-        //                            break;
-        //                        }
-
-        //                        common.dataenum.Errors++;
-        //                        _db.Add(new UploadError
-        //                        {
-        //                            UploadId = common.dataenum.UploadId,
-        //                            Error = " Line " + readingRow + ": Error with "
-        //                            + (item == null ? "Item no." : "")
-        //                            + (!checkQty ? "quantity" : "")
-
-        //                            + ", Skipped line: " + readingRow
-        //                        });
-        //                        common.dataenum.TotalRecord++;
-        //                        continue;
-        //                    }
+                    common.status = -1;
 
 
+                    _db.Add(new UploadError
+                    {
+                        UploadId = common.dataenum.UploadId,
+                        Error = common.message
+                    });
 
-        //                }
-        //                catch (Exception e)
-        //                {
-        //                    common.dataenum.Errors++;
-        //                    _db.Add(new UploadError
-        //                    {
-        //                        UploadId = common.dataenum.UploadId,
-        //                        Error = "Line " + readingRow + ": "
-        //                       + e.Message + ";"
-        //                    });
-        //                }
-        //            }
-        //        }
-        //    }
+                    _db.Add(common.dataenum);
+                    await _db.SaveChangesAsync();
+                    return common;
+                }
 
-        //    _db.Add(common.dataenum);
-        //    await _db.SaveChangesAsync();
-        //    return common;
-        //}
+                if (headerCorrect)
+                {
+                    var note = _eHelper.GetCellValue(wsPart, wbPart, "C5");
+                    var rq = new InvRequest()
+                    {
+                        Closed = false,
+                        ConfirmationNote = "",
+                        ConfirmedBy = "",
+                        Confirmed = null,
+                        Ref = batchRef,
+                        Reported = false,
+                        ReportedNote = "",
+                        RqBy = user,
+                        RqCmt = note,
+                        RqDate = DateTime.Now,
+                        RqID = "MFG-" + batchRef,
+                        RqType = "MFG",
+                        SoConfirm = false
+                    };
+                    await _db.AddAsync(rq);
+                    await _db.SaveChangesAsync();
+
+                    int readingRow = 7;
+                    //Read data from table
+                    while (headerCorrect)
+                    {
+                        readingRow++;
+                        string itemNo = _eHelper.GetCellValue(wsPart, wbPart, "B" + readingRow);
+                        double quantity = 0;
+                        var inputNumberCorrect = double.TryParse(_eHelper.GetCellValue(wsPart, wbPart, "E" + readingRow), out quantity);
+
+                        if (string.IsNullOrEmpty(itemNo))
+                        {
+                            if (quantity == 0 || !inputNumberCorrect)
+                                break;
+
+                            common.dataenum.Errors++;
+                            _db.Add(new UploadError
+                            {
+                                UploadId = common.dataenum.UploadId,
+                                Error = "Line " + readingRow + ": Item no not found. Line skipped"
+                            });
+                            continue;
+                        }
+                        else
+                        {
+                            if (quantity == 0 || !inputNumberCorrect)
+                            {
+                                common.dataenum.Errors++;
+                                _db.Add(new UploadError
+                                {
+                                    UploadId = common.dataenum.UploadId,
+                                    Error = "Line " + readingRow + ": Quantity error. Line skipped"
+                                });
+                                continue;
+                            }
+
+                            ItemData item = await _db.ItemDatas.FindAsync(itemNo);
+                            if (item == null)
+                            {
+                                common.dataenum.Errors++;
+                                _db.Add(new UploadError
+                                {
+                                    UploadId = common.dataenum.UploadId,
+                                    Error = "Line " + readingRow + ": Item no. " + itemNo + " is not existed in system. Line skipped"
+                                });
+                                continue;
+                            }
+                        }
+
+
+                        try
+                        {
+                            DateTime dateIn;
+                            var checkDate = DateTime.TryParse(_eHelper.GetCellValue(wsPart, wbPart, "D" + readingRow), out dateIn);
+                            var rqDet = new RequestDet
+                            {
+                                Arranged = 0,
+                                Closed = null,
+                                Issued = 0,
+                                IssueOn = null,
+                                ItemNo = itemNo,
+                                Picked = 0,
+                                Quantity = quantity,
+                                Ready = 0,
+                                SpecDate = checkDate ? dateIn : null,
+                                RqID = rq.RqID,
+                                Shipped = null,
+                                RequireDate = requiredDate,
+                            };
+                            _db.Add(rqDet);
+                            common.dataenum.Inserted++;
+                        }
+                        catch (Exception e)
+                        {
+                            common.dataenum.Errors++;
+                            _db.Add(new UploadError
+                            {
+                                UploadId = common.dataenum.UploadId,
+                                Error = "Line " + readingRow + ": "
+                               + e.Message + ";"
+                            });
+                        }
+                    }
+                }
+            }
+
+            _db.Add(common.dataenum);
+            await _db.SaveChangesAsync();
+            return common;
+        }
     }
 }

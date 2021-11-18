@@ -94,11 +94,11 @@ namespace NMVS.Services
             };
         }
 
-        public string GetSoNbr(string input, string soType)
+        public string GetSoNbr(string input, int soType)
         {
             string nbr = input[2..];
             string header = input.Substring(0, 2);
-            if (soType == "Sale")
+            if (soType == 0)
             {
                 if (header == "WT" || header == "WR")
                 {
@@ -113,7 +113,7 @@ namespace NMVS.Services
                     return input;
                 }
             }
-            else if (soType == "WH Transfer")
+            else if (soType == 2)
             {
                 if (header == "SO" || header == "WR")
                 {
@@ -128,7 +128,7 @@ namespace NMVS.Services
                     return input;
                 }
             }
-            else if (soType == "Warranty return")
+            else if (soType == 1)
             {
                 var checkParentSO = _context.SalesOrders.Find("SO" + nbr);
                 if (checkParentSO == null)
@@ -140,6 +140,11 @@ namespace NMVS.Services
                     if (!checkParentSO.Closed)
                     {
                         return "uc";
+                    }
+                    var uq = _context.Unqualifieds.Where(x => x.SoNbr == checkParentSO.SoNbr);
+                    if (uq == null)
+                    {
+                        return "uq404";
                     }
                 }
                 if (header == "SO" || header == "WR")
@@ -195,13 +200,22 @@ namespace NMVS.Services
                 WorksheetPart wsPart =
                     (WorksheetPart)(wbPart.GetPartById(theSheet.Id));
 
-                int readingRow = 10;
 
                 //check header
                 string soNbr, soTo = "", shipTo = "", curr = "", note = "";
-                var delDate = DateTime.FromOADate(double.Parse(_eHelper.GetCellValue(wsPart, wbPart, "C6")));
-                var ordDate = DateTime.FromOADate(double.Parse(_eHelper.GetCellValue(wsPart, wbPart, "C5")));
-                bool headerCorrect = true;
+                int soType = -1;
+                DateTime? delDate = DateTime.Now;
+                DateTime? ordDate = delDate;
+                try
+                {
+                    delDate = DateTime.FromOADate(double.Parse(_eHelper.GetCellValue(wsPart, wbPart, "C6")));
+                    ordDate = DateTime.FromOADate(double.Parse(_eHelper.GetCellValue(wsPart, wbPart, "C5")));
+                }
+                catch
+                {
+                }
+                bool headerCorrect = _eHelper.VefiryHeader(wsPart, wbPart, "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "B11", "F11",
+                    "SO No.", "Sold-To ID", "Ship-To ID", "Order date", "Delivery Date", "Currency", "Note", "Type", "Item code", "Quantity");
 
                 if (headerCorrect)
                 {
@@ -212,9 +226,35 @@ namespace NMVS.Services
 
                 }
 
+                //Check So Type
+                headerCorrect = int.TryParse(_eHelper.GetCellValue(wsPart, wbPart, "C9"), out soType);
+                if (soType == 0 || soType == 1)
+                {
+                    headerCorrect = true;
+                }
+                else
+                {
+                    common.dataenum.TotalRecord = 0;
+                    common.dataenum.Updated = 0;
+                    common.dataenum.Errors = 1;
+                    common.dataenum.Inserted = 0;
+                    common.message = "Sales order type incorrect";
+                    common.status = -1;
+                    _context.Add(new UploadError
+                    {
+                        UploadId = common.dataenum.UploadId,
+                        Error = common.message
+                    });
+
+                    _context.Add(common.dataenum);
+                    await _context.SaveChangesAsync();
+                    return common;
+                }
+
+                //check so
                 soNbr = _eHelper.GetCellValue(wsPart, wbPart, "C2");
                 var oldSo = await _context.SalesOrders.FindAsync(soNbr);
-                //if can not find supplier code, break
+                //if can not find customer code, break
                 if (oldSo != null || string.IsNullOrEmpty(soTo) || string.IsNullOrEmpty(shipTo) || string.IsNullOrEmpty(curr))
                 {
 
@@ -222,11 +262,11 @@ namespace NMVS.Services
                     common.dataenum.Updated = 0;
                     common.dataenum.Errors = 1;
                     common.dataenum.Inserted = 0;
-                    common.message = "input header is incorrect!" +
-                        (string.IsNullOrEmpty(soTo) ? "Sold-to not found" : "") +
-                        (string.IsNullOrEmpty(shipTo) ? "ship-to not found" : "") +
-                        (string.IsNullOrEmpty(curr) ? "currency not found" : "")+
-                        (oldSo != null ? "Sales order already existed" : "")
+                    common.message = "Header data is incorrect:" +
+                        (string.IsNullOrEmpty(soTo) ? " Sold-to not found;" : "") +
+                        (string.IsNullOrEmpty(shipTo) ? " Ship-to not found;" : "") +
+                        (string.IsNullOrEmpty(curr) ? " Currency not found;" : "") +
+                        (oldSo != null ? " Sales order already existed;" : "")
                         ;
                     common.status = -1;
 
@@ -243,14 +283,14 @@ namespace NMVS.Services
                 }
 
                 var soldTo = _context.Customers.Find(soTo);
-                var shipToCust = _context.Customers.Find(soTo);
+                var shipToCust = _context.Customers.Find(shipTo);
                 if (shipToCust == null || soldTo == null)
                 {
+                    common.message = shipTo == null ? "Sold-to not found" : soldTo == null ? "Ship-to not found" : common.message;
                     common.dataenum.TotalRecord = 0;
                     common.dataenum.Updated = 0;
                     common.dataenum.Errors = 1;
                     common.dataenum.Inserted = 0;
-                    common.message = "Sold-to and Ship-to not found";
                     common.status = -1;
 
 
@@ -272,63 +312,94 @@ namespace NMVS.Services
                         Comment = note,
                         CustCode = soTo,
                         ShipTo = shipTo,
-                        PriceDate = delDate,
+                        PriceDate = (DateTime)delDate,
                         UpdatedOn = DateTime.Now,
-                        OrdDate = ordDate,
+                        OrdDate = (DateTime)ordDate,
                         ReqDate = delDate,
-                        DueDate = delDate,
+                        DueDate = (DateTime)delDate,
                         ShipVia = "Truck",
                         UpdatedBy = user,
-                        SoType = "Sale",
+                        SoType = soType,
                         SoCurr = curr,
                         SoNbr = soNbr
-
-
                     };
                     _context.Add(salesOrder);
                     await _context.SaveChangesAsync();
-                    string sonbr = salesOrder.SoNbr;
 
+                    int readingRow = 11;
                     //Read data from table
                     while (headerCorrect)
                     {
                         readingRow++;
+
+                        string itemNo = _eHelper.GetCellValue(wsPart, wbPart, "B" + readingRow);
+
+                        double quantity = 0;
+                        var inputNumberCorrect = double.TryParse(_eHelper.GetCellValue(wsPart, wbPart, "F" + readingRow), out quantity);
+
+                        if (string.IsNullOrEmpty(itemNo) && (quantity == 0 || !inputNumberCorrect))
+                        {
+                            common.dataenum.Errors++;
+                            _context.Add(new UploadError
+                            {
+                                UploadId = common.dataenum.UploadId,
+                                Error = "Line " + readingRow + ": Item no not found. Skipped"
+                            });
+                            break;
+                        }
                         try
                         {
-                            string itemNo = _eHelper.GetCellValue(wsPart, wbPart, "B" + readingRow).Trim();
                             if (string.IsNullOrEmpty(itemNo))
                             {
-                                break;
-                            }
-                            double quantity = double.Parse(_eHelper.GetCellValue(wsPart, wbPart, "F" + readingRow).Trim());
-                            double discount = double.Parse(_eHelper.GetCellValue(wsPart, wbPart, "H" + readingRow).Trim());
-                            double netprice = double.Parse(_eHelper.GetCellValue(wsPart, wbPart, "I" + readingRow).Trim());
-
-                            double tax = double.Parse(_eHelper.GetCellValue(wsPart, wbPart, "J" + readingRow).Trim());
-                            //Check Supplier exist
-                        
-                                var det = new SoDetail
+                                common.dataenum.Errors++;
+                                _context.Add(new UploadError
                                 {
-                                    ItemNo = itemNo,
-                                    SoNbr = salesOrder.SoNbr,
-                                    Discount = discount,
-                                    NetPrice = netprice,
-                                    Quantity = quantity,
-                                    Tax = tax,
-                                    RequiredDate = delDate,
-                                    
-                                    
-
-                                };
-                                await _context.AddAsync(det);
-
-                                await _context.SaveChangesAsync();
-                                
-                                common.dataenum.Inserted++;
-                                common.dataenum.TotalRecord++;
-
-
+                                    UploadId = common.dataenum.UploadId,
+                                    Error = "Line " + readingRow + ": Item no not found. Line skipped"
+                                });
+                                continue;
                             }
+                            else
+                            {
+                                var itemData = _context.ItemDatas.Find(itemNo);
+                                if (itemData == null)
+                                {
+                                    common.dataenum.Errors++;
+                                    _context.Add(new UploadError
+                                    {
+                                        UploadId = common.dataenum.UploadId,
+                                        Error = "Line " + readingRow + ": Item no. " + itemNo + " is not existed in system. Line skipped"
+                                    });
+                                    continue;
+                                }
+                            }
+                            double discount = double.Parse(_eHelper.GetCellValue(wsPart, wbPart, "H" + readingRow));
+                            double netprice = double.Parse(_eHelper.GetCellValue(wsPart, wbPart, "I" + readingRow));
+                            double tax = double.Parse(_eHelper.GetCellValue(wsPart, wbPart, "J" + readingRow));
+                            //Check Supplier exist
+
+                            var det = new SoDetail
+                            {
+                                ItemNo = itemNo,
+                                SoNbr = salesOrder.SoNbr,
+                                Discount = discount,
+                                NetPrice = netprice,
+                                Quantity = quantity,
+                                Tax = tax,
+                                RequiredDate = delDate,
+
+
+
+                            };
+                            await _context.AddAsync(det);
+
+                            await _context.SaveChangesAsync();
+
+                            common.dataenum.Inserted++;
+                            common.dataenum.TotalRecord++;
+
+
+                        }
                         catch (Exception e)
                         {
                             common.dataenum.Errors++;

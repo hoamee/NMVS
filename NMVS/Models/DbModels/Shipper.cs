@@ -95,6 +95,8 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Quantity")]
         public double Quantity { set; get; }
 
+        public int PackCount { set; get; }
+
         public int InventoryId { set; get; }
 
     }

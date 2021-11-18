@@ -12,7 +12,8 @@
             <div class="card-header">
                 <h3 class="mb-0">@ViewData["Title"]</h3>
             </div>
-            <div class="table-responsive card-body">
+            <div class=" card-body">
+                <a href="/Unqualifieds/InputWarranty" class="btn btn-outline-primary">Input warranty item</a>
                 <table class="table table-bordered table-condensed" width="100%" id="datatable-search">
                     <thead>
                         <tr>
@@ -62,23 +63,34 @@
 
 
                                 <td>
-                                    @if (done)
+
+                                    @if (done || !string.IsNullOrEmpty(item.SoNbr))
                                     {
-                                    <button class="btn btn-outline-secondary" disabled >@item.UqId</button>
+                                        <button class="btn btn-outline-secondary" disabled>@item.UqId</button>
                                     }
                                     else
                                     {
                                         <span class="btn btn-outline-primary" onclick="takeAction(@item.UqId);">@item.UqId</span>
                                     }
 
+
                                 </td>
                                 <td class="text-sm font-weight-normal pt-no">
-                                    
+
                                     @Html.DisplayFor(modelItem => item.ItemNo)
                                 </td>
-                                <td>
-                                    
-                                </td>
+
+                                @if (string.IsNullOrEmpty(item.SoNbr))
+                                {
+                                    <td class="text-center">-</td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.SoNbr)
+                                    </td>
+                                }
+
                                 <td class="pt-id">
                                     @Html.DisplayFor(modelItem => item.PtId)
                                 </td>
@@ -96,14 +108,17 @@
                                 </td>
                                 <td style="white-space: normal;">
                                     @{
-                                        string[] words = item.Note.Split("**");
-                                        foreach (var w in words)
+                                        if (!string.IsNullOrEmpty(item.Note))
                                         {
-                                            if (!string.IsNullOrEmpty(w))
+                                            string[] words = item.Note.Split("**");
+                                            foreach (var w in words)
                                             {
-                                                <span>@w</span><br />
-                                            }
+                                                if (!string.IsNullOrEmpty(w))
+                                                {
+                                                    <span>@w</span><br />
+                                                }
 
+                                            }
                                         }
 
                                     }
@@ -113,7 +128,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
         </div>
     </div>
 </div>

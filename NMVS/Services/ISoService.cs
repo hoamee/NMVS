@@ -15,7 +15,7 @@ namespace NMVS.Services
 
         public List<ItemAvailVm> GetItemNAvail();
 
-        public string GetSoNbr(string input, string soType);
+        public string GetSoNbr(string input, int soType);
 
         public Task<CommonResponse<UploadReport>> ImportWarranty(string filepath, string fileName, string user);
 

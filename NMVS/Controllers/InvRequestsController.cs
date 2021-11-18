@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,9 @@ using NMVS.Models.ViewModels;
 using NMVS.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace NMVS.Controllers
@@ -460,6 +463,33 @@ namespace NMVS.Controllers
             {
                 return RedirectToAction("Error", "Home", new { common.message });
             }
+        }
+        public async Task<JsonResult> UploadList(IList<IFormFile> files)
+        {
+            var common = new CommonResponse<UploadReport>();
+            foreach (IFormFile source in files)
+            {
+                string filename = ContentDispositionHeaderValue.Parse(source.ContentDisposition).FileName.Trim('"');
+
+                filename = EnsureCorrectFilename(filename);
+
+                using (FileStream output = System.IO.File.Create("uploads/" + filename))
+                    await source.CopyToAsync(output);
+
+                common = await _service.ImportList("uploads/" + filename, filename, User.Identity.Name);
+
+            }
+
+
+            return Json(common);
+        }
+
+        private string EnsureCorrectFilename(string filename)
+        {
+            if (filename.Contains("\\"))
+                filename = filename.Substring(filename.LastIndexOf("\\") + 1);
+
+            return filename;
         }
 
 

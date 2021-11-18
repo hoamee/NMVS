@@ -71,13 +71,17 @@ namespace NMVS.Controllers
                 try
                 {
                     salesOrder.SoNbr = _soService.GetSoNbr(salesOrder.SoNbr, salesOrder.SoType);
-                    if (salesOrder.SoNbr == "" && salesOrder.SoType == "Warranty return")
+                    if (salesOrder.SoNbr == "" && salesOrder.SoType == 1)
                     {
                         ModelState.AddModelError("", "System coundn't found related SO. " + salesOrder.SoNbr);
                     }
                     else if (salesOrder.SoNbr == "uc")
                     {
                         ModelState.AddModelError("", "Parent SO is unclosed");
+                    }
+                    else if (salesOrder.SoNbr == "uq404")
+                    {
+                        ModelState.AddModelError("", "No warranty item found in Unqualified list");
                     }
                     else
                     {
@@ -211,6 +215,7 @@ namespace NMVS.Controllers
             if (ModelState.IsValid)
             {
                 var dataReady = true;
+                var uq = _context.Unqualifieds.Where(x => x.SoNbr == soDet.SoNbr);
                 if (soDet.SpecDate != null)
                 {
                     soDet.SpecDate = Convert.ToDateTime(soDet.SpecDate);
