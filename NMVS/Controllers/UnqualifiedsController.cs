@@ -63,7 +63,7 @@ namespace NMVS.Controllers
                         double unshippedQty = 0;
                         if (dets.Any())
                         {
-                            unshippedQty = _context.SoDetails.Where(x => x.SoNbr == wrNbr).Sum(x => x.Quantity - x.Shipped);                        
+                            unshippedQty = _context.SoDetails.Where(x => x.SoNbr == wrNbr && x.ItemNo == uq.ItemNo).Sum(x => x.Quantity - x.Shipped);                        
                         }
 
                         if (qty > maximumQty)
@@ -100,6 +100,9 @@ namespace NMVS.Controllers
                                 };
                                 _context.Add(wrSo);
                                 _context.SaveChanges();
+
+                                
+                                
                             }
                             else
                             {
@@ -108,8 +111,7 @@ namespace NMVS.Controllers
                             }
 
 
-
-                            _context.Add(new SoDetail
+                            var wrDet = new SoDetail
                             {
                                 Quantity = qty,
                                 Discount = 0,
@@ -119,7 +121,48 @@ namespace NMVS.Controllers
                                 Shipped = 0,
                                 SoNbr = wrNbr,
                                 Tax = 0
-                            });
+                            };
+                            _context.Add(wrDet);
+                            _context.SaveChanges();
+
+                            var invRq = _context.InvRequests.Find(wrNbr);
+                            if (invRq == null)
+                            {
+                                _context.InvRequests.Add(new InvRequest
+                                {
+                                    RqType = "Issue",
+                                    Ref = wrNbr,
+                                    RqBy = User.Identity.Name,
+                                    RqDate = DateTime.Now,
+                                    RqID = wrNbr
+
+                                });
+                                _context.SaveChanges();
+                            }
+
+                            var rqDet = new RequestDet
+                            {
+                                RqID = wrNbr,
+                                ItemNo = wrDet.ItemNo,
+                                SpecDate = wrDet.SpecDate,
+                                Arranged = 0,
+                                Picked = 0,
+                                Issued = 0,
+                                Ready = 0,
+                                RequireDate = wrDet.RequiredDate,
+                                Shipped = null,
+                                Quantity = wrDet.Quantity,
+                                SodId = wrDet.SodId
+                            };
+                            _context.Add(rqDet);
+                            _context.SaveChanges();
+
+                            rqDet.SodId = wrDet.SodId;
+                            wrDet.RqDetId = rqDet.DetId;
+                            _context.Update(rqDet);
+                            _context.Update(wrDet);
+
+
                             uq.DisposedQty = 0;
                             uq.RecycleQty = 0;
                             _context.Add(uq);

@@ -353,7 +353,7 @@ namespace NMVS.Controllers.Api
                         order.Reported += report.Qty;
                         order.Note += report.Note;
                         // 2. add note
-
+                        rqDet.MovementNote += " **" + report.Note;
 
                         // decrease item master hold qty
                         var pt = await _context.ItemMasters.FindAsync(order.PtId);

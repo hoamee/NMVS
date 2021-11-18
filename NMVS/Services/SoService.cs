@@ -326,6 +326,12 @@ namespace NMVS.Services
                     _context.Add(salesOrder);
                     await _context.SaveChangesAsync();
 
+                    var requestCreated = RequestCreated(soNbr, user);
+                    if (!requestCreated)
+                    {
+                        return ThrowExcelError("System error while creating inventory request", common.dataenum.UploadId);
+                    }
+
                     int readingRow = 11;
                     //Read data from table
                     while (headerCorrect)
@@ -339,13 +345,7 @@ namespace NMVS.Services
 
                         if (string.IsNullOrEmpty(itemNo) && (quantity == 0 || !inputNumberCorrect))
                         {
-                            common.dataenum.Errors++;
-                            _context.Add(new UploadError
-                            {
-                                UploadId = common.dataenum.UploadId,
-                                Error = "Line " + readingRow + ": Item no not found. Skipped"
-                            });
-                            break;
+                           break;
                         }
                         try
                         {
@@ -388,12 +388,31 @@ namespace NMVS.Services
                                 Tax = tax,
                                 RequiredDate = delDate,
 
-
-
                             };
                             await _context.AddAsync(det);
-
                             await _context.SaveChangesAsync();
+
+                            var rqDet = new RequestDet
+                            {
+                                RqID = soNbr,
+                                ItemNo = det.ItemNo,
+                                SpecDate = det.SpecDate,
+                                Arranged = 0,
+                                Picked = 0,
+                                Issued = 0,
+                                Ready = 0,
+                                RequireDate = det.RequiredDate,
+                                Shipped = null,
+                                Quantity = det.Quantity,
+                                SodId = det.SodId
+                            };
+                            _context.Add(rqDet);
+                            _context.SaveChanges();
+
+                            rqDet.SodId = det.SodId;
+                            det.RqDetId = rqDet.DetId;
+                            _context.Update(rqDet);
+                            _context.Update(det);
 
                             common.dataenum.Inserted++;
                             common.dataenum.TotalRecord++;
@@ -419,5 +438,55 @@ namespace NMVS.Services
             await _context.SaveChangesAsync();
             return common;
         }
+
+        private bool RequestCreated(string wrNbr, string user)
+        {
+            try
+            {
+                var invRq = _context.InvRequests.Find(wrNbr);
+                if (invRq == null)
+                {
+                    _context.InvRequests.Add(new InvRequest
+                    {
+                        RqType = "Issue",
+                        Ref = wrNbr,
+                        RqBy = user,
+                        RqDate = DateTime.Now,
+                        RqID = wrNbr
+
+                    });
+                    _context.SaveChanges();
+                }
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private CommonResponse<UploadReport> ThrowExcelError(string mess, string uploadId)
+        {
+            CommonResponse<UploadReport> common = new();
+            common.message = mess;
+            common.dataenum.TotalRecord = 0;
+            common.dataenum.Updated = 0;
+            common.dataenum.Errors = 1;
+            common.dataenum.Inserted = 0;
+            common.status = -1;
+
+
+            _context.Add(new UploadError
+            {
+                UploadId = mess,
+                Error = mess
+            });
+
+            _context.Add(common.dataenum);
+            _context.SaveChanges();
+            return common;
+        }
+
+        
     }
 }
