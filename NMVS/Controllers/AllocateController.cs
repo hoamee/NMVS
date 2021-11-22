@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NMVS.Models;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace NMVS.Controllers
 {
+    [Authorize(Roles = "Arrange inventory, Move inventory")]
     public class AllocateController : Controller
     {
         private readonly ApplicationDbContext _db;

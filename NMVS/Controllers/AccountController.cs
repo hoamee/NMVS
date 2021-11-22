@@ -29,6 +29,13 @@ namespace NMVS.Controllers
             _userData = userDataService;
         }
 
+        [HttpGet]        
+        public IActionResult AccessDenied(string returnUrl = null)
+        {
+            return View("_Error403");
+
+        }
+
         public async Task<IActionResult> Login()
         {
             if (await _userManager.FindByNameAsync("nmvadmin") == null)

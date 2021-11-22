@@ -116,8 +116,8 @@
                                     <span>
                                         @Html.DisplayFor(modelItem => item.IssueToDesc)
                                         @if (!string.IsNullOrEmpty(item.ToLoc))
-                                        { 
-                                        <span>(@item.ToLoc)</span>
+                                        {
+                                            <span>(@item.ToLoc)</span>
                                         }
                                     </span>
                                 </td>
@@ -153,14 +153,23 @@
                                     }
                                     else
                                     {
-                                        <div class="p-2 bd-highlight">
-                                            <button class="btn btn-info modal-btn">
-                                                Submit
-                                            </button>
-                                            <button class="btn btn-danger report-btn">
-                                                Report
-                                            </button>
-                                        </div>
+                                        if (User.IsInRole("Move inventory"))
+                                        {
+
+
+                                            <div class="p-2 bd-highlight">
+                                                <button class="btn btn-info modal-btn">
+                                                    Submit
+                                                </button>
+                                                <button class="btn btn-danger report-btn">
+                                                    Report
+                                                </button>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Incomplete</span>
+                                        }
                                     }
                                 </td>
                             </tr>

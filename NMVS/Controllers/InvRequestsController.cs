@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 
 namespace NMVS.Controllers
 {
+    [Authorize(Roles = "Request inventory, Handle request")]
     public class InvRequestsController : Controller
     {
         private readonly ApplicationDbContext _db;

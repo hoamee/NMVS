@@ -75,7 +75,10 @@
                                 <td>
                                     @if (item.Closed != true)
                                     {
-                                        @Html.ActionLink("Edit", "EditWo", new { id = item.WoNbr }, new { @class = "btn btn-sm btn-outline-warning" })
+                                        if (User.IsInRole("WoCreation") || User.IsInRole("WoReporter"))
+                                        {
+                                            @Html.ActionLink("Edit", "EditWo", new { id = item.WoNbr }, new { @class = "btn btn-sm btn-outline-warning" })
+                                        }
                                         <span></span>
                                         @Html.ActionLink("Details", "WoDetails", new { id = item.WoNbr }, new { @class = "btn btn-sm btn-outline-info" })
                                     }
@@ -90,18 +93,21 @@
                     </tbody>
                 </table>
             </div>
-            <div class="card-footer">
+            @if (User.IsInRole("WoCreation") || User.IsInRole("WoReporter"))
+            {
+                <div class="card-footer">
 
-                <div class="row col-12">
-                    <span class="col-auto">
-                        <a asp-action="CreateWo" class="btn btn-sm btn-outline-info">
-                            <span class="fa fa-plus-circle"></span>
-                            Add new
-                        </a>
-                    </span>
+                    <div class="row col-12">
+                        <span class="col-auto">
+                            <a asp-action="CreateWo" class="btn btn-sm btn-outline-info">
+                                <span class="fa fa-plus-circle"></span>
+                                Add new
+                            </a>
+                        </span>
 
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     </div>
 </div>

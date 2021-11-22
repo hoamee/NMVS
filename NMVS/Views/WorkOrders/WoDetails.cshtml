@@ -149,7 +149,7 @@
             <tbody>
                 @foreach (var item in ViewBag.woBills)
                 {
-                <script>
+                    <script>
                         var dataEle = {
                             x: 'Bill:' + @Html.Raw(item.WoBillNbr),
                             y: @Html.Raw(item.ComQty),
@@ -163,7 +163,7 @@
                             ]
                         };
                         dataArr.push(dataEle);
-                </script>
+                    </script>
 
                     <tr>
                         <td>
@@ -188,20 +188,24 @@
                             @item.DueDate.ToShortDateString()
                         </td>
                         <td>
+                            @if (User.IsInRole("WoCreation"))
+                            {
+                                if (item.IsClosed)
+                                {
+                                    <div class="badge bg-secondary" onclick="closeBill(@item.WoBillNbr, 're-activate');">Closed</div>
+                                }
+                                else
+                                {
+                                    <div class="badge bg-success" onclick="closeBill(@item.WoBillNbr, 'close')">Open</div>
+                                }
+                            }
 
-                            @if (item.IsClosed)
-                            {
-                                <div class="badge bg-secondary" onclick="closeBill(@item.WoBillNbr, 're-activate');">Closed</div>
-                            }
-                            else
-                            {
-                                <div class="badge bg-success" onclick="closeBill(@item.WoBillNbr, 'close')">Open</div>
-                            }
                         </td>
                     </tr>
                 }
                 <tr>
-                    @if (Model.Closed != true)
+
+                    @if (Model.Closed != true && User.IsInRole("WoCreation"))
                     {
                         <td colspan="7" class="text-center">
                             <a class="btn btn-primary" href="/WoBills/PushBill/@Model.WoNbr">
@@ -227,7 +231,7 @@
 
 <script src="~/assets/js/bootbox/bootbox.min.js"></script>
 <script>
-    function closeBill(bill, mess) {      
+    function closeBill(bill, mess) {
 
         bootbox.confirm({
             message: "Are you sure want to " + mess + " this bill?",
@@ -262,11 +266,11 @@
             }
         });
 
-        
+
 
     };
 
-    
+
 
     $(document).ready(function () {
         $('.nav-wo').addClass('active');

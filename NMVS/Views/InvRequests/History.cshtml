@@ -60,7 +60,7 @@
                                     <td>
                                         @Html.DisplayFor(modelItem => item.Note)
                                     </td>
-                                   
+
                                 </tr>
                             }
                         </tbody>
@@ -68,22 +68,25 @@
                     </table>
                 </div>
             </div>
-            <div class="card-footer">
+            @if (User.IsInRole("Request inventory"))
+            {
+                <div class="card-footer">
 
-                <div class="row col-12">
-                    <span class="col-auto">
-                        <a asp-action="NewRequest" class="btn btn-sm btn-outline-info">
-                            Add new
-                        </a>
-                    </span>
-                    <span class="col-auto">
-                        <button class="btn btn-sm btn-outline-info" id="new-list">
-                            <span class="fa fa-cloud-upload"></span>
-                            <span>Upload</span>
-                        </button>
-                    </span>
+                    <div class="row col-12">
+                        <span class="col-auto">
+                            <a asp-action="NewRequest" class="btn btn-sm btn-outline-info">
+                                Add new
+                            </a>
+                        </span>
+                        <span class="col-auto">
+                            <button class="btn btn-sm btn-outline-info" id="new-list">
+                                <span class="fa fa-cloud-upload"></span>
+                                <span>Upload</span>
+                            </button>
+                        </span>
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     </div>
 </div>

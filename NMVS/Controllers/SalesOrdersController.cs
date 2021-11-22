@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -15,7 +16,7 @@ using NMVS.Services;
 
 namespace NMVS.Controllers
 {
-
+    [Authorize(Roles = "Create sales order, Approve SO")]
     public class SalesOrdersController : Controller
     {
         private readonly ApplicationDbContext _context;

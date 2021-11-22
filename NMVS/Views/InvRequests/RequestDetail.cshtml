@@ -100,14 +100,20 @@
             <div class="card-footer">
                 @if (Model.Rq.RqType == "MFG" && Model.Rq.SoConfirm != true)
                 {
-                    <a asp-action="UpdateList" class="btn btn-outline-warning" asp-route-id="@Model.Rq.Id">Update</a>
+                    if (User.IsInRole("Request inventory"))
+                    {
+                        <a asp-action="UpdateList" class="btn btn-outline-warning" asp-route-id="@Model.Rq.Id">Update</a>
+                    }
                 }
 
                 <a asp-action="History" class="btn btn-outline-secondary">History</a>
                 @if (Model.Rq.SoConfirm == true && Model.Rq.Confirmed != true && User.IsInRole("Handle request"))
                 {
-                    <span class="btn btn-outline-success" onclick="confirmRequest(true)">Confirm</span>
-                    <span class="btn btn-outline-danger" onclick="confirmRequest(false)">Reject</span>
+                    if (User.IsInRole("Handle Request"))
+                    {
+                        <span class="btn btn-outline-success" onclick="confirmRequest(true)">Confirm</span>
+                        <span class="btn btn-outline-danger" onclick="confirmRequest(false)">Reject</span>
+                    }
                 }
 
 
@@ -238,7 +244,7 @@
 
                         </tbody>
                         <tfoot>
-                            @if (Model.Rq.RqType == "MFG" && Model.Rq.SoConfirm != true)
+                            @if (Model.Rq.RqType == "MFG" && Model.Rq.SoConfirm != true && User.IsInRole("Request inventory"))
                             {
                                 <tr>
                                     <td colspan="9" class="text-center col-6">

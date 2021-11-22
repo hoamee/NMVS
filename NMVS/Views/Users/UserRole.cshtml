@@ -23,6 +23,8 @@
                             <th>QC</th>
                             <th>Create SO</th>
                             <th>Approve SO</th>
+                            <th>Arrange Inventory</th>
+                            <th>Movement</th>
                             <th>Register vehicle</th>
                             <th>Guard</th>
                             <th>Create WO</th>
@@ -100,6 +102,26 @@
                             </td>
                             <td class="text-sm font-weight-normal">
                                 @if (item.AppSO)
+                                {
+                                    <p class="badge bg-success">Yes</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">No</p>
+                                }
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.ArrangeInventory)
+                                {
+                                    <p class="badge bg-success">Yes</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">No</p>
+                                }
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.MoveInv)
                                 {
                                     <p class="badge bg-success">Yes</p>
                                 }

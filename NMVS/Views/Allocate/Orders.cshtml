@@ -39,7 +39,7 @@
                                 From
                             </th>
                             <th>
-                                To 
+                                To
                             </th>
                             <th>
                                 Destination Description
@@ -58,68 +58,77 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                        <tr id="tr-@item.OrderId">
-                            <td class="td-id">
-                                @item.OrderId
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.RequestId)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.PtId)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.ItemNo)
-                            </td>
+                            <tr id="tr-@item.OrderId">
+                                <td class="td-id">
+                                    @item.OrderId
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.RequestId)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PtId)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ItemNo)
+                                </td>
 
-                            <td class="td-qty">
-                                @Html.DisplayFor(modelItem => item.Qty)
-                            </td>
-                            <td class="td-moved">
-                                @Html.DisplayFor(modelItem => item.Moved)
-                            </td>
-                            <td class="td-reported">
-                                @Html.DisplayFor(modelItem => item.Reported)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.AlcFrom)
-                            </td>
-                            <td class="to-code">
-                                @Html.DisplayFor(modelItem => item.AlcToCode)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.AlcToDesc)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.MvmTime)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.ConfirmBy)
-                            </td>
-                            <td>
-                                @if (item.Confirmed == true || item.Moved >= item.Qty)
-                                {
-                                    <p class="badge bg-success"> Completed </p>
-                                }
-                                else
-                                {
-                                    <div class="p-2 bd-highlight">
-                                        <button class="btn btn-info modal-btn">
-                                            Submit
-                                        </button>
-                                        <button class="btn btn-danger report-btn">
-                                            Report
-                                        </button>
-                                    </div>
-                                }
-                            </td>
-                        </tr>
+                                <td class="td-qty">
+                                    @Html.DisplayFor(modelItem => item.Qty)
+                                </td>
+                                <td class="td-moved">
+                                    @Html.DisplayFor(modelItem => item.Moved)
+                                </td>
+                                <td class="td-reported">
+                                    @Html.DisplayFor(modelItem => item.Reported)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AlcFrom)
+                                </td>
+                                <td class="to-code">
+                                    @Html.DisplayFor(modelItem => item.AlcToCode)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AlcToDesc)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.MvmTime)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ConfirmBy)
+                                </td>
+                                <td>
+                                    @if (item.Confirmed == true || item.Moved >= item.Qty)
+                                    {
+                                        <p class="badge bg-success"> Completed </p>
+                                    }
+                                    else
+                                    {
+                                        @if (User.IsInRole("Move inventory"))
+                                        {
+
+
+                                            <div class="p-2 bd-highlight">
+                                                <button class="btn btn-info modal-btn">
+                                                    Submit
+                                                </button>
+                                                <button class="btn btn-danger report-btn">
+                                                    Report
+                                                </button>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Incomplete</span>
+                                        }
+                                    }
+                                </td>
+                            </tr>
                         }
 
                     </tbody>
                 </table>
             </div>
-            
+
         </div>
     </div>
 </div>
@@ -128,7 +137,7 @@
 <script src="~/assets/js/qr/html5-qrcode.min.js"></script>
 <script>
     var routeURL = location.protocol + "//" + location.host;
-    
+
 
     $(document).ready(function () {
         $('.nav-movement').addClass('active');

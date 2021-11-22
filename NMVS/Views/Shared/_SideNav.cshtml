@@ -94,73 +94,79 @@
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a data-bs-toggle="collapse" href="#navRequest" class="nav-link nav-request" aria-controls="navRequest" role="button" aria-expanded="false">
-                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-                        <span class="fa fa-thumbs-up"></span>
+            @if (User.IsInRole("Request inventory") || User.IsInRole("Handle request"))
+            {
+
+                <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#navRequest" class="nav-link nav-request" aria-controls="navRequest" role="button" aria-expanded="false">
+                        <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                            <span class="fa fa-thumbs-up"></span>
+                        </div>
+                        <span class="nav-link-text ms-1">Request</span>
+                    </a>
+                    <div class="collapse nav-request" id="navRequest">
+                        <ul class="nav ms-4 ps-3">
+                            <li class="nav-item ">
+                                <a class="nav-link nav-rq-his" href="/InvRequests/History">
+                                    <span class="sidenav-mini-icon"> AR </span>
+                                    <span class="sidenav-normal"> Request history</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item nav-rq-in-mfg">
+                                <a class="nav-link nav-rq-in-mfg" href="/InvRequests/IssueNoteMfg">
+                                    <span class="sidenav-mini-icon"> I </span>
+                                    <span class="sidenav-normal"> Issue note MFG</span>
+                                </a>
+                            </li>
+                            <li class="nav-item nav-rq-in-ve">
+                                <a class="nav-link nav-rq-in-ve" href="/InvRequests/IssueNoteVehicle">
+                                    <span class="sidenav-mini-icon"> I </span>
+                                    <span class="sidenav-normal"> Delivery issue notes</span>
+                                </a>
+                            </li>
+                            <li class="nav-item nav-rq-in-so">
+                                <a class="nav-link nav-rq-in-so" href="/InvRequests/IssueNoteList">
+                                    <span class="sidenav-mini-icon"> I </span>
+                                    <span class="sidenav-normal"> Issue note history</span>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                    <span class="nav-link-text ms-1">Request</span>
-                </a>
-                <div class="collapse nav-request" id="navRequest">
-                    <ul class="nav ms-4 ps-3">
-                        <li class="nav-item ">
-                            <a class="nav-link nav-rq-his" href="/InvRequests/History">
-                                <span class="sidenav-mini-icon"> AR </span>
-                                <span class="sidenav-normal"> Request history</span>
-                            </a>
-                        </li>
 
-                        <li class="nav-item nav-rq-in-mfg">
-                            <a class="nav-link nav-rq-in-mfg" href="/InvRequests/IssueNoteMfg">
-                                <span class="sidenav-mini-icon"> I </span>
-                                <span class="sidenav-normal"> Issue note MFG</span>
-                            </a>
-                        </li>
-                        <li class="nav-item nav-rq-in-ve">
-                            <a class="nav-link nav-rq-in-ve" href="/InvRequests/IssueNoteVehicle">
-                                <span class="sidenav-mini-icon"> I </span>
-                                <span class="sidenav-normal"> Delivery issue notes</span>
-                            </a>
-                        </li>
-                        <li class="nav-item nav-rq-in-so">
-                            <a class="nav-link nav-rq-in-so" href="/InvRequests/IssueNoteList">
-                                <span class="sidenav-mini-icon"> I </span>
-                                <span class="sidenav-normal"> Issue note history</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                </li>
+            }
 
-            </li>
+            @if (User.IsInRole("Arrange inventory") || User.IsInRole("Move inventory"))
+            {
+                <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#navAllocate" class="nav-link nav-allocate" aria-controls="navAllocate" role="button" aria-expanded="false">
+                        <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                            <span class="fa fa-boxes"></span>
+                        </div>
+                        <span class="nav-link-text ms-1">Allocate</span>
+                    </a>
+                    <div class="collapse nav-allocate" id="navAllocate">
+                        <ul class="nav ms-4 ps-3">
+                            <li class="nav-item ">
+                                <a class="nav-link nav-add-alc" href="/Allocate/AllocateRequests/">
+                                    <span class="sidenav-mini-icon"> AR </span>
+                                    <span class="sidenav-normal"> Allocate requests</span>
+                                </a>
+                            </li>
 
 
-            <li class="nav-item">
-                <a data-bs-toggle="collapse" href="#navAllocate" class="nav-link nav-allocate" aria-controls="navAllocate" role="button" aria-expanded="false">
-                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-                        <span class="fa fa-boxes"></span>
+                            <li class="nav-item nav-un">
+                                <a class="nav-link " href="/Allocate/Unallocated">
+                                    <span class="sidenav-mini-icon"> U </span>
+                                    <span class="sidenav-normal"> Uncallocated</span>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                    <span class="nav-link-text ms-1">Allocate</span>
-                </a>
-                <div class="collapse nav-allocate" id="navAllocate">
-                    <ul class="nav ms-4 ps-3">
-                        <li class="nav-item ">
-                            <a class="nav-link nav-add-alc" href="/Allocate/AllocateRequests/">
-                                <span class="sidenav-mini-icon"> AR </span>
-                                <span class="sidenav-normal"> Allocate requests</span>
-                            </a>
-                        </li>
 
-
-                        <li class="nav-item nav-un">
-                            <a class="nav-link " href="/Allocate/Unallocated">
-                                <span class="sidenav-mini-icon"> U </span>
-                                <span class="sidenav-normal"> Uncallocated</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-            </li>
+                </li>
+            }
 
 
             <li class="nav-item">
@@ -191,14 +197,17 @@
 
             </li>
 
-            <li class="nav-item side-unq">
-                <a class="nav-link side-unq" href="/Unqualifieds/OverView">
-                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-                        <span class="fa fa-recycle"></span>
-                    </div>
-                    <span class="nav-link-text ms-1">Unqualified items</span>
-                </a>
-            </li>
+            @if (User.IsInRole("Handle request"))
+            {
+                <li class="nav-item side-unq">
+                    <a class="nav-link side-unq" href="/Unqualifieds/OverView">
+                        <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                            <span class="fa fa-recycle"></span>
+                        </div>
+                        <span class="nav-link-text ms-1">Unqualified items</span>
+                    </a>
+                </li>
+            }
 
             @if (User.IsInRole("Receive inventory") || User.IsInRole("QC"))
             {
@@ -231,78 +240,97 @@
 
             }
 
-            <li class="nav-item mt-3">
-                <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6"><span class="fa fa-truck"></span> Vehicle</h6>
-            </li>
+            @if (User.IsInRole("Register vehicle") || User.IsInRole("Guard"))
+            {
+                <li class="nav-item mt-3">
+                    <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6"><span class="fa fa-truck"></span> Vehicle</h6>
+                </li>
 
-            <li class="nav-item nav-ship">
-                <a class="nav-link nav-ship" href="/Shippers/Browse">
-                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-                        <span class="fa fa-truck-moving"></span>
+                @if (User.IsInRole("Register vehicle"))
+                {
+                    <li class="nav-item nav-ship">
+                        <a class="nav-link nav-ship" href="/Shippers/Browse">
+                            <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                                <span class="fa fa-truck-moving"></span>
+                            </div>
+                            <span class="nav-link-text ms-1">Vehicles</span>
+                        </a>
+                    </li>
+                }
+
+                @if (User.IsInRole("Guard"))
+                {
+                    <li class="nav-item nav-guardp">
+                        <a class="nav-link nav-guard" href="/Shippers/Checkin">
+                            <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                                <span class="fa fa-shield"></span>
+                            </div>
+                            <span class="nav-link-text ms-1">Guard</span>
+                        </a>
+                    </li>
+                }
+
+            }
+
+
+
+
+
+            @if (User.IsInRole("WoCreation") || User.IsInRole("WoReporter") )
+            {
+                <li class="nav-item mt-3">
+                    <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6"> MFG</h6>
+                </li>
+
+
+                <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#navWo" class="nav-link nav-wo" aria-controls="navWo" role="button" aria-expanded="false">
+                        <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                            <span class="fa fa-boxes"></span>
+                        </div>
+                        <span class="nav-link-text ms-1">Work Orders</span>
+                    </a>
+                    <div class="collapse" id="navWo">
+                        <ul class="nav ms-4 ps-3">
+                            <li class="nav-item ">
+                                <a class="nav-link wo-dash" href="/WorkOrders/WoDashboard/">
+                                    <span class="sidenav-mini-icon"> D </span>
+                                    <span class="sidenav-normal"> Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="nav-item nav-w-ord">
+                                <a class="nav-link " href="/WorkOrders/WoBrowse">
+                                    <span class="sidenav-mini-icon"> Br </span>
+                                    <span class="sidenav-normal"> Work orders browse</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item ">
+                                <a class="nav-link nav-bill" href="/WoBills/Bills">
+                                    <span class="sidenav-mini-icon"> Bi </span>
+                                    <span class="sidenav-normal"> Bills</span>
+                                </a>
+                            </li>
+
+
+                        </ul>
                     </div>
-                    <span class="nav-link-text ms-1">Vehicles</span>
-                </a>
-            </li>
 
-            <li class="nav-item nav-guardp">
-                <a class="nav-link nav-guard" href="/Shippers/Checkin">
-                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-                        <span class="fa fa-shield"></span>
-                    </div>
-                    <span class="nav-link-text ms-1">Guard</span>
-                </a>
-            </li>
+                </li>
+            }
 
 
-
-            <li class="nav-item mt-3">
-                <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6"> MFG</h6>
-            </li>
-
-
-            <li class="nav-item">
-                <a data-bs-toggle="collapse" href="#navWo" class="nav-link nav-wo" aria-controls="navWo" role="button" aria-expanded="false">
-                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-                        <span class="fa fa-boxes"></span>
-                    </div>
-                    <span class="nav-link-text ms-1">Work Orders</span>
-                </a>
-                <div class="collapse" id="navWo">
-                    <ul class="nav ms-4 ps-3">
-                        <li class="nav-item ">
-                            <a class="nav-link wo-dash" href="/WorkOrders/WoDashboard/">
-                                <span class="sidenav-mini-icon"> D </span>
-                                <span class="sidenav-normal"> Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="nav-item nav-w-ord">
-                            <a class="nav-link " href="/WorkOrders/WoBrowse">
-                                <span class="sidenav-mini-icon"> Br </span>
-                                <span class="sidenav-normal"> Work orders browse</span>
-                            </a>
-                        </li>
-
-                        <li class="nav-item ">
-                            <a class="nav-link nav-bill" href="/WoBills/Bills">
-                                <span class="sidenav-mini-icon"> Bi </span>
-                                <span class="sidenav-normal"> Bills</span>
-                            </a>
-                        </li>
-
-
-                    </ul>
-                </div>
-
-            </li>
-
-            <li class="nav-item side-prdln">
-                <a class="nav-link side-prdln" href="/ProductLines/ProdLineBrowse">
-                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-                        <span class="fa fa-syringe"></span>
-                    </div>
-                    <span class="nav-link-text ms-1">Prod line</span>
-                </a>
-            </li>
+            @if (User.IsInRole("WoCreation") || User.IsInRole("WoReporter"))
+            {
+                <li class="nav-item side-prdln">
+                    <a class="nav-link side-prdln" href="/ProductLines/ProdLineBrowse">
+                        <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                            <span class="fa fa-syringe"></span>
+                        </div>
+                        <span class="nav-link-text ms-1">Prod line</span>
+                    </a>
+                </li>
+            }
 
 
             <li class="nav-item mt-3">

@@ -20,15 +20,24 @@ namespace NMVS.Controllers
             _context = context;
         }
 
+
+
         // GET: Shippers
         public async Task<IActionResult> Browse()
         {
-            var model = await _context.Shippers.ToListAsync();
-            foreach(var item in model)
+            if (User.IsInRole("Register vehicle") || User.IsInRole("Guard"))
             {
-                item.IssueConfirmed = _context.ShipperDets.Where(x => x.ShpId == item.ShpId).Any();
+                var model = await _context.Shippers.ToListAsync();
+                foreach (var item in model)
+                {
+                    item.IssueConfirmed = _context.ShipperDets.Where(x => x.ShpId == item.ShpId).Any();
+                }
+                return View(model);
             }
-            return View(model);
+            else
+            {
+                return View("_Error403");
+            }
         }
 
         // GET: Shippers/Details/5
@@ -52,8 +61,16 @@ namespace NMVS.Controllers
         // GET: Shippers/Create
         public IActionResult Register()
         {
-            ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
-            return View();
+            if (User.IsInRole("Register vehicle") || User.IsInRole("Guard"))
+            {
+                ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
+                return View();
+            }
+            else
+            {
+                return View("_Error403");
+            }
+
         }
 
         // POST: Shippers/Create
@@ -63,37 +80,54 @@ namespace NMVS.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Register([Bind("ShpId,RememberMe,ShpDesc,Driver,DrContact,ShpTo,ShpVia,DateIn,ActualIn,ActualOut,CheckInBy,CheckOutBy,Loc,RegisteredBy")] Shipper shipper)
         {
-            if (ModelState.IsValid)
+            if (User.IsInRole("Register vehicle") || User.IsInRole("Guard"))
             {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Add(shipper);
-                    _context.SaveChanges();
-                    return RedirectToAction(nameof(Browse));
-                }catch(Exception e)
-                {
-                    ModelState.AddModelError("", e.ToString());
+                    try
+                    {
+                        _context.Add(shipper);
+                        _context.SaveChanges();
+                        return RedirectToAction(nameof(Browse));
+                    }
+                    catch (Exception e)
+                    {
+                        ModelState.AddModelError("", e.ToString());
+                    }
                 }
+                ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
+                return View(shipper);
             }
-            ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
-            return View(shipper);
+            else
+            {
+                return View("_Error403");
+            }
+
         }
 
         // GET: Shippers/Edit/5
         public IActionResult Edit(int? id)
         {
-            if (id == null)
+            if (User.IsInRole("Register vehicle") || User.IsInRole("Guard"))
             {
-                return NotFound();
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                var shipper = _context.Shippers.Find(id);
+                if (shipper == null)
+                {
+                    return NotFound();
+                }
+                ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
+                return View(shipper);
+            }
+            else
+            {
+                return View("_Error403");
             }
 
-            var shipper = _context.Shippers.Find(id);
-            if (shipper == null)
-            {
-                return NotFound();
-            }
-            ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
-            return View(shipper);
         }
 
         // POST: Shippers/Edit/5
@@ -103,51 +137,67 @@ namespace NMVS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ShpId,RememberMe,ShpDesc,Driver,DrContact,ShpFrom,ShpTo,ShpVia,DateIn,ActualIn,ActualOut,CheckInBy,CheckOutBy,Loc,RegisteredBy")] Shipper shipper)
         {
-            if (id != shipper.ShpId)
+            if (User.IsInRole("Register vehicle") || User.IsInRole("Guard"))
             {
-                return NotFound();
+                if (id != shipper.ShpId)
+                {
+                    return NotFound();
+                }
+
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        _context.Update(shipper);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!ShipperExists(shipper.ShpId))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    return RedirectToAction(nameof(Browse));
+                }
+                ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
+                return View(shipper);
+            }
+            else
+            {
+                return View("_Error403");
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(shipper);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ShipperExists(shipper.ShpId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Browse));
-            }
-            ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
-            return View(shipper);
         }
 
         // GET: Shippers/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (User.IsInRole("Register vehicle") || User.IsInRole("Guard"))
             {
-                return NotFound();
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                var shipper = await _context.Shippers
+                    .FirstOrDefaultAsync(m => m.ShpId == id);
+                if (shipper == null)
+                {
+                    return NotFound();
+                }
+
+                return View(shipper);
+            }
+            else
+            {
+                return View("_Error403");
             }
 
-            var shipper = await _context.Shippers
-                .FirstOrDefaultAsync(m => m.ShpId == id);
-            if (shipper == null)
-            {
-                return NotFound();
-            }
-
-            return View(shipper);
         }
 
         // POST: Shippers/Delete/5
@@ -168,59 +218,83 @@ namespace NMVS.Controllers
 
         public async Task<IActionResult> CheckIn()
         {
-            return View(await _context.Shippers.ToListAsync());
+            if (User.IsInRole("Guard"))
+            {
+                return View(await _context.Shippers.ToListAsync());
+            }
+            else
+            {
+                return View("_Error403");
+            }
+
         }
 
         public async Task<IActionResult> ApproveCheckIn(int id)
         {
-            var shipper = await _context.Shippers.FindAsync(id);
-            if (shipper!= null)
+            if (User.IsInRole("Guard"))
             {
-                shipper.CheckInBy = User.Identity.Name;
-                shipper.ActualIn = DateTime.Now;
-                _context.Update(shipper);
-                _context.SaveChanges();
+                var shipper = await _context.Shippers.FindAsync(id);
+                if (shipper != null)
+                {
+                    shipper.CheckInBy = User.Identity.Name;
+                    shipper.ActualIn = DateTime.Now;
+                    _context.Update(shipper);
+                    _context.SaveChanges();
+                }
+                return Ok();
             }
-            return Ok();
+            else
+            {
+                return View("_Error403");
+            }
+
         }
 
         public IActionResult CheckOut(int id)
         {
-            var shp = _context.Shippers.Find(id);
-
-            var noteDet = (from d in _context.ShipperDets.Where(x => x.ShpId == id)
-                           join i in _context.ItemDatas on d.ItemNo equals i.ItemNo into all
-                           from a in all.DefaultIfEmpty()
-                           join s in _context.SalesOrders on d.RqId equals s.SoNbr into sOrder
-                           from so in sOrder.DefaultIfEmpty()
-                           join c in _context.Customers on so.CustCode equals c.CustCode into soldTo
-                           from soto in soldTo.DefaultIfEmpty()
-                           join c2 in _context.Customers on so.ShipTo equals c2.CustCode into shipTo
-                           from shto in shipTo.DefaultIfEmpty()
-                           select new ShipperDet
-                           {
-                               InventoryId = d.InventoryId,
-                               DetId = d.DetId,
-                               ItemName = a.ItemName,
-                               ItemNo = a.ItemNo,
-                               Quantity = d.Quantity,
-                               RqId = d.RqId,
-                               ShpId = d.ShpId,
-                               SoldTo = soto.CustCode,
-                               SoldToName = soto.CustName,
-                               ShipToId = shto.CustCode,
-                               ShipToAddr = shto.Addr,
-                               ShipToName = shto.CustName
-                           }).ToList();
-
-            var model = new IssueNoteShipperVm
+            if (User.IsInRole("Guard"))
             {
-                Det = noteDet,
-                Shp = shp
-            };
-            return View(model);
+                var shp = _context.Shippers.Find(id);
+
+                var noteDet = (from d in _context.ShipperDets.Where(x => x.ShpId == id)
+                               join i in _context.ItemDatas on d.ItemNo equals i.ItemNo into all
+                               from a in all.DefaultIfEmpty()
+                               join s in _context.SalesOrders on d.RqId equals s.SoNbr into sOrder
+                               from so in sOrder.DefaultIfEmpty()
+                               join c in _context.Customers on so.CustCode equals c.CustCode into soldTo
+                               from soto in soldTo.DefaultIfEmpty()
+                               join c2 in _context.Customers on so.ShipTo equals c2.CustCode into shipTo
+                               from shto in shipTo.DefaultIfEmpty()
+                               select new ShipperDet
+                               {
+                                   InventoryId = d.InventoryId,
+                                   DetId = d.DetId,
+                                   ItemName = a.ItemName,
+                                   ItemNo = a.ItemNo,
+                                   Quantity = d.Quantity,
+                                   RqId = d.RqId,
+                                   ShpId = d.ShpId,
+                                   SoldTo = soto.CustCode,
+                                   SoldToName = soto.CustName,
+                                   ShipToId = shto.CustCode,
+                                   ShipToAddr = shto.Addr,
+                                   ShipToName = shto.CustName
+                               }).ToList();
+
+                var model = new IssueNoteShipperVm
+                {
+                    Det = noteDet,
+                    Shp = shp
+                };
+                return View(model);
+            }
+            else
+            {
+                return View("_Error403");
+            }
+
         }
 
-       
+
     }
 }
