@@ -26,26 +26,5 @@ namespace NMVS.Controllers.Api
 
         }
 
-        //[HttpPost]
-        //[Route("NewCustomer")]
-        //public async Task<IActionResult> NewCustomer(CustomerVm cust)
-        //{
-        //    var role = _httpContextAccessor.HttpContext.User.IsInRole(Helper.UserManagement);
-        //    CommonResponse<int> commonResponse;
-        //    if (role)
-        //    {
-        //        CustomerVm ctm = cust;
-        //        commonResponse = await _customerService.AddCustomer(ctm);
-        //    }
-        //    else
-        //    {
-        //        commonResponse = new();
-        //        commonResponse.status = 0;
-        //        commonResponse.message = "Access denied!";
-        //    }
-
-        //    return Ok(commonResponse);
-
-        //}
     }
 }

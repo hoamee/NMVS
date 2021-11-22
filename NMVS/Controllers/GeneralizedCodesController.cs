@@ -11,7 +11,7 @@ using NMVS.Models.DbModels;
 
 namespace NMVS.Controllers
 {
-    
+    [Authorize(Roles = "SupperUser")]
     public class GeneralizedCodesController : Controller
     {
         private readonly ApplicationDbContext _context;

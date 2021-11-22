@@ -25,118 +25,140 @@
                             <th>Approve SO</th>
                             <th>Register vehicle</th>
                             <th>Guard</th>
+                            <th>Create WO</th>
+                            <th>Wo reporter</th>
                             <th>Active</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            <tr>
-                                <td class="text-sm font-weight-normal">
-                                    <span class="btn btn-sm btn-outline-primary" onclick="editRole('@item.UserName')">@Html.DisplayFor(x => item.UserName)</span>
+                        <tr>
+                            <td class="text-sm font-weight-normal">
+                                <span class="btn btn-sm btn-outline-primary" onclick="editRole('@item.UserName')">@Html.DisplayFor(x => item.UserName)</span>
 
-                                </td>
-                                <td class="text-sm font-weight-normal">
-                                    @if (item.UserManagement)
-                                    {
-                                        <p class="badge bg-success">Yes</p>
-                                    }
-                                    else
-                                    {
-                                        <p class="badge bg-secondary">No</p>
-                                    }
-                                </td>
-                                <td class="text-sm font-weight-normal">
-                                    @if (item.RequestInv)
-                                    {
-                                        <p class="badge bg-success">Yes</p>
-                                    }
-                                    else
-                                    {
-                                        <p class="badge bg-secondary">No</p>
-                                    }
-                                </td>
-                                <td class="text-sm font-weight-normal">
-                                    @if (item.HandleRequest)
-                                    {
-                                        <p class="badge bg-success">Yes</p>
-                                    }
-                                    else
-                                    {
-                                        <p class="badge bg-secondary">No</p>
-                                    }
-                                </td>
-                                <td class="text-sm font-weight-normal">
-                                    @if (item.ReceiveInv)
-                                    {
-                                        <p class="badge bg-success">Yes</p>
-                                    }
-                                    else
-                                    {
-                                        <p class="badge bg-secondary">No</p>
-                                    }
-                                </td>
-                                <td class="text-sm font-weight-normal">
-                                    @if (item.QC)
-                                    {
-                                        <p class="badge bg-success">Yes</p>
-                                    }
-                                    else
-                                    {
-                                        <p class="badge bg-secondary">No</p>
-                                    }
-                                </td>
-                                <td class="text-sm font-weight-normal">
-                                    @if (item.CreateSO)
-                                    {
-                                        <p class="badge bg-success">Yes</p>
-                                    }
-                                    else
-                                    {
-                                        <p class="badge bg-secondary">No</p>
-                                    }
-                                </td>
-                                <td class="text-sm font-weight-normal">
-                                    @if (item.AppSO)
-                                    {
-                                        <p class="badge bg-success">Yes</p>
-                                    }
-                                    else
-                                    {
-                                        <p class="badge bg-secondary">No</p>
-                                    }
-                                </td>
-                                <td class="text-sm font-weight-normal">
-                                    @if (item.RegVehicle)
-                                    {
-                                        <p class="badge bg-success">Yes</p>
-                                    }
-                                    else
-                                    {
-                                        <p class="badge bg-secondary">No</p>
-                                    }
-                                </td>
-                                <td class="text-sm font-weight-normal">
-                                    @if (item.Guard)
-                                    {
-                                        <p class="badge bg-success">Yes</p>
-                                    }
-                                    else
-                                    {
-                                        <p class="badge bg-secondary">No</p>
-                                    }
-                                </td>
-                                <td class="text-sm font-weight-normal">
-                                    @if (item.Active)
-                                    {
-                                        <p class="badge bg-success">Active</p>
-                                    }
-                                    else
-                                    {
-                                        <p class="badge bg-secondary">Inactive</p>
-                                    }
-                                </td>
-                            </tr>
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.UserManagement)
+                                {
+                                    <p class="badge bg-success">Yes</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">No</p>
+                                }
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.RequestInv)
+                                {
+                                    <p class="badge bg-success">Yes</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">No</p>
+                                }
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.HandleRequest)
+                                {
+                                    <p class="badge bg-success">Yes</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">No</p>
+                                }
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.ReceiveInv)
+                                {
+                                    <p class="badge bg-success">Yes</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">No</p>
+                                }
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.QC)
+                                {
+                                    <p class="badge bg-success">Yes</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">No</p>
+                                }
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.CreateSO)
+                                {
+                                    <p class="badge bg-success">Yes</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">No</p>
+                                }
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.AppSO)
+                                {
+                                    <p class="badge bg-success">Yes</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">No</p>
+                                }
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.RegVehicle)
+                                {
+                                    <p class="badge bg-success">Yes</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">No</p>
+                                }
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.Guard)
+                                {
+                                    <p class="badge bg-success">Yes</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">No</p>
+                                }
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.WoCreation)
+                                {
+                                    <p class="badge bg-success">Yes</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">No</p>
+                                }
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.WoReporter)
+                                {
+                                    <p class="badge bg-success">Yes</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">No</p>
+                                }
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.Active)
+                                {
+                                    <p class="badge bg-success">Active</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">Inactive</p>
+                                }
+                            </td>
+                        </tr>
                         }
                     </tbody>
                 </table>

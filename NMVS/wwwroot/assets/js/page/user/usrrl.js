@@ -28,6 +28,8 @@ function editRole(usrId) {
                 $('#u-apso').prop('checked', obj.appSO);
                 $('#u-reg').prop('checked', obj.regVehicle);
                 $('#u-guard').prop('checked', obj.guard);
+                $('#u-wo').prop('checked', obj.woCreation);
+                $('#u-u-worp').prop('checked', obj.woReporter);
                 $('#u-active').prop('checked', obj.active);
 
                 $('#seeding-modal').modal('toggle');
@@ -54,7 +56,9 @@ function seedRole() {
         AppSO: $('#u-apso').is(":checked"),
         RegVehicle: $('#u-reg').is(":checked"),
         Guard: $('#u-guard').is(":checked"),
-        Active: $('#u-active').is(":checked")
+        Active: $('#u-active').is(":checked"),
+        WoReporter: $('#u-wo').is(":checked"),
+        WoCreation: $('#u-worp').is(":checked"),
     };
 
 

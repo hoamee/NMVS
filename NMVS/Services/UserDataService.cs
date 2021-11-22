@@ -66,32 +66,10 @@ namespace NMVS.Services
                                       UserManagement = p.RoleNames.Contains(Helper.UserManagement),
                                       ArrangeInventory = p.RoleNames.Contains(Helper.ArrangeInventory),
                                       MoveInv = p.RoleNames.Contains(Helper.MoveInventory),
+                                      WoReporter = p.RoleNames.Contains(Helper.WoReporter),
+                                      WoCreation = p.RoleNames.Contains(Helper.WoCreation),
                                       Active = p.UserLock
                                   }).ToList();
-
-            //var userRolesList = (from user in _db.Users
-            //                     select new
-            //                     {
-            //                         Username = user.UserName,
-            //                         RoleNames = (from userRole in _db.UserRoles
-            //                                      join role in _db.Roles on userRole.RoleId
-            //                                          equals role.Id
-            //                                      select role.Name).ToList()
-            //                     }).ToList().Select(p => new UserRoleVm()
-
-            //                     {
-            //                         UserName = p.Username,
-            //                         Guard = p.RoleNames.Contains(Helper.Guard),
-            //                         QC = p.RoleNames.Contains(Helper.QC),
-            //                         AppSO = p.RoleNames.Contains(Helper.AppSO),
-            //                         CreateSO = p.RoleNames.Contains(Helper.CreateSO),
-            //                         RequestInv = p.RoleNames.Contains(Helper.RequestInv),
-            //                         HandleRequest = p.RoleNames.Contains(Helper.HandleRequest),
-            //                         ReceiveInv = p.RoleNames.Contains(Helper.ReceiveInv),
-            //                         RegVehicle = p.RoleNames.Contains(Helper.RegVehicle),
-            //                         UserManagement = p.RoleNames.Contains(Helper.UserManagement)
-
-            //                     }).ToList();
 
             return userRolesList2;
         }
@@ -124,6 +102,8 @@ namespace NMVS.Services
                                       UserManagement = p.RoleNames.Contains(Helper.UserManagement),
                                       ArrangeInventory = p.RoleNames.Contains(Helper.ArrangeInventory),
                                       MoveInv = p.RoleNames.Contains(Helper.MoveInventory),
+                                      WoReporter = p.RoleNames.Contains(Helper.WoReporter),
+                                      WoCreation = p.RoleNames.Contains(Helper.WoCreation),
                                       Active = p.UserLock
                                   }).FirstOrDefault();
 
@@ -186,6 +166,16 @@ namespace NMVS.Services
             if (!_roleManager.RoleExistsAsync(Helper.RegVehicle).GetAwaiter().GetResult())
             {
                 await _roleManager.CreateAsync(new ApplicationRole(Helper.RegVehicle));
+            }
+
+            if (!_roleManager.RoleExistsAsync(Helper.WoCreation).GetAwaiter().GetResult())
+            {
+                await _roleManager.CreateAsync(new ApplicationRole(Helper.WoCreation));
+            }
+
+            if (!_roleManager.RoleExistsAsync(Helper.WoReporter).GetAwaiter().GetResult())
+            {
+                await _roleManager.CreateAsync(new ApplicationRole(Helper.WoReporter));
             }
 
             if (!_roleManager.RoleExistsAsync("SuperUser").GetAwaiter().GetResult())
@@ -375,6 +365,38 @@ namespace NMVS.Services
                 }
             }
 
+            //12. Create workorder
+            if (usr.WoCreation)
+            {
+                if (!await _userManager.IsInRoleAsync(user, Helper.WoCreation))
+                {
+                    await _userManager.AddToRoleAsync(user, Helper.WoCreation);
+                }
+            }
+            else
+            {
+                if (await _userManager.IsInRoleAsync(user, Helper.WoCreation))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, Helper.WoCreation);
+                }
+            }
+
+            //13. report workorder
+            if (usr.WoReporter)
+            {
+                if (!await _userManager.IsInRoleAsync(user, Helper.WoReporter))
+                {
+                    await _userManager.AddToRoleAsync(user, Helper.WoReporter);
+                }
+            }
+            else
+            {
+                if (await _userManager.IsInRoleAsync(user, Helper.WoReporter))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, Helper.WoReporter);
+                }
+            }
+
             //10. Active
             if (usr.Active)
             {
@@ -399,7 +421,7 @@ namespace NMVS.Services
 
             if (!await _userManager.IsInRoleAsync(admin, "SuperUser"))
             {
-                await _userManager.AddToRoleAsync(user, "SuperUser");
+                await _userManager.AddToRoleAsync(admin, "SuperUser");
             }
 
         }

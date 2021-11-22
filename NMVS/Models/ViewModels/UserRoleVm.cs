@@ -27,6 +27,10 @@ namespace NMVS.Models.ViewModels
 
         public bool Guard { set; get; }
 
+        public bool WoCreation { set; get; }
+
+        public bool WoReporter { set; get; }
+
         public bool Active { set; get; }
 
         public bool ArrangeInventory { set; get; }
