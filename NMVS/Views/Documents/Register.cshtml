@@ -1,0 +1,60 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
+    ViewData["Title"] = "Register new account";
+}
+
+<div class="card-header">
+    <h3 class="mb-0">@ViewData["Title"]</h3>
+</div>
+<div class="table-responsive card-body">
+    <p>
+        <b>Step 1: Go to log in page and select "Sign up"</b>
+    </p>
+    <div class="col-10">
+        <img src="~/assets/documentation/sign up.png" class="img-fluid" alt="login page">
+    </div>
+    <br />
+    <p>
+        <b>Step 2: Fill all the information, include:</b>
+    </p>
+    <ul>
+        <li>
+            Your full name
+        </li>
+        <li>
+            Acount name (account for login)
+        </li>
+        <li>
+            Password
+        </li>
+        <li>
+            Repeat password
+        </li>
+        <li>
+            Your email address <span class="text-danger">(your email will be helpful for password recovery)</span>
+        </li>
+        <li>
+            Click on "sign up"
+        </li>
+    </ul>
+    <div class="col-10">
+        <img src="~/assets/documentation/sign up form.png" class="img-fluid" alt="sign up page">
+    </div>
+
+    <br />
+    <p>
+        <b>Step 3: An message shows up: Your account is created, but has not activated yet. Please inform the administrator to activate your account</b>
+    </p>
+    
+    <div class="col-10">
+        <img src="~/assets/documentation/sign up warning.png" class="img-fluid" alt="sign up page">
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.side-reg').addClass('active');
+        $('#side-reg').css('color', 'white');
+})
+</script>

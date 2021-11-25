@@ -36,9 +36,11 @@ namespace NMVS.Controllers
 
         }
 
+        [HttpGet]
         public async Task<IActionResult> Login()
         {
-            if (await _userManager.FindByNameAsync("nmvadmin") == null)
+            await _userData.InitRoleAsync();
+            if (_userManager.Users.FirstOrDefault(x=>x.UserName == "nmvadmin") == null)
             {
                 var newUser = new ApplicationUser
                 {
@@ -50,6 +52,7 @@ namespace NMVS.Controllers
 
                 var result = await _userManager.CreateAsync(newUser, "NetmarksHN#2021");
                 ModelState.AddModelError("", "Not existed");
+
 
                 var usr = new UserRoleVm
                 {
@@ -65,6 +68,8 @@ namespace NMVS.Controllers
                     RegVehicle = true,
                     RequestInv = true,
                     UserManagement = true,
+                    WoCreation= true,
+                    WoReporter = true,
                     UserName = "nmvadmin"
                 };
 

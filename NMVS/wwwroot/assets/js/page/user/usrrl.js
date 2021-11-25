@@ -32,7 +32,7 @@ function editRole(usrId) {
                 $('#u-worp').prop('checked', obj.woReporter);
                 $('#u-active').prop('checked', obj.active);
                 $('#u-arrange').prop('checked', obj.arrangeInventory);
-                $('#u-moveinv').prop('checked', obj.moveInventory);
+                $('#u-moveinv').prop('checked', obj.moveInv);
 
                 $('#seeding-modal').modal('toggle');
             }

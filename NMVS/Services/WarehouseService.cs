@@ -31,7 +31,7 @@ namespace NMVS.Services
         public List<TypeVm> GetWhType()
         {
             var whTypes = (from gen in _db.GeneralizedCodes
-                           where gen.CodeFldName == "WarehouseType"
+                           where gen.CodeFldName == "WH"
                            select new TypeVm
                            {
                                Code = gen.CodeValue,

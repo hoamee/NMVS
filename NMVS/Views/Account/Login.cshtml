@@ -4,31 +4,32 @@
     Layout = "~/Views/Shared/_Account.cshtml";
 
 }
+@*<div class="embedly-responsive" style="position: relative;padding-bottom: 78.2227%;height: 0;overflow: hidden;"><iframe class="embedly-embed" frameborder="0" scrolling="no" allowfullscreen src="https://cdn.embedly.com/widgets/media.html?src=https://www.relive.cc/view/vE6JdMzRLxv/widget?r=embed-site&url=https://www.relive.cc/view/vE6JdMzRLxv?r=embed-site&image=https://www.relive.cc/view/vE6JdMzRLxv/png?x-ref=embed-site&key=f1631a41cb254ca5b035dc5747a5bd75&type=text/html&schema=relive" width="1024" height="801" style="position: absolute;top: 0;left: 0;width: 100%;height: 100%;"></iframe></div>*@
+    <div class="card-body">
+        <form role="form" id="account" method="post" asp-action="Login" asp-controller="Account">
+            <div asp-validation-summary="All" class="text-danger" id="validation-summary"></div>
 
-<div class="card-body">
-    <form role="form" id="account" method="post" asp-action="Login" asp-controller="Account">
-        <div asp-validation-summary="All" class="text-danger" id="validation-summary"></div>
+            <div class="mb-3">
+                <input asp-for="UserName" type="text" class="form-control form-control-lg" placeholder="User account" aria-label="User account">
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <input asp-for="Password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-check form-switch">
+                <input asp-for="RememberMe" class="form-check-input" type="checkbox" id="rememberMe">
+                <label class="form-check-label" for="rememberMe">Remember me</label>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
+            </div>
+        </form>
+    </div>
+    <div class="card-footer text-center pt-0 px-lg-2 px-1">
+        <p class="mb-4 text-sm mx-auto">
+            Don't have an account?
+            <a href="/Account/Register" class="text-primary text-gradient font-weight-bold">Sign up</a>
+        </p>
+    </div>
 
-        <div class="mb-3">
-            <input asp-for="UserName" type="text" class="form-control form-control-lg" placeholder="Email" aria-label="Email">
-            <span asp-validation-for="UserName" class="text-danger"></span>
-        </div>
-        <div class="mb-3">
-            <input asp-for="Password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
-        <div class="form-check form-switch">
-            <input asp-for="RememberMe" class="form-check-input" type="checkbox" id="rememberMe">
-            <label class="form-check-label" for="rememberMe">Remember me</label>
-        </div>
-        <div class="text-center">
-            <button type="submit" class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
-        </div>
-    </form>
-</div>
-<div class="card-footer text-center pt-0 px-lg-2 px-1">
-    <p class="mb-4 text-sm mx-auto">
-        Don't have an account?
-        <a href="/Account/Register" class="text-primary text-gradient font-weight-bold">Sign up</a>
-    </p>
-</div>

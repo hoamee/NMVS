@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace NMVS.Controllers
 {
-    [Authorize(Roles = "Arrange inventory, Move inventory")]
+    
     public class AllocateController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -25,13 +25,14 @@ namespace NMVS.Controllers
             _db = db;
         }
 
-
+        [Authorize(Roles = "Arrange inventory")]
         public IActionResult AllocateRequests()
         {
             var model = _service.GetRequestList().OrderBy(x => x.IsClosed);
             return View(model);
         }
 
+        [Authorize(Roles = "Arrange inventory")]
         public IActionResult NewRequest()
         {
             ViewBag.ItemNo = _service.GetItemDistinc();
@@ -39,7 +40,7 @@ namespace NMVS.Controllers
                 , "LocCode", "LocDesc");
             return View();
         }
-
+        [Authorize(Roles = "Arrange inventory")]
         public async Task<ActionResult> SelectLoc([Bind("ItemNo,LocCode")] ItemMaster itemMaster)
         {
             var itemMasters = _service.GetAvailItem(itemMaster.ItemNo, itemMaster.LocCode);
@@ -47,19 +48,18 @@ namespace NMVS.Controllers
             return View(itemMasters);
         }
 
-
         public IActionResult Orders()
         {
 
             return View(_service.GetAllocateOrders());
         }
-
+        [Authorize(Roles = "Arrange inventory")]
         public IActionResult UnAllocated()
         {
 
             return View(_service.GetUnAllocated());
         }
-
+        [Authorize(Roles = "Arrange inventory")]
         public async Task<ActionResult> ConfirmLoc(int id)
         {
             var ptmstr = await _db.ItemMasters.FindAsync(id);

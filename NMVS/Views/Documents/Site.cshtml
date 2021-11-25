@@ -1,0 +1,72 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
+    ViewData["Title"] = "Site";
+}
+
+<div class="card-header">
+    <h3 class="mb-0">@ViewData["Title"]</h3>
+</div>
+<div class="card-body">
+    <h5>
+        Site is a concept of largest storage location. A site is parent of warehouses and grandparent of locations.
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/Site - menu.png" class="img-fluid">
+    </div>
+
+    <h5>
+        <b>I. Create new site</b>
+    </h5>
+    <p>
+        <b>1. User should be in role "Handle request". Otherwise, user can not see the "Site" menu</b>
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/site - role.png" class="img-fluid">
+    </div>
+    <br />
+    <p>
+        <b>2. From side bar, select Site</b>
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/Site - sidebar.png" class="img-fluid shadow p-3 mb-5 bg-body rounded">
+    </div>
+
+    <p>
+        <b>3. Select Add site and fill the information</b>
+    </p>
+    <div class="row">
+        <div class="col-md-6" align="center">
+            <img src="~/assets/documentation/site - add.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+        </div>
+        <div class="col-md-5 " align="center">
+            <img src="~/assets/documentation/site - reg.png" class="img-fluid shadow p-3 mb-5 bg-body rounded">
+        </div>
+    </div>
+    <p class="text-danger">The active attribute decide this site is visible in other some selection list </p>
+
+    <p>
+        <b>4. View the created site</b>
+    </p>
+
+    <div align="center">
+        <img src="~/assets/documentation/site - created.png" class="img-fluid shadow p-3 mb-5 bg-body rounded col-md-8">
+    </div>
+
+    <p class="text-danger">
+        <b>5. Warning: if you encount this message, that mean the site code is conflicted. Please select another Site code</b>
+    </p>
+    <div align="center">
+        <img src="~/assets/documentation/site-existed.png" class="img-fluid shadow p-3 mb-5 bg-body rounded">
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.side-site').addClass('active');
+        $('#side-site').css('color', 'white');
+        $('.navConfig').addClass('active');
+        $('#navConfig').addClass('show');
+        $('.fa-tools').css('color','white');
+})
+</script>

@@ -400,19 +400,15 @@ namespace NMVS.Services
             //10. Active
             if (usr.Active)
             {
-                if (!user.Active)
-                {
-                    user.Active = true;
-                    await _userManager.UpdateAsync(user);
-                }
+                var dbUser = _db.Users.FirstOrDefault(x => x.UserName == user.UserName);
+                dbUser.Active = true;
+
             }
             else
             {
-                if (user.Active)
-                {
-                    user.Active = false;
-                    await _userManager.UpdateAsync(user);
-                }
+                var dbUser = _db.Users.FirstOrDefault(x => x.UserName == user.UserName);
+                dbUser.Active = false;
+
             }
 
 
@@ -424,6 +420,7 @@ namespace NMVS.Services
                 await _userManager.AddToRoleAsync(admin, "SuperUser");
             }
 
+            await _db.SaveChangesAsync();
         }
     }
 }

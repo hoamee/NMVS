@@ -63,9 +63,16 @@ namespace NMVS.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(warehouse);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (await _context.Warehouses.FindAsync(warehouse.WhCode) != null)
+                {
+                    ModelState.AddModelError("", "Warehouse code \"" + warehouse.WhCode + "\" is already existed. Please input another code");
+                }
+                else
+                {
+                    _context.Add(warehouse);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
             ViewBag.SiteList = _service.GetSite();
             ViewBag.WhTypes = _service.GetWhType();

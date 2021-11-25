@@ -354,12 +354,13 @@ namespace NMVS.Controllers.Api
                 //5. update from-item master
                 pt.PtHold -= alo.MovedQty;
                 pt.PtQty -= alo.MovedQty;
-                response.status = 1;
+                
                 _context.Update(pt);
                 _context.Update(fromLoc);
                 _context.Update(toLoc);
                 _context.Update(order);
                 await _context.SaveChangesAsync();
+                response.status = 1;
                 return Ok(response);
             }
             catch (Exception e)

@@ -1,0 +1,90 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
+    ViewData["Title"] = "Active user & roles setting";
+}
+
+<div class="card-header">
+    <h3 class="mb-0">@ViewData["Title"]</h3>
+</div>
+<div class="table-responsive card-body">
+    <h5>
+        <b>Step 1: Log in with an account with role Manage user</b>
+    </h5>
+    <h5>
+        <b>Step 2: at the bottom of side navigation, select function "User roles"</b>
+    </h5>
+
+    <div class="col-10">
+        <img src="~/assets/documentation/seeding role - menu.png" class="img-fluid" alt="login page">
+    </div>
+
+
+    <br />
+    <h5>
+        <b>Step 3: Select an account</b>
+    </h5>
+    <div class="col-10">
+        <img src="~/assets/documentation/role - select user.png" class="img-fluid" alt="login page">
+    </div>
+
+    <br />
+    <h5>
+        <b>Step 4: Assign roles/activation status to user. Detail:</b>
+    </h5>
+    <ul>
+        <li>
+            Active: Able to log in system
+        </li>
+        <li>
+            User management: Access function User management and update other user's role, status
+        </li>
+        <li>
+            Request inventory: Create a inventory request
+        </li>
+        <li>
+            Handle request: Accept/Deny inventory request. Also can create pick list
+        </li>
+        <li>
+            Receive inventory: Create/Import/Edit/Delete incoming list
+        </li>
+        <li>
+            QC: For QC department. QC can decide the quantity of accept or reject
+        </li>
+        <li>
+            Create SO: Create sales order
+        </li>
+        <li>
+            Approve SO: Approve sales order
+        </li>
+        <li>
+            Arrange inventory: Create inventory allocate order
+        </li>
+        <li>
+            Movement: Response movement order (include allocate order, issue order)
+        </li>
+        <li>
+            Register vehicle
+        </li>
+        <li>
+            Guard: check in/check out vehicle
+        </li>
+        <li>
+            Create WO: Create work orders
+        </li>
+        <li>
+            Wo reporter: Report work orders process
+        </li>
+    </ul>
+    <div class="col-10">
+        <img src="~/assets/documentation/role - seeding.png" class="img-fluid" alt="sign up page">
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.side-reg').addClass('active');
+        $('#side-reg').css('color', 'white');
+})
+</script>

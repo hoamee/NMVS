@@ -177,7 +177,8 @@
             }
             else if (qty <= 0) {
                 $('#moved-qty').notify('Report quantity couldn\'t be less than or equal to 0');
-            } else {
+            }
+            else {
 
 
 
@@ -190,7 +191,11 @@
                     var desInput = decodedText;
                     html5QrcodeScanner.clear();
                     if (desInput !== desCode) {
-                        bootbox.alert('Incorrect destination! Please check your destination again! ' + desInput);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Target location incorrect!'
+                        })
                     }
                     else {
                         var oId = parseInt($('#table2 .td-id').text().trim());

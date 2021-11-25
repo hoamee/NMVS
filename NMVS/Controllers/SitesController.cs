@@ -58,9 +58,16 @@ namespace NMVS.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(site);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (await _context.Sites.FindAsync(site.SiCode) != null)
+                {
+                    ModelState.AddModelError("", "Site code \"" + site.SiCode + "\" is already exist. Please select another code");
+                }
+                else
+                {
+                    _context.Add(site);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
             return View(site);
         }

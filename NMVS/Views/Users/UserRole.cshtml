@@ -16,6 +16,7 @@
                     <thead class="thead-light">
                         <tr>
                             <th>Account</th>
+                            <th>Active</th>
                             <th>User management</th>
                             <th>Request Inventory</th>
                             <th>Handle Request</th>
@@ -29,7 +30,6 @@
                             <th>Guard</th>
                             <th>Create WO</th>
                             <th>Wo reporter</th>
-                            <th>Active</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -39,6 +39,17 @@
                             <td class="text-sm font-weight-normal">
                                 <span class="btn btn-sm btn-outline-primary" onclick="editRole('@item.UserName')">@Html.DisplayFor(x => item.UserName)</span>
 
+                            </td>
+
+                            <td class="text-sm font-weight-normal">
+                                @if (item.Active)
+                                {
+                                    <p class="badge bg-success">Active</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">Inactive</p>
+                                }
                             </td>
                             <td class="text-sm font-weight-normal">
                                 @if (item.UserManagement)
@@ -168,16 +179,6 @@
                                 else
                                 {
                                     <p class="badge bg-secondary">No</p>
-                                }
-                            </td>
-                            <td class="text-sm font-weight-normal">
-                                @if (item.Active)
-                                {
-                                    <p class="badge bg-success">Active</p>
-                                }
-                                else
-                                {
-                                    <p class="badge bg-secondary">Inactive</p>
                                 }
                             </td>
                         </tr>
