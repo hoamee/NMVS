@@ -49,31 +49,45 @@ namespace NMVS.Controllers
             return View();
         }
 
-        public IActionResult DownloadItemDataForm()
+        public IActionResult Qc()
         {
-            var filePath = "template/IDL01_Item data list.xlsx";
-            var fileExists = System.IO.File.Exists(filePath);
-            string error = "";
-            if (fileExists)
+            return View();
+        }
+
+        public IActionResult Allocate()
+        {
+            return View();
+        }
+
+        public IActionResult DownloadTemplate(string id)
+        {
+            var filePath = "";
+            var template = "";
+            if (string.IsNullOrEmpty(id))
             {
-                try
-                {
-                    var fs = System.IO.File.OpenRead(filePath);
-                    return File(fs, "application /vnd.ms-excel", "Item data upload template.xlsx");
-                }
-                catch (Exception e)
-                {
-                    error = e.Message;
-                }
+                return RedirectToAction("Error", "Home", "An error occurred");
+            }
+            if (id == "itemdata")
+            {
+                template = "Item data upload template.xlsx";
+                filePath = "template/IDL01_Item data list.xlsx";
+            }
+            else if (id == "supplier")
+            {
+                template = "Supplier upload template.xlsx";
+                filePath = "template/SPL01_Supplier List.xlsx";
+            }else if(id == "customer")
+            {
+                template = "Customer upload template.xlsx";
+                filePath = "template/CTM01_Customer list.xlsx";
+            }
+            else if (id == "incoming")
+            {
+                template = "Imcoming list upload template.xlsx";
+                filePath = "template/ICLS01_Incoming List (Supplier).xlsx";
             }
 
-            return RedirectToAction("Error", "Home", error);
 
-
-        }
-        public IActionResult DownloadCustomerForm()
-        {
-            var filePath = "template/CTM01_Customer list.xlsx";
             var fileExists = System.IO.File.Exists(filePath);
             string error = "";
             if (fileExists)
@@ -81,29 +95,7 @@ namespace NMVS.Controllers
                 try
                 {
                     var fs = System.IO.File.OpenRead(filePath);
-                    return File(fs, "application /vnd.ms-excel", "Customer upload template.xlsx");
-                }
-                catch (Exception e)
-                {
-                    error = e.Message;
-                }
-            }
-
-            return RedirectToAction("Error", "Home", error);
-
-
-        }
-        public IActionResult DownloadSupplierForm()
-        {
-            var filePath = "template/SPL01_Supplier List.xlsx";
-            var fileExists = System.IO.File.Exists(filePath);
-            string error = "";
-            if (fileExists)
-            {
-                try
-                {
-                    var fs = System.IO.File.OpenRead(filePath);
-                    return File(fs, "application /vnd.ms-excel", "Supplier upload template.xlsx");
+                    return File(fs, "application /vnd.ms-excel", template);
                 }
                 catch (Exception e)
                 {

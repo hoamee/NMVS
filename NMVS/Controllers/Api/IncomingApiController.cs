@@ -210,7 +210,7 @@ namespace NMVS.Controllers.Api
         {
             var role = _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
 
-            var receiveLoc = _context.Locs.FirstOrDefault(l => l.LocType == "receive");
+            var receiveLoc = _context.Locs.FirstOrDefault(l => l.LocType == "LocReceive");
             CommonResponse<string> common = new();
             if (role)
             {

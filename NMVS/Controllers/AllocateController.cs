@@ -64,7 +64,7 @@ namespace NMVS.Controllers
         {
             var ptmstr = await _db.ItemMasters.FindAsync(id);
             var locList = new List<LocationCapSelect>();
-            var whl = await _db.Locs.Where(x => x.LocCode != ptmstr.LocCode && (x.LocType == "fixed" || x.LocType == "temporary")).ToListAsync();
+            var whl = await _db.Locs.Where(x => x.LocCode != ptmstr.LocCode && x.LocType != "Unqualified" && x.LocStatus == true).ToListAsync();
 
             ViewBag.ptid = id;
 

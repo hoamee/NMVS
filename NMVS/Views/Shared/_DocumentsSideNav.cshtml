@@ -19,54 +19,80 @@
                 </a>
             </li>
 
-        <li class="nav-item side-role">
-            <a class="nav-link side-role" href="/Documents/rolemanager">
-                <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-                    <span id="side-role" class="fa fa-users"></span>
+            <li class="nav-item side-role">
+                <a class="nav-link side-role" href="/Documents/rolemanager">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <span id="side-role" class="fa fa-users"></span>
+                    </div>
+                    <span class="nav-link-text ms-1">Roles and activation </span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a data-bs-toggle="collapse" href="#navConfig" class="nav-link navConfig" aria-controls="navConfig" role="button" aria-expanded="false">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <span class="fa fa-tools"></span>
+                    </div>
+                    <span class="nav-link-text ms-1">Configuration</span>
+                </a>
+                <div class="collapse nav-inquiry" id="navConfig">
+                    <ul class="nav ms-4 ps-3">
+                        <li class="nav-item ">
+                            <a class="nav-link side-site" href="/Documents/Site">
+                                <span class="sidenav-mini-icon"> S </span>
+                                <span class="sidenav-normal"> Site</span>
+                            </a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link side-warehouse" href="/Documents/Warehouse">
+                                <span class="sidenav-mini-icon"> W </span>
+                                <span class="sidenav-normal"> Warehouses</span>
+                            </a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link side-loc" href="/Documents/Location">
+                                <span class="sidenav-mini-icon"> L </span>
+                                <span class="sidenav-normal"> Locations</span>
+                            </a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link side-item-data" href="/Documents/ItemData">
+                                <span class="sidenav-mini-icon"> I </span>
+                                <span class="sidenav-normal"> ICD</span>
+                            </a>
+                        </li>
+
+                    </ul>
                 </div>
-                <span class="nav-link-text ms-1">Roles and activation </span>
-            </a>
-        </li>
 
-        <li class="nav-item">
-            <a data-bs-toggle="collapse" href="#navConfig" class="nav-link navConfig" aria-controls="navConfig" role="button" aria-expanded="false">
-                <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-                    <span class="fa fa-tools"></span>
-                </div>
-                <span  class="nav-link-text ms-1">Configuration</span>
-            </a>
-            <div class="collapse nav-inquiry" id="navConfig">
-                <ul class="nav ms-4 ps-3">
-                    <li class="nav-item ">
-                        <a class="nav-link side-site" href="/Documents/Site">
-                            <span class="sidenav-mini-icon"> S </span>
-                            <span class="sidenav-normal"> Site</span>
-                        </a>
-                    </li>
-                    <li class="nav-item ">
-                        <a class="nav-link side-warehouse" href="/Documents/Warehouse">
-                            <span class="sidenav-mini-icon"> W </span>
-                            <span class="sidenav-normal"> Warehouses</span>
-                        </a>
-                    </li>
-                    <li class="nav-item ">
-                        <a class="nav-link side-loc" href="/Documents/Location">
-                            <span class="sidenav-mini-icon"> L </span>
-                            <span class="sidenav-normal"> Locations</span>
-                        </a>
-                    </li>
-                    <li class="nav-item ">
-                        <a class="nav-link side-item-data" href="/Documents/ItemData">
-                            <span class="sidenav-mini-icon"> I </span>
-                            <span class="sidenav-normal"> ICD</span>
-                        </a>
-                    </li>
+            </li>
 
-                </ul>
-            </div>
 
-        </li>
+            <li class="nav-item side-ic-list">
+                <a class="nav-link side-ic-list" href="/Documents/incominglist">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <span id="side-ic-list" class="fa fa-list"></span>
+                    </div>
+                    <span class="nav-link-text ms-1">Incoming list</span>
+                </a>
+            </li>
 
+            <li class="nav-item side-qc">
+                <a class="nav-link side-qc" href="/Documents/qc">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <span id="side-qc" class="fa fa-check-double"></span>
+                    </div>
+                    <span class="nav-link-text ms-1">QC</span>
+                </a>
+            </li>
+            <li class="nav-item side-alc">
+                <a class="nav-link side-alc" href="/Documents/allocate">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <span id="side-alc" class="fa fa-boxes"></span>
+                    </div>
+                    <span class="nav-link-text ms-1">Allocate</span>
+                </a>
+            </li>
         </ul>
     </div>
     <div class="sidenav-footer mx-3 mt-3 pt-3">

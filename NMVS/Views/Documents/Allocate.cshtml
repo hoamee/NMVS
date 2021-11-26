@@ -1,0 +1,88 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
+    ViewData["Title"] = "Allocate";
+}
+
+<div class="card-header">
+    <h3 class="mb-0">@ViewData["Title"]</h3>
+</div>
+<div class="card-body">
+    <p>
+        Allocate is to create a movement order that move item inside a site. (to move to another site, please find Sales order with type Warehouse Transfer)
+    </p>
+    <p>
+        There are 2 ways to create a allocate order: Create allocate request function, Unallocated function
+    </p>
+    <div class="col-auto" align="center">
+        <img src="~/assets/documentation/alc-diagram.png" class="img-fluid">
+    </div>
+    <ul>
+        <li>
+            Create allocate request: Move many item to a location
+        </li>
+        <li>
+            Unallocated: Split an item to multiple location
+        </li>
+    </ul>
+
+    <p>
+        To working with QC function, User should be in role "Arrange inventory"
+    </p>
+
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/alc-role.png" class="img-fluid">
+    </div>
+
+    <br />
+
+    <h5>
+        <b>I. Unallocated</b>
+    </h5>
+    <p>
+        Unallocated is a list of items that are in Receiving location
+    </p>
+    <div class="row">
+        <p class="col-auto">
+            <b>1. From side bar, Allocate, select unallocated</b>
+        </p>
+        <div class="col-auto" align="center">
+            <img src="~/assets/documentation/alc-unallocate-menu.png" class="img-fluid">
+        </div>
+    </div>
+    <p class="col-auto">
+        <b>2. Click on pick list of an item</b>
+    </p>
+    <div class="col-md-6" align="center">
+        <img src="~/assets/documentation/alc-u-picklist-btn.png" class="img-fluid">
+    </div>
+
+    <br />
+    <p class="col-auto">
+        <b>3. Select movement quantity, movement time then submit</b>
+    </p>
+    <div class="col-md-10" align="center">
+        <img src="~/assets/documentation/alc-u-picking.png" class="img-fluid">
+    </div>
+
+    <h5>
+        <b>II. Create allocate request</b>
+    </h5>
+
+    <div class="row">
+        <p class="col-auto">
+            <b>1. From side bar, Allocate, select unallocated</b>
+        </p>
+        <div class="col-auto" align="center">
+            <img src="~/assets/documentation/alc-c-menu.png" class="img-fluid">
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.side-alc').addClass('active');
+        $('#side-alc').css('color', "white");
+    })
+</script>

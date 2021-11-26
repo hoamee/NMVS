@@ -1,0 +1,91 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
+    ViewData["Title"] = "Incoming list";
+}
+
+<div class="card-header">
+    <h3 class="mb-0">@ViewData["Title"]</h3>
+</div>
+<div class="card-body">
+    <p>
+        By take action in QC function, user can make item from incoming list to be accepted or be rejected.
+        After accepted, item is officially exist in the system, with default location is Receive location
+    </p>
+
+    <p>
+        To working with QC function, User should be in role "QC"
+    </p>
+
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/qc-role.png" class="img-fluid">
+    </div>
+
+    <h5>
+        <b>I. View QC list</b>
+    </h5>
+
+    <div class="row">
+        <p class="col-auto">
+            <b>1. From side bar, select QC</b>
+        </p>
+        <div class="col-auto" align="center">
+            <img src="~/assets/documentation/qc-menu.png" class="img-fluid">
+        </div>
+    </div>
+
+
+    <h5>
+        <b>II. Process the QC list</b>
+    </h5>
+    <p>
+        <b>1. Click on ID of the line to view detail</b>
+    </p>
+
+    <div class="col-md-9" align="center">
+        <img src="~/assets/documentation/qc-list.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+    </div>
+
+
+    <br />
+    <p>
+        <b>2. Click  on <span class="btn btn-outline-warning btn-sm">Pending QC</span> and fill the infomation</b>
+    </p>
+    <div class="col-md-6">
+        <img src="~/assets/documentation/qc-process.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+    </div>
+    <p class="text-danger italic">
+        Note: In case accept all item, please leave the number zeror at first input zone. Otherwise, input number of <b>rejected quantity</b> and leave some note at second text-box
+    </p>
+
+
+    <br />
+    <div class="row col-12">
+        <div class="col-md-4">
+            <p>
+                In this example, we <span class="text-danger">rejected 100</span> item with the note "Reject 100 unqualified item"
+            </p>
+        </div>
+        <div class="col-md-6">
+            <img src="~/assets/documentation/qc-completed.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+        </div>
+    </div>
+
+    <br />
+    <p>
+        We can also view the process from the parent list
+    </p>
+    <div class="col-md-auto" align="center">
+        <img src="~/assets/documentation/qc-list2.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+    </div>
+
+
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.side-qc').addClass('active');
+        $('#side-qc').css('color', "white");
+    })
+</script>

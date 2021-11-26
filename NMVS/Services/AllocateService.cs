@@ -188,7 +188,7 @@ namespace NMVS.Services
 
         public List<ItemMasterVm> GetUnAllocated()
         {
-            var rcvLoc = _db.Locs.Where(x => x.LocType == "receive").Select(x=>x.LocCode).ToList();
+            var rcvLoc = _db.Locs.Where(x => x.LocType == "LocReceive").Select(x=>x.LocCode).ToList();
             var ls = (from item in _db.ItemMasters.Where(x => rcvLoc.Contains(x.LocCode) && x.PtQty > 0)
                       join dt in _db.ItemDatas on item.ItemNo equals dt.ItemNo into itemData
 
