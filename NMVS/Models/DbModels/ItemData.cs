@@ -42,7 +42,7 @@ namespace NMVS.Models.DbModels
         public bool Flammable { set; get; }
 
 
-        [Display(Name = "Warehouse Unit (per 1 pack)")]
+        [Display(Name = "Warehouse Unit")]
         [Required]
         public double ItemWhUnit { set; get; }
 

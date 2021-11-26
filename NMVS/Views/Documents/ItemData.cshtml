@@ -1,0 +1,165 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
+    ViewData["Title"] = "Item data, Customer, Supplier";
+}
+
+<div class="card-header">
+    <h3 class="mb-0">@ViewData["Title"]</h3>
+</div>
+<div class="card-body">
+    <p>
+        Item data/Customer/Supplier is detail info of Item/Customer/Supplier.
+    </p>
+    <p>
+        These information is <span class="text-danger">Required</span> to receive, issue item, issue delivery note.... Please see bellow Item data example for information registration
+    </p>
+
+    <h5>
+        <b>I. Register new item</b>
+    </h5>
+    <p>
+        <b>1. User should be in role "Handle request". Otherwise, user can not see and access the "Item data" menu.</b>
+        <i>For Customer & Supplier function, user should be in role "Create SO" or "Approve SO"</i>
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/site - role.png" class="img-fluid">
+    </div>
+    <br />
+    <p>
+        <b>2. From side bar, select Item data</b>
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/item-data-menu.png" class="img-fluid">
+    </div>
+
+    <p>
+        <b>3. Select Add item or Upload and fill the information</b>
+    </p>
+    <p>
+        <b class="text-primary">a. Manually input item data</b>
+    </p>
+    <p>
+        This function let user add item data manually by fill in form.
+    </p>
+    <div class="row">
+        <div class="col-md-6" align="center">
+            <img src="~/assets/documentation/item-data-add.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+        </div>
+        <div class="col-md-5 " align="center">
+            <img src="~/assets/documentation/item-data-form.png" class="img-fluid shadow p-3 mb-5 bg-body rounded">
+        </div>
+    </div>
+    <p>
+        <b class="text-primary">b. Upload item data list</b>
+    </p>
+    <div class="row">
+        <div class="col-md-6" align="center">
+            <img src="~/assets/documentation/item-data-upload.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+        </div>
+        <div class="col-md-5">
+            <p>
+                This function let user upload a list of item data. Supported file type: <b>*.xlsx</b> (<span class="text-success">Microsoft Excel file</span>).
+                From Item data function, select "Upload"
+            </p>
+        </div>
+    </div>
+    <br />
+    <div class="row col-12">
+        <div class="col-md-4">
+            <p>
+                Click on <b>Choose file</b> box and browse the file from pop-up Windows browse
+            </p>
+        </div>
+        <div class="col-md-6">
+            <img src="~/assets/documentation/item-data-upload-form.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+        </div>
+    </div>
+    <div class="row">
+        <p class="col-md-auto">
+            Please wait while seeing this icon
+        </p>
+        <div class="col-md-auto" align="center">
+            <img src="~/assets/documentation/item-data-wait.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+        </div>
+    </div>
+    <br />
+    <p>
+        View the upload result
+    </p>
+    <div class="col-md-auto" align="center">
+        <img src="~/assets/documentation/item-data-upload-result.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+    </div>
+
+
+
+    <p class="text-danger">**Notice: By click on "View report" button, you can view detail of error from file: </p>
+    <ul class="text-danger">
+        <li>
+            Where the error is
+        </li>
+        <li>
+            Why a specific line got error
+        </li>
+        <li>
+            Who was upload the file
+        </li>
+        <li>
+            Uploaded file name
+        </li>
+        <li>
+            Uploaded time
+        </li>
+    </ul>
+
+
+    <div class="col-md-auto" align="center">
+        <img src="~/assets/documentation/item-data-errors.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+    </div>
+    <p class="text-danger">**Notice: System keeps the code of item data pernamently, if an item data with the same code and <u><i>other information</i></u> uploaded, the existing item code will be updated with new <u><i>other information</i></u> </p>
+    <br />
+    <h5>
+        <b>II. Edit Item data</b>
+    </h5>
+    <p>
+        <b>Click on Item code button and fill the information</b>
+    </p>
+    <div class="row">
+        <div class="col-md-6" align="center">
+            <img src="~/assets/documentation/item-data-edit-button.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+        </div>
+        <div class="col-md-5 " align="center">
+            <img src="~/assets/documentation/item-data-edit-form.png" class="img-fluid shadow p-3 mb-5 bg-body rounded">
+        </div>
+    </div>
+
+    <br />
+    <h5>
+        <b>III. Remove Item data</b>
+    </h5>
+    <p class="text-danger">**There is no remove option for Item data/Customer/Supplier. In order to hide them, please un-check the Active attribute</p>
+
+    <h5>
+        <b>IV. Excel form template</b>
+    </h5>
+    <ul>
+        <li>
+            <a href="/Documents/DownloadItemDataForm">Item data template</a>
+        </li>
+        <li>
+            <a href="/Documents/DownloadCustomerForm">Customer template</a>
+        </li>
+        <li>
+            <a href="/Documents/DownloadSupplierForm">Supplier template</a>
+        </li>
+    </ul>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.side-item-data').addClass('active');
+        $('.navConfig').addClass('active');
+        $('#navConfig').addClass('show');
+        $('.fa-tools').css('color', 'white');
+    })
+</script>

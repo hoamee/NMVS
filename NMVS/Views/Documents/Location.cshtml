@@ -1,7 +1,7 @@
 ﻿@{
 
     Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
-    ViewData["Title"] = "Warehouses";
+    ViewData["Title"] = "Location";
 }
 
 <div class="card-header">
@@ -9,60 +9,60 @@
 </div>
 <div class="card-body">
     <h5>
-        Warehouse is a concept of middle storage location, between Site and Location
+        Location is a concept of smallest storage location, child of Warehouse
     </h5>
     <div class="col-10" align="center">
-        <img src="~/assets/documentation/wh-map.png" class="img-fluid">
+        <img src="~/assets/documentation/loc-map.png" class="img-fluid">
     </div>
 
     <h5>
-        <b>I. Create new warehouse</b>
+        <b>I. Create new Location</b>
     </h5>
     <p>
-        <b>1. User should be in role "Handle request". Otherwise, user can not see the "Warehouse" menu</b>
+        <b>1. User should be in role "Handle request". Otherwise, user can not see the "Location" menu</b>
     </p>
     <div class="col-10" align="center">
         <img src="~/assets/documentation/site - role.png" class="img-fluid">
     </div>
     <br />
     <p>
-        <b>2. From side bar, select Warehouse</b>
+        <b>2. From side bar, select Location</b>
     </p>
     <div class="col-10" align="center">
-        <img src="~/assets/documentation/wh-menu.png" class="img-fluid">
+        <img src="~/assets/documentation/loc-menu.png" class="img-fluid">
     </div>
 
     <p>
-        <b>3. Select Add warehouse and fill the information</b>
+        <b>3. Select Add Location and fill the information</b>
     </p>
     <div class="row">
         <div class="col-md-6" align="center">
-            <img src="~/assets/documentation/wh-add.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+            <img src="~/assets/documentation/loc-add.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
         </div>
         <div class="col-md-5 " align="center">
-            <img src="~/assets/documentation/wh-create.png" class="img-fluid shadow p-3 mb-5 bg-body rounded">
+            <img src="~/assets/documentation/loc-add-form.png" class="img-fluid shadow p-3 mb-5 bg-body rounded">
         </div>
     </div>
-    <p class="text-danger">**Notice: The Active attribute decide this warehouse is visible in other selection list </p>
+    <p class="text-danger">**Notice: The Active attribute decide this Location is visible in other selection list </p>
 
     <p>
-        <b>4. View the created Warehouse</b>
+        <b>4. View the created Location</b>
     </p>
 
     <div align="center">
-        <img src="~/assets/documentation/wh-list.png" class="img-fluid shadow p-3 mb-5 bg-body rounded col-md-8">
+        <img src="~/assets/documentation/loc-list.png" class="img-fluid shadow p-3 mb-5 bg-body rounded col-md-8">
     </div>
 
     <p class="text-danger">
         <b>5. Warning: if you encount this message, that mean the Warehouse code is conflicted. Please select another Warehouse code</b>
     </p>
     <div align="center">
-        <img src="~/assets/documentation/wh-existed.png" class="img-fluid shadow p-3 mb-5 bg-body rounded">
+        <img src="~/assets/documentation/loc-existed.png" class="img-fluid shadow p-3 mb-5 bg-body rounded">
     </div>
 
     <br />
     <h5>
-        <b>II. Edit Warehouse</b>
+        <b>II. Edit Location</b>
     </h5>
     <p>
         <b>Click on Warehouse code button and fill the information</b>
@@ -87,9 +87,9 @@
 
 <script>
     $(document).ready(function () {
-        $('.side-warehouse').addClass('active');
+        $('.side-loc').addClass('active');
         $('.navConfig').addClass('active');
         $('#navConfig').addClass('show');
-        $('.fa-tools').css('color','white');
-})
+        $('.fa-tools').css('color', 'white');
+    })
 </script>

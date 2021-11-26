@@ -56,7 +56,7 @@ namespace NMVS.Controllers
         // GET: ItemDatas/Create
         public IActionResult AddItem()
         {
-            ViewBag.ItemType = _context.GeneralizedCodes.Where(x => x.CodeFldName == "Itemtype").ToList();
+            ViewBag.ItemType = _context.GeneralizedCodes.Where(x => x.CodeFldName == "ItemData").ToList();
             return View();
         }
 

@@ -63,10 +63,17 @@ namespace NMVS.Controllers
         {
             if (ModelState.IsValid)
             {
-                loc.LocRemain = loc.LocCap;
-                _context.Add(loc);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (await _context.Locs.FindAsync(loc.LocCode) == null)
+                {
+                    loc.LocRemain = loc.LocCap;
+                    _context.Add(loc);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Location code \"" + loc.LocCode+ "\" is already existed. Please make another choice");
+                }
             }
             ViewBag.Whs = _service.GetWhList();
             ViewBag.LocType = _service.GetLocTypes();
