@@ -35,16 +35,43 @@ namespace NMVS.Controllers
         [Authorize(Roles = "Arrange inventory")]
         public IActionResult NewRequest()
         {
-            ViewBag.ItemNo = _service.GetItemDistinc();
-            ViewBag.LocCode = new SelectList(_db.Locs
-                , "LocCode", "LocDesc");
+            var locList = (from loc in _db.Locs
+                           join wh in _db.Warehouses on loc.WhCode equals wh.WhCode into locs
+                           from i in locs.DefaultIfEmpty()
+                           select new Loc
+                           {
+                               LocCode = loc.LocCode,
+                               LocDesc = loc.LocDesc,
+                               WhCode = i.WhDesc,
+                               LocCap = loc.LocCap,
+                               LocCmmt = i.SiCode
+                           }).ToList();
+            foreach(var loc in locList)
+            {
+                var used = _db.ItemMasters.Where(x => x.LocCode == loc.LocCode).Sum(x => x.PtQty);
+                var hold = _db.AllocateOrders.Where(x => x.LocCode == loc.LocCode).Sum(x => x.AlcOrdQty - x.MovedQty - x.Reported)
+                    + _db.IssueOrders.Where(x => x.ToLoc == loc.LocCode).Sum(x => x.ExpOrdQty - x.MovedQty - x.Reported);
+                var outGo = _db.AllocateOrders.Where(x => x.AlcOrdFrom == loc.LocCode).Sum(x => x.AlcOrdQty - x.MovedQty - x.Reported)
+                    + _db.IssueOrders.Where(x => x.FromLoc == loc.LocCode).Sum(x => x.ExpOrdQty - x.MovedQty - x.Reported);
+
+                loc.LocRemain = loc.LocCap - used - hold;
+                loc.LocOutgo = outGo;
+                loc.LocHolding = hold;
+
+            }
+
+            ViewBag.LocCode = locList;
             return View();
         }
+
         [Authorize(Roles = "Arrange inventory")]
-        public async Task<ActionResult> SelectLoc([Bind("ItemNo,LocCode")] ItemMaster itemMaster)
+        public async Task<ActionResult> SelectLoc([Bind("LocCode")] ItemMaster itemMaster)
         {
-            var itemMasters = _service.GetAvailItem(itemMaster.ItemNo, itemMaster.LocCode);
-            ViewBag.Loc = await _db.Locs.FindAsync(itemMaster.LocCode);
+            var itemMasters = _service.GetAvailItem(itemMaster.LocCode);
+            var loc = await _db.Locs.FindAsync(itemMaster.LocCode);
+            loc.LocRemain = await _db.ItemMasters.Where(x => x.LocCode == loc.LocCode).SumAsync(x => x.PtQty);
+            loc.LocRemain = loc.LocCap - loc.LocRemain;
+            ViewBag.Loc = loc;
             return View(itemMasters);
         }
 

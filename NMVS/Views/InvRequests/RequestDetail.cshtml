@@ -109,11 +109,10 @@
                 <a asp-action="History" class="btn btn-outline-secondary">History</a>
                 @if (Model.Rq.SoConfirm == true && Model.Rq.Confirmed != true && User.IsInRole("Handle request"))
                 {
-                    if (User.IsInRole("Handle Request"))
-                    {
+                    
                         <span class="btn btn-outline-success" onclick="confirmRequest(true)">Confirm</span>
                         <span class="btn btn-outline-danger" onclick="confirmRequest(false)">Reject</span>
-                    }
+                    
                 }
 
 

@@ -61,7 +61,7 @@ namespace NMVS.Services
                     _db.Update(pt);
                     _db.SaveChanges();
                     common.status = 1;
-                    common.message += "Success";
+                    common.message = "Success";
                 }
 
 
@@ -100,9 +100,9 @@ namespace NMVS.Services
             return model;
         }
 
-        public List<ItemMasterVm> GetAvailItem(string itemNo, string locCode)
+        public List<ItemMasterVm> GetAvailItem(string locCode)
         {
-            var ls = (from item in _db.ItemMasters.Where(x => x.ItemNo == itemNo && !string.IsNullOrEmpty(x.LocCode) && x.LocCode != locCode)
+            var ls = (from item in _db.ItemMasters.Where(x => !string.IsNullOrEmpty(x.LocCode) && x.LocCode != locCode)
                       join dt in _db.ItemDatas on item.ItemNo equals dt.ItemNo into itemData
 
                       from i in itemData.DefaultIfEmpty()
@@ -116,7 +116,7 @@ namespace NMVS.Services
                           DateIn = item.PtDateIn,
                           Loc = f.LocDesc + " (" + f.LocCode + ")",
                           Name = i.ItemName,
-                          No = itemNo,
+                          No = item.ItemNo,
                           Ptid = item.PtId,
                           Qty = item.PtQty
                       }).ToList();

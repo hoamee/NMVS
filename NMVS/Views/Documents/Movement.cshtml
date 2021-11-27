@@ -1,0 +1,108 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
+    ViewData["Title"] = "Movement";
+}
+
+<div class="card-header">
+    <h3 class="mb-0">@ViewData["Title"]</h3>
+</div>
+<div class="card-body">
+    <p>
+        Movement (<i>Movement orders as well</i>) is to move item. Movement include 2 types:
+    </p>
+    <ul>
+        <li>
+            Allocate order: Moving item to another location inside a site
+        </li>
+        <li>
+            Issue order: Moving item to Manufacturing locations and to vehicles
+        </li>
+    </ul>
+
+
+    <p>
+        To working with Movement, User should be in role "Movement"
+    </p>
+
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/mvm-role.png" class="img-fluid">
+    </div>
+
+    <br />
+
+    <h5 id="allocate">
+        <b>I. Allocate order</b>
+    </h5>
+    <div class="row">
+        <p class="col-auto">
+            <b>1. From side bar, <i class="fa fa-luggage-cart"></i> Movement, select Allocate order to view the list to view movement order</b>
+        </p>
+        <div class="col-auto" align="center">
+            <img src="~/assets/documentation/mvm-a-list.png" class="img-fluid">
+        </div>
+    </div>
+    <br />
+    <p class="col-auto">
+        <b>
+            2. Afer moved item to specified location. Click on <span class="btn btn-primary btn-sm">Submit</span>.
+            Fill the quantity, input location code/Scan QR of the location then submit to finish your work
+        </b>
+    </p>
+    <div class="col-md-6" align="center">
+        <img src="~/assets/documentation/mvm-a-submit.png" class="img-fluid">
+    </div>
+
+    <br />
+    <p class="col-auto">
+        <b>
+            3. In some case, we can not finish the orders, by some reason: the target location is full,
+            or in accessable,
+            the items has been broken... Click on <span class="btn btn-danger btn-sm">Report</span> to report a problem
+        </b>
+    </p>
+    <div class="col-md-8" align="center">
+        <img src="~/assets/documentation/mvm-a-report.png" class="img-fluid">
+    </div>
+    <p class="text-danger text-bold">**Note: for broken case, please check on the check box <span><input type="checkbox" /> Unqualified</span>. Then move item to the location for unqualified item</p>
+    <br />
+    <h5>
+        <b>II. Issue  order</b>
+    </h5>
+    <div class="row">
+        <p class="col-auto">
+            <b>1. From side bar, <i class="fa fa-luggage-cart"></i> Movement, select Issue order to view the list to view movement orders</b>
+        </p>
+        <div class="col-auto" align="center">
+            <img src="~/assets/documentation/mvm-i-list.png" class="img-fluid">
+        </div>
+    </div>
+    <br />
+    <p class="col-auto">
+        <b>
+            2. To <span class="text-info">Finish</span> or <span class="text-danger">Report</span> Issue order, we do the same things as Allocate order
+            <a href="#" onclick="document.getElementById('allocate').scrollIntoView();">(I. allocate order)</a>.
+            However, please pay attention on <i>Type</i> of issue order.
+        </b>
+    </p>
+    <ul>
+        <li>
+            For "Production" type: we input/Scan the location code to finish (Same as Allocate orders)
+        </li>
+        <li>
+            For "Issue" type: we input/Scan the <i>Inventory</i> code to finish
+        </li>
+    </ul>
+    <div class="col-md-6" align="center">
+        <img src="~/assets/documentation/mvm-i-submit-2.png" class="img-fluid">
+    </div>
+
+    <br />
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.side-mvm').addClass('active');
+        $('#side-mvm').css('color', "white");
+    })
+</script>

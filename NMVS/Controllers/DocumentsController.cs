@@ -59,6 +59,16 @@ namespace NMVS.Controllers
             return View();
         }
 
+        public IActionResult Movement()
+        {
+            return View();
+        }
+
+        public IActionResult RequestInv()
+        {
+            return View();
+        }
+
         public IActionResult DownloadTemplate(string id)
         {
             var filePath = "";

@@ -128,9 +128,6 @@
                                     Item
                                 </th>
                                 <th>
-                                    Location
-                                </th>
-                                <th>
                                     Quantity
                                 </th>
                                 <th>
@@ -230,10 +227,10 @@
             var selectQty = parseFloat($("#selected-qty").html());
             var initQty = parseFloat($('#init-quantity').html());
             var tempInitQty = initQty;
-            var remain = parseFloat($(this).closest('tr').children('.remain-cap').text());
             var input = parseFloat($(this).closest('tr').children('.td-input').children('.val-input').val());
             var vHold = parseFloat($(this).closest('tr').children('.td-hold').text());
-            var acceptedInput = remain - vHold;
+            var vQty = parseFloat($(this).closest('tr').children('.pt-qty').text());
+            var acceptedInput = vQty - vHold;
 
             if (isNaN(input)) {
                 alert("Cannot add value NaN to cart");

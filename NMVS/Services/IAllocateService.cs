@@ -13,7 +13,7 @@ namespace NMVS.Services
 
         public List<TypeVm> GetItemDistinc();
 
-        public List<ItemMasterVm> GetAvailItem(string itemNo, string locCode);
+        public List<ItemMasterVm> GetAvailItem(string locCode);
 
         public List<AllocateOrderVm> GetAllocateOrders();
 

@@ -1,10 +1,10 @@
 ﻿<!-- Modal -->
 
-<div class="modal" tabindex="-1" id="item-modal" >
+<div class="modal" tabindex="-1" id="loc-modal" >
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content" style="height: 100%">
             <div class="modal-header">
-                <h5 class="modal-title">Suppliers</h5>
+                <h5 class="modal-title">Location</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -12,26 +12,56 @@
                     <thead>
                         <tr>
                             <th>
-                                Item no.
+                                Location code
                             </th>
                             <th>
-                                Item description
+                                Location name
+                            </th>
+                            <th>
+                                Warehouse
+                            </th>
+                            <th>
+                                Site
+                            </th>
+                            <th>
+                                Remaining
+                            </th>
+                            <th>
+                                Booked
+                            </th>
+                            <th>
+                                Out go
                             </th>
                         </tr>
 
                     </thead>
 
                     <tbody>
-                        @foreach (var item in ViewBag.ItemNo)
+                        @foreach (var item in ViewBag.LocCode)
                         {
-                            <tr>
-                                <td>
-                                    <button type="button" class="btn btn-outline-primary" onclick="setItemNo('@item.Code')">@item.Code</button>
-                                </td>
-                                <td>
-                                    @item.Desc
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>
+                                <button type="button" class="btn btn-outline-primary" onclick="setLoc('@item.LocCode', '@item.LocDesc')">@item.LocCode</button>
+                            </td>
+                            <td>
+                                @item.LocDesc
+                            </td>
+                            <td>
+                                @item.WhCode
+                            </td>
+                            <td>
+                                @item.LocCmmt
+                            </td>
+                            <td>
+                                @item.LocRemain
+                            </td>
+                            <td>
+                                @item.LocOutgo
+                            </td>
+                            <td>
+                                @item.LocHolding
+                            </td>
+                        </tr>
                         }
 
                     </tbody>

@@ -3,18 +3,18 @@
     Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
     ViewData["Title"] = "Register new account";
 }
-
-<div class="card-header">
-    <h3 class="mb-0">@ViewData["Title"]</h3>
+<div class="progress" style="height: 30px;">
+    <div class="progress-bar progress-bar-striped progress-bar-animated" style="font-weight: bold; font-size: 15px; height: 100%;" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
 </div>
-<div class="table-responsive card-body">
+<div class="card-body p-5 step">
     <p>
         <b>Step 1: Go to log in page and select "Sign up"</b>
     </p>
     <div class="col-10">
         <img src="~/assets/documentation/sign up.png" class="img-fluid" alt="login page">
     </div>
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p>
         <b>Step 2: Fill all the information, include:</b>
     </p>
@@ -41,12 +41,12 @@
     <div class="col-10">
         <img src="~/assets/documentation/sign up form.png" class="img-fluid" alt="sign up page">
     </div>
-
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p>
         <b>Step 3: An message shows up: Your account is created, but has not activated yet. Please inform the administrator to activate your account</b>
     </p>
-    
+
     <div class="col-10">
         <img src="~/assets/documentation/sign up warning.png" class="img-fluid" alt="sign up page">
     </div>
@@ -56,5 +56,5 @@
     $(document).ready(function () {
         $('.side-reg').addClass('active');
         $('#side-reg').css('color', 'white');
-})
+    })
 </script>
