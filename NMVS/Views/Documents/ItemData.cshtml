@@ -4,17 +4,16 @@
     ViewData["Title"] = "Item data, Customer, Supplier";
 }
 
-<div class="card-header">
-    <h3 class="mb-0">@ViewData["Title"]</h3>
-</div>
-<div class="card-body">
+<partial name="_ProgressbarWbutton" />
+<div class="card-body p-5 step">
     <p>
         Item data/Customer/Supplier is detail info of Item/Customer/Supplier.
     </p>
     <p>
         These information is <span class="text-danger">Required</span> to receive, issue item, issue delivery note.... Please see bellow Item data example for information registration
     </p>
-
+</div>
+<div class="card-body p-5 step" style="display: none">
     <h5>
         <b>I. Register new item</b>
     </h5>
@@ -25,14 +24,16 @@
     <div class="col-10" align="center">
         <img src="~/assets/documentation/site - role.png" class="img-fluid">
     </div>
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p>
         <b>2. From side bar, select Item data</b>
     </p>
     <div class="col-10" align="center">
         <img src="~/assets/documentation/item-data-menu.png" class="img-fluid">
     </div>
-
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p>
         <b>3. Select Add item or Upload and fill the information</b>
     </p>
@@ -50,11 +51,13 @@
             <img src="~/assets/documentation/item-data-form.png" class="img-fluid shadow p-3 mb-5 bg-body rounded">
         </div>
     </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p>
         <b class="text-primary">b. Upload item data list</b>
     </p>
     <div class="row">
-        <div class="col-md-6" align="center">
+        <div class="col-md-7" align="center">
             <img src="~/assets/documentation/item-data-upload.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
         </div>
         <div class="col-md-5">
@@ -64,7 +67,8 @@
             </p>
         </div>
     </div>
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <div class="row col-12">
         <div class="col-md-4">
             <p>
@@ -83,16 +87,16 @@
             <img src="~/assets/documentation/item-data-wait.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
         </div>
     </div>
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p>
         View the upload result
     </p>
     <div class="col-md-auto" align="center">
         <img src="~/assets/documentation/item-data-upload-result.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
     </div>
-
-
-
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p class="text-danger">**Notice: By click on "View report" button, you can view detail of error from file: </p>
     <ul class="text-danger">
         <li>
@@ -111,13 +115,15 @@
             Uploaded time
         </li>
     </ul>
-
-
     <div class="col-md-auto" align="center">
         <img src="~/assets/documentation/item-data-errors.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
     </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p class="text-danger">**Notice: System keeps the code of item data pernamently, if an item data with the same code and <u><i>other information</i></u> uploaded, the existing item code will be updated with new <u><i>other information</i></u> </p>
-    <br />
+</div>
+
+<div class="card-body p-5 step" style="display: none">
     <h5>
         <b>II. Edit Item data</b>
     </h5>
@@ -132,22 +138,27 @@
             <img src="~/assets/documentation/item-data-edit-form.png" class="img-fluid shadow p-3 mb-5 bg-body rounded">
         </div>
     </div>
+</div>
 
-    <br />
+<div class="card-body p-5 step" style="display: none">
     <h5>
         <b>III. Remove Item data</b>
     </h5>
     <p class="text-danger">**There is no remove option for Item data/Customer/Supplier. In order to hide them, please un-check the Active attribute</p>
+</div>
 
+
+<div class="card-body">
+ 
     <h5>
-        <b>IV. Excel form template</b>
+        <b>Excel form template</b>
     </h5>
 
-    <a href="/Documents/DownloadTemplate/itemdata"><i class="fa fa-download"></i>Item data template</a>
+    <a href="/Documents/DownloadTemplate/itemdata"><i class="fa fa-download"></i>Item data template</a><br />
 
-    <a href="/Documents/DownloadTemplate/customer"><i class="fa fa-download"></i>Customer template</a>
+    <a href="/Documents/DownloadTemplate/customer"><i class="fa fa-download"></i>Customer template</a><br />
 
-    <a href="/Documents/DownloadTemplate/supplier"><i class="fa fa-download"></i>Supplier template</a>
+    <a href="/Documents/DownloadTemplate/supplier"><i class="fa fa-download"></i>Supplier template</a><br />
 
 </div>
 

@@ -4,10 +4,9 @@
     ViewData["Title"] = "Allocate";
 }
 
-<div class="card-header">
-    <h3 class="mb-0">@ViewData["Title"]</h3>
-</div>
-<div class="card-body">
+<partial name="_ProgressbarWbutton" />
+
+<div class="card-body p-5 step">
     <p>
         Allocate is to create a movement order that move item inside a site. (to move to another site, please find Sales order with type Warehouse Transfer)
     </p>
@@ -25,7 +24,8 @@
             Unallocated: Split an item to multiple location
         </li>
     </ul>
-
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p>
         To working with Allocate, User should be in role "Arrange inventory"
     </p>
@@ -33,9 +33,8 @@
     <div class="col-10" align="center">
         <img src="~/assets/documentation/alc-role.png" class="img-fluid">
     </div>
-
-    <br />
-
+</div>
+<div class="card-body p-5 step" style="display: none">
     <h5>
         <b>I. Unallocated</b>
     </h5>
@@ -50,21 +49,24 @@
             <img src="~/assets/documentation/alc-unallocate-menu.png" class="img-fluid">
         </div>
     </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p class="col-auto">
         <b>2. Click on pick list of an item</b>
     </p>
     <div class="col-md-6" align="center">
         <img src="~/assets/documentation/alc-u-picklist-btn.png" class="img-fluid">
     </div>
-
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p class="col-auto">
         <b>3. Select movement quantity, movement time then submit</b>
     </p>
     <div class="col-md-10" align="center">
         <img src="~/assets/documentation/alc-u-picking.png" class="img-fluid">
     </div>
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <h5>
         <b>II. Create allocate request</b>
     </h5>
@@ -77,13 +79,16 @@
             <img src="~/assets/documentation/alc-c-menu.png" class="img-fluid">
         </div>
     </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p class="col-auto">
         <b>2. Click on button <span class="btn btn-outline-info btn-sm">New allocate request</span></b>
     </p>
     <div class="col-auto" align="center">
         <img src="~/assets/documentation/alc-c-btn.png" class="img-fluid">
     </div>
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p class="col-auto">
         <b>3. Select item. It look like Picking in Unallocated function. However, this time you we are going to select multiple item from many location to another single location</b>
     </p>
@@ -96,6 +101,7 @@
         </div>
     </div>
 </div>
+
 
 <script>
     $(document).ready(function () {

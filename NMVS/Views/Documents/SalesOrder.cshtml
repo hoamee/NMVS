@@ -1,0 +1,149 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
+    ViewData["Title"] = "Sales order";
+}
+
+
+
+<partial name="_ProgressbarWbutton" />
+
+<div class="card-body p-5 step">
+    <p>
+        Sales order include 3 types:
+    </p>
+    <ul>
+        <li>
+            Sale: Normal sale to customer. Prefix "SO" (ex: SO202199Abc)
+        </li>
+        <li>
+            Warehouse transfer: Transfer goods to another site. Prefix "WH" (ex: WH202179xyz)
+        </li>
+        <li>
+            Warranty return: Issue goods to customer by warranty return request, Prefix "WR" (ex: WR202199Abc). This SO type is generated automatically when import a warranty return goods.
+        </li>
+    </ul>
+    <p>
+        To <i>create</i> a SO user should be in role <b class="text-success">Create SO</b>
+    </p>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        Go to Sales order then select New Sales Order or Upload
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/so-menu.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5 class="text-primary">
+        a. Create SO manually
+    </h5>
+    <h5>
+        1. select <span class="btn btn-outline-info btn-sm">New sales order</span>
+    </h5>
+    <h5>
+        1.1 Fill the information.
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/so-create-form.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        2. Select <span class="btn btn-outline-primary btn-sm">Add item</span> to add an item
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/so-detail-null.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        3. Fill the information then click <span class="btn btn-primary btn-sm">Create</span>
+    </h5>
+    <p>
+        If the <i>Date in</i> field is specified, system corrects all the related Item No with the same Date specified. Hence the quantity required cannot be greater than available quantity
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/so-create-line-form.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        4. Review the items and click <span class="btn btn-outline-success btn-sm">Close and submit</span> to submit your request
+    </h5>
+    <h5 class="text-danger">
+        Note: after close, we can no longer update or edit the information
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/so-create-review.png" class="img-fluid">
+    </div>
+
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        5. SO approval
+    </h5>
+    <p>
+        Only user in role "Approve SO" can approve the SO. 
+        This user can see two buttons: <span class="btn btn-success btn-sm">Approve</span> | <span class="btn btn-outline-danger btn-sm">Reject</span>
+        to response to the SO
+    </p>
+    <ul>
+        <li>
+            <span class="btn btn-success btn-sm">Approve</span> : An inventory request is automatically created
+        </li>
+        <li>
+            <span class="btn btn-outline-danger btn-sm">Reject</span> : this SO can be edited and can be submitted again
+        </li>
+    </ul>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/so-approve.png" class="img-fluid">
+    </div>
+
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5 class="text-primary">
+        B. Create SO by upload a list
+    </h5>
+    <h5>
+        1. select <span class="btn btn-outline-info btn-sm"><span class="fa fa-cloud-upload"></span>upload</span> then browse the file
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/so-upload-menu.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        2. View the upload result and correct if any error
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/so-upload-notification.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        3. Add/edit/Review again before submit
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/so-upload-correct.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-footer">
+
+    <h5>
+        <b>Excel form template</b>
+    </h5>
+
+    <a href="/Documents/DownloadTemplate/so">
+        <i class="fa fa-download"></i>
+        Sales order upload template
+    </a>
+
+</div>
+<script>
+    $(document).ready(function () {
+        $('.side-so').addClass('active');
+        $('#side-so').css('color', "white");
+    })
+</script>

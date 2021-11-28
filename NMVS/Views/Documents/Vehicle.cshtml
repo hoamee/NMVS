@@ -1,0 +1,79 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
+    ViewData["Title"] = "Vehicle";
+}
+
+
+
+<partial name="_ProgressbarWbutton" />
+<div class="card-body p-5 step">
+    <h4>
+        Overview
+    </h4>
+    <ul>
+        <li>
+            Register vehicle is a <i class="text-danger">Required</i> step to issue goods to outside
+        </li>
+        <li>
+            To register vehicle, User should be in role "Register vehicle".
+        </li>
+    </ul>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        Step 1
+    </h5>
+    <p>
+        Browse to Vehicles then click on "Register"
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/ve-menu.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        Step 2
+    </h5>
+    <p>
+        Fill the information
+    </p>
+    <p class="text-danger">
+        Note: For regularly vehicle, please check on the "Regular" check box. This vehicle will be automaticaly registered after checkout
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/ve-reg.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        Finally
+    </h5>
+    <p>
+        Note:
+    </p>
+    <ul>
+        <li>
+            Before the vehicle checkout, user can edit any things about the vehicle
+        </li>
+        <li>
+            If vehicle has not checked out yet, but some goods are on vehicle. User can not edit or delete this vehicle information
+        </li>
+        <li>
+            Vehicle with Auto save status <span class="badge bg-gradient-secondary">Once</span> will <i class="text-danger">not</i> be auto registered after checked out
+        </li>
+        <li>
+            Vehicle with Auto save status <span class="badge bg-gradient-success">Auto save</span> will be auto registerd after check out
+        </li>
+    </ul>
+    <div class="col-12" align="center">
+        <img src="~/assets/documentation/ve-list.png" class="img-fluid">
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.side-ve').addClass('active');
+        $('#side-ve').css('color', "white");
+    })
+</script>

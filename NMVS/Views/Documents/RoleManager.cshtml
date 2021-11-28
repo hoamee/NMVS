@@ -3,12 +3,10 @@
     Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
     ViewData["Title"] = "Active user & roles setting";
 }
-<div class="progress" style="height: 30px;">
-    <div class="progress-bar progress-bar-striped progress-bar-animated" style="font-weight: bold; font-size: 15px; height: 100%;" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-</div>
+<partial name="_ProgressbarWbutton" />
 <div class="card-body p-5 step">
     <h5>
-        <b>Step 1: Log in with an account with role Manage user</b>
+        <b>Step 1: Log in with an account in role Manage user</b>
     </h5>
 </div>
 <div class="card-body p-5 step" style="display: none">

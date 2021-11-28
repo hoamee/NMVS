@@ -3,15 +3,15 @@
     Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
     ViewData["Title"] = "Incoming list";
 }
+<partial name="_ProgressbarWbutton" />
 
-<div class="card-header">
-    <h3 class="mb-0">@ViewData["Title"]</h3>
-</div>
-<div class="card-body">
+
+<div class="card-body p-5 step">
     <p>
         Incoming List is a list of items that are going to receive to warehouse. Include from Supplier and Manufacturing
     </p>
-
+</div>
+<div class="card-body p-5 step" style="display: none">
     <h5>
         <b>I. Creat new List</b>
     </h5>
@@ -21,7 +21,8 @@
     <div class="col-10" align="center">
         <img src="~/assets/documentation/ic-role.png" class="img-fluid">
     </div>
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <div class="row">
         <p class="col-auto">
             <b>2. From side bar, select Incoming List</b>
@@ -30,9 +31,10 @@
             <img src="~/assets/documentation/ic-menu.png" class="img-fluid">
         </div>
     </div>
-
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p>
-        <b>3. Select Add new list or Upload and fill the information</b>
+    <b>3. Select Add new list or Upload and fill the information</b>
     </p>
     <p>
         <b class="text-primary">a. Manually input Incoming List data</b>
@@ -62,8 +64,11 @@
             Delivery date: date receive the goods.
         </li>
     </ul>
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p class="text-danger">**Notice: We can assume that Manufacturing is an supplier, Supplier code: MFG. In order to receive item from manufacturing, please input supplier code as "MFG" </p>
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p>
         <b class="text-primary">b. Upload Incoming list</b>
     </p>
@@ -78,7 +83,8 @@
             </p>
         </div>
     </div>
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <div class="row col-12">
         <div class="col-md-4">
             <p>
@@ -89,45 +95,43 @@
             <img src="~/assets/documentation/ic-upload-select.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
         </div>
     </div>
-
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p>
         View the upload result
     </p>
     <div class="col-md-auto" align="center">
         <img src="~/assets/documentation/ic-upload-complete.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
     </div>
-
-
-
-    <div class="row">
-        <div class="col-md-auto">
-            <p class="text-danger">**Notice: By click on "View report" button, you can view detail of error from file: </p>
-            <ul class="text-danger">
-                <li>
-                    Where the error is
-                </li>
-                <li>
-                    Why a specific line got error
-                </li>
-                <li>
-                    Who was upload the file
-                </li>
-                <li>
-                    Uploaded file name
-                </li>
-                <li>
-                    Uploaded time
-                </li>
-            </ul>
-        </div>
-
-
-        <div class="col-md-auto" align="center">
-            <img src="~/assets/documentation/ic-error.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
-        </div>
+</div>
+<div class="card-body p-5 step" style="display: none"><div class="row">
+    <div class="col-md-auto">
+        <p class="text-danger">**Notice: By click on "View report" button, you can view detail of error from file: </p>
+        <ul class="text-danger">
+            <li>
+                Where the error is
+            </li>
+            <li>
+                Why a specific line got error
+            </li>
+            <li>
+                Who was upload the file
+            </li>
+            <li>
+                Uploaded file name
+            </li>
+            <li>
+                Uploaded time
+            </li>
+        </ul>
     </div>
 
+
+    <div class="col-md-auto" align="center">
+        <img src="~/assets/documentation/ic-error.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+    </div>
+</div></div>
+<div class="card-body p-5 step" style="display: none">
     <h5>
         <b>II. Edit Incoming List</b>
     </h5>
@@ -142,7 +146,8 @@
     <div class="img" align="center">
         <img src="~/assets/documentation/ic-edit-header.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
     </div>
-
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p>
         <b>
             To edit single item, click on the <span class="btn btn-sm">Item no</span> and edit or <span class="text-danger">Remove</span> the information
@@ -151,8 +156,8 @@
     <div class="img" align="center">
         <img src="~/assets/documentation/ic-edit-item.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
     </div>
-
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <h5>
         <b>III. Pass list to QC</b>
     </h5>
@@ -166,15 +171,19 @@
         </div>
     </div>
     <p class="text-danger">**Notice: After close list, user can no longer edit/remove the list </p>
-    <h5>
-        <b>IV. Excel form template</b>
-    </h5>
+</div>
+
+<div class="card-body">
     
-            <a href="/Documents/DownloadTemplate/incoming">
-                <i class="fa fa-download"></i>
-                Incoming List template
-            </a>
-        
+    <h5>
+        <b>Excel form template</b>
+    </h5>
+
+    <a href="/Documents/DownloadTemplate/incoming">
+        <i class="fa fa-download"></i>
+        Incoming List template
+    </a>
+
 </div>
 
 <script>

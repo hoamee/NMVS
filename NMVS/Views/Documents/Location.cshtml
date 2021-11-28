@@ -14,7 +14,11 @@
     <div class="col-10" align="center">
         <img src="~/assets/documentation/loc-map.png" class="img-fluid">
     </div>
+</div>
 
+<partial name="_ProgressbarWbutton" />
+
+<div class="card-body p-5 step">
     <h5>
         <b>I. Create new Location</b>
     </h5>
@@ -24,14 +28,16 @@
     <div class="col-10" align="center">
         <img src="~/assets/documentation/site - role.png" class="img-fluid">
     </div>
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p>
         <b>2. From side bar, select Location</b>
     </p>
     <div class="col-10" align="center">
         <img src="~/assets/documentation/loc-menu.png" class="img-fluid">
     </div>
-
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p>
         <b>3. Select Add Location and fill the information</b>
     </p>
@@ -44,7 +50,8 @@
         </div>
     </div>
     <p class="text-danger">**Notice: The Active attribute decide this Location is visible in other selection list </p>
-
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p>
         <b>4. View the created Location</b>
     </p>
@@ -52,15 +59,16 @@
     <div align="center">
         <img src="~/assets/documentation/loc-list.png" class="img-fluid shadow p-3 mb-5 bg-body rounded col-md-8">
     </div>
-
+</div>
+<div class="card-body p-5 step" style="display: none">
     <p class="text-danger">
         <b>5. Warning: if you encount this message, that mean the Warehouse code is conflicted. Please select another Warehouse code</b>
     </p>
     <div align="center">
         <img src="~/assets/documentation/loc-existed.png" class="img-fluid shadow p-3 mb-5 bg-body rounded">
     </div>
-
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <h5>
         <b>II. Edit Location</b>
     </h5>
@@ -69,21 +77,22 @@
     </p>
     <div class="row">
         <div class="col-md-6" align="center">
-            <img src="~/assets/documentation/wh-edit.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
+            <img src="~/assets/documentation/loc-edit-list.png" class="img-fluid  shadow p-3 mb-5 bg-body rounded">
         </div>
         <div class="col-md-5 " align="center">
-            <img src="~/assets/documentation/wh-form.png" class="img-fluid shadow p-3 mb-5 bg-body rounded">
+            <img src="~/assets/documentation/loc-edit-form.png" class="img-fluid shadow p-3 mb-5 bg-body rounded">
         </div>
     </div>
-
-    <br />
+</div>
+<div class="card-body p-5 step" style="display: none">
     <h5>
         <b>III. Remove Warehouse</b>
     </h5>
     <p class="text-danger">**There is no remove option for Site/Warehouse/Location. In order to hide them, please un-check the Active attribute</p>
-
-
 </div>
+
+
+
 
 <script>
     $(document).ready(function () {

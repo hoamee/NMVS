@@ -4,9 +4,6 @@
     ViewData["Title"] = "Site";
 }
 
-<script>
-    $('.btn-nav').hide();
-</script>
 <div class="card">
     <h5>
         Site is a concept of largest storage location. A site is parent of warehouses and grandparent of locations.
@@ -18,17 +15,8 @@
 </div>
 <br />
 
-<div class="progress" style="height: 30px;">
-    <div class="progress-bar progress-bar-striped progress-bar-animated" style="font-weight: bold; font-size: 15px; height: 100%;" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-</div>
-<div>
-    <button class="action back btn btn-outline-warning" style="display: none">Back</button>
-    <button class="action next btn btn-outline-primary float-end">Next</button>
-</div>
+<partial name="_ProgressbarWbutton" />
 <div class="card-body p-5 step">
-    <h4>Step 1</h4>
-</div>
-<div class="card-body p-5 step" style="display: none">
     <h5>
         <b>I. Create new site</b>
     </h5>

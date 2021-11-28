@@ -5,17 +5,108 @@
 }
 
 
-<div class="progress" style="height: 30px;">
-    <div class="progress-bar progress-bar-striped progress-bar-animated" style="font-weight: bold; font-size: 15px; height: 100%;" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-</div>
 
-<div class="card-body p-5 step" >
-    <h4>Step 1</h4>
+<partial name="_ProgressbarWbutton" />
+
+<div class="card-body p-5 step">
+    <h4>
+        Request inventory (For Manufacturing) is create request to get a list of item from warehouse
+    </h4>
 </div>
-<div class="card-body p-5 step" style="display: none">Step 2</div>
-<div class="card-body p-5 step" style="display: none">Step 3</div>
-<div class="card-body p-5 step" style="display: none">Step 4</div>
-<div class="card-body p-5 step" style="display: none">Step 5</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        To <i>create</i> a request user should be in role <b class="text-success">Request inventory</b>
+    </h5>
+    <h5>
+        To <i>handle</i> a request user should be in role <b class="text-success">Handle request</b>
+    </h5>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        Go to Request > History then select Create new request or Upload
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/rq-create-menu.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5 class="text-primary">
+        a. Create request manually
+    </h5>
+    <h5>
+        1. select <span class="btn btn-outline-info btn-sm">Add new</span> then fill the Batch no. (<i class="text-danger">Required</i>), and note (<i>Optional</i>)
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/rq-create-manually.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        2. To request an item, go to your request and select <span class="btn btn-outline-primary btn-sm">Add item</span>
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/rq-create-manually-add-item.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        3. Fill the information then click <span class="btn btn-primary btn-sm">Create</span>
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/rq-create-manually-form.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        4. Review the items and click <span class="btn btn-outline-success btn-sm">Close</span> to submit your request
+    </h5>
+    <h5 class="text-danger">
+        Note: after close, we can no longer update or edit the request
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/rq-create-manually-close.png" class="img-fluid">
+    </div>
+
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5 class="text-primary">
+        B. Create request by upload a list
+    </h5>
+    <h5>
+        1. select <span class="btn btn-outline-info btn-sm"><span class="fa fa-cloud-upload"></span>upload</span> then browse the file
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/rq-create-upload-1.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        2. View the upload result and correct if any error
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/rq-create-upload-2.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        3. Review again before submit
+    </h5>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/rq-create-upload-3.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-footer">
+
+    <h5>
+        <b>Excel form template</b>
+    </h5>
+
+    <a href="/Documents/DownloadTemplate/request">
+        <i class="fa fa-download"></i>
+        Inventory request template
+    </a>
+
+</div>
 <script>
     $(document).ready(function () {
         $('.side-request').addClass('active');

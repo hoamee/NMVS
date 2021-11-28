@@ -1,0 +1,133 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
+    ViewData["Title"] = "Process a inventory request";
+}
+
+
+
+<partial name="_ProgressbarWbutton" />
+<div class="card-body p-5 step">
+    <h4>
+        Overview
+    </h4>
+   
+    <ul>
+        <li>
+            Process a request is to decide which item is going to be issued, where to issue, how many.
+        </li>
+        <li>
+            The result of this process is a Issue order.
+        </li>
+        <li>
+            For Manufacturing issue: the target location is a registered location, with type "Manufacturing".
+        </li>
+        <li>
+            For Sale/Warranty return/Warehouse transfer: The target location is a vehicle that was checked in.
+        </li>
+        <li>
+            To process a request, User should be in role "Handle request".
+        </li>
+    </ul>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        Step 1
+    </h5>
+    <p>
+        Browse to Request > History then click on a request
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/pr-menu.png" class="img-fluid">
+    </div>
+</div>
+
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        Step 2
+    </h5>
+    <p>
+        Review requested item, required date and response by click on <i class="btn btn-outline-success btn-sm">Confirm</i> or <i class="btn btn-outline-danger btn-sm">Reject</i>
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/pr-detail-unconfirm.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        Step 3
+    </h5>
+    <ul>
+        <li>
+            After confirmed, the request confirmation status is changed to <i class="badge bg-success">Confirmed</i>
+        </li>
+        <li>
+            In the Items panel, the button <i class="btn btn-outline-info btn-sm">Picking list</i> show up. Click on it to start choosing item
+        </li>
+    </ul>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/pr-detail-confirmed.png" class="img-fluid">
+    </div>
+</div>
+
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        Step 4
+    </h5>
+
+    <ol>
+        <li>
+            Input quantity of item and click <i class="btn btn-success btn-sm">Add</i>
+        </li>
+        <li>
+            Review items, remove if any change in your mind. Then click on <i class="btn btn-info btn-sm">Submit</i>
+        </li>
+        <li>
+            Review again before save to system. If everythings is correct, click on <i class="btn btn-primary btn-sm">Save changes</i>
+        </li>
+    </ol>
+
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/pr-pick-list.png" class="img-fluid">
+    </div>
+</div>
+
+<div class="card-body p-5 step" style="display: none">
+    <h5>
+        Step 5
+    </h5>
+    Now, Issue orders is set by your picking list information. You can review directly on the request page:
+    <ul>
+        <li>
+            Selected: Sum of quantity you have picked
+        </li>
+        <li>
+            Arranged: Sum of quantity has been success moved by issue order.
+        </li>
+        <li>
+            Movement note:
+            <ul>
+                <li>
+                    <i class="btn btn-outline-danger btn-sm">Movement note</i> This red button is an alert that there are some problem with movement (Broken, No space available at targer location, ...)
+                </li>
+                <li>
+                    <i class="btn btn-outline-primary btn-sm">Movement note</i> This Blue button is a good signal. No problem
+                </li>
+                <li>
+                    Click on these two button to view detail of movement process
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/pr-final.png" class="img-fluid">
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('.side-pr').addClass('active');
+        $('#side-pr').css('color', "white");
+    })
+</script>
