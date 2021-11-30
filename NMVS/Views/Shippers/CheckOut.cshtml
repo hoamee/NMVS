@@ -4,6 +4,7 @@
     ViewData["Title"] = "Check out";
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Category = "Guard";
+    var i = 0;
 }
 
 
@@ -40,7 +41,6 @@
                     <dd class="col-sm-10">
                         @Html.DisplayFor(model => model.Shp.DrContact)
                     </dd>
-
                 </dl>
             </div>
            
@@ -72,10 +72,19 @@
                                     Item name
                                 </th>
                                 <th>
+                                    Packs
+                                </th>
+                                <th>
                                     Quantity
                                 </th>
                                 <th>
+                                    Sold-to
+                                </th>
+                                <th>
                                     Ship-to
+                                </th>
+                                <th>
+                                    Ship-to Address
                                 </th>
                                 <th>
 
@@ -89,30 +98,41 @@
                         <tbody>
                             @foreach (var t in Model.Det)
                             {
-                                <tr>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.InventoryId)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.ItemNo)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.ItemName)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.Quantity)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => t.ShipToName)
-                                    </td>
-                                    <td>
-                                        <input type="checkbox" class="btn-check btn-set" id="btn-check-@t.DetId" autocomplete="off">
-                                        <label class="btn btn-outline-warning" for="btn-check-@t.DetId">Mark as correct</label>
-                                    </td>
-                                </tr>
+                                i++;
+                                
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.InventoryId)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.ItemNo)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.ItemName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.PackCount)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.Quantity)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.SoldToName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.ShipToName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => t.ShipToAddr)
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="btn-check btn-set" id="btn-check-@i" autocomplete="off">
+                                    <label class="btn btn-outline-warning" for="btn-check-@i">Mark as correct</label>
+                                </td>
+                            </tr>
                             }
                             <tr>
-                                <td colspan="6" class="text-center">
+                                <td colspan="9" class="text-center">
                                     <b><i>End of list</i></b>
                                 </td>
                             </tr>

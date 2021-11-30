@@ -17,5 +17,7 @@ namespace NMVS.Services
         public UserRoleVm GetUserRole(string userName);
 
         public Task SeedingRole(UserRoleVm usr);
+
+        public Task<CommonResponse<string>> ResetPassword(string usrName);
     }
 }

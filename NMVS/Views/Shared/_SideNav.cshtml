@@ -85,14 +85,14 @@
             </li>
 
 
-            <li class="nav-item nav-dashboard">
+            @*<li class="nav-item nav-dashboard">
                 <a class="nav-link nav-dashboard" href="/Home/Dashboard">
                     <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
                         <span class="fa fa-chart-area"></span>
                     </div>
                     <span class="nav-link-text ms-1">Dashboard</span>
                 </a>
-            </li>
+            </li>*@
 
             @if (User.IsInRole("Request inventory") || User.IsInRole("Handle request"))
             {

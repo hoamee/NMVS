@@ -7,28 +7,7 @@
 <section class="row">
     <div class="col-12 col-lg-9">
         <div class="row">
-            @if (ViewBag.Unsolved > 0)
-            {
-                <div class="col-6 col-lg-3 col-md-6">
-                    <a href="/Allocate/AllocateRequests">
-                        <div class="card">
-                            <div class="card-body px-3 py-4-5">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="stats-icon red">
-                                            <i class="iconly-boldDanger"></i>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <h6 class="text-muted font-semibold">Allocate Request</h6>
-                                        <h6 class="font-extrabold mb-0">@ViewBag.Unsolved Unsolved</h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            }
+           
 
             @if (ViewBag.UnArranged > 0)
             {

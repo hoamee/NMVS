@@ -94,6 +94,7 @@ namespace NMVS.Controllers.Api
             CommonResponse<int> commonResponse = new();
 
             commonResponse.message = "Order not found!";
+            commonResponse.status = -1;
 
             var issueQty = alo.AlcOrdQty;
 
@@ -111,6 +112,12 @@ namespace NMVS.Controllers.Api
                     {
                         if (!string.IsNullOrEmpty(shp.CheckOutBy))
                         {
+                            return Ok(commonResponse);
+                        }
+                        if (string.IsNullOrEmpty(shp.CheckInBy))
+                        {
+
+                            commonResponse.message = "Shipper has not checked in yet";
                             return Ok(commonResponse);
                         }
 
@@ -149,6 +156,7 @@ namespace NMVS.Controllers.Api
                                 //
                                 if (order.IssueType == "Issue")
                                 {
+
                                     var shpDet = _context.ShipperDets.FirstOrDefault(x => x.DetId == order.DetId && x.ShpId == order.ToVehicle);
                                     if (shpDet == null)
                                     {
@@ -261,6 +269,7 @@ namespace NMVS.Controllers.Api
                                 _context.Update(order);
                                 _context.SaveChanges();
                                 commonResponse.message = "Success"!;
+                                commonResponse.status = 1;
                             }
 
 

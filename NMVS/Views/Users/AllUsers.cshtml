@@ -19,6 +19,7 @@
                             <th>User name</th>
                             <th>Email</th>
                             <th>Active</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -38,6 +39,11 @@
                                         <p class="badge bg-secondary">Inactive</p>
                                     }
                                 </td>
+                               <td>
+                                   <span class="btn btn-outline-info" onclick="resetPassword('@item.UserName');">
+                                       Reset password
+                                   </span>
+                               </td>
                             </tr>
                         }
                     </tbody>
@@ -47,8 +53,63 @@
     </div>
 </div>
 
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
 <script src="~/assets/datatable/datatables.min.js"></script>
 <script>
+    var routeURL = location.protocol + "//" + location.host;
+    function resetPassword(usrName) {
+
+        Swal.fire({
+            title: 'Are you sure you want to reset password to this user?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, reset password!'
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+                var postData = {
+                    UserName: usrName
+                }
+                $.ajax({
+                    url: routeURL + "/api/Users/ResetPassword",
+                    data: JSON.stringify(postData),
+                    contentType: "application/json",
+                    dataType: "json",
+                    beforeSend: Swal.showLoading(),
+                    type: "POST",
+                    success: function (common) {
+                        if (common.status == 1) {
+                            Swal.fire(
+                                usrName + "'s password has been reseted",
+                                'Please copy this new password before close: ' + common.dataenum,
+                                'success'
+                            )
+                        }
+                        else if (common.status == -1) {
+                            Swal.fire(
+                                "An error occurred",
+                                '',
+                                'error'
+                            )
+                        }
+                        else {
+                            Swal.fire(
+                                "Access denied!",
+                                '',
+                                'error'
+                            )
+                        }
+
+
+                    }
+
+                });
+            }
+        })
+    };
 
     $(document).ready(function () {
         $('.nav-user').addClass('active');

@@ -1,0 +1,58 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
+    ViewData["Title"] = "Guard";
+}
+
+
+
+<partial name="_ProgressbarWbutton" />
+<div class="card-body p-5 step">
+    <h4>
+        Overview
+    </h4>
+    <ul>
+        <li>
+            By Guard function, user can Check in & Check out vehicle
+        </li>
+        <li>
+            To use Guard function, User should be in role "Guard".
+        </li>
+    </ul>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h3>Check in</h3>
+    
+    <p>
+        Browse to Guard review information of registered vehicle then Click on <i class="btn btn-outline-primary btn-sm">Check in</i>
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/gu-menu.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h3>Check out</h3>
+
+    <p>
+        Browse to Guard review information of registered vehicle then Click on <i class="btn btn-outline-danger btn-sm">Check out</i>
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/gu-check-out-menu.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h3>Check out</h3>
+
+    <p>
+        Review the information and click on  <i class="btn btn-outline-warning btn-sm">Mark as correct</i>. After check all items, click on Finish
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/gu-check-out.gif" class="img-fluid">
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('.side-gu').addClass('active');
+        $('#side-gu').css('color', "white");
+    })
+</script>

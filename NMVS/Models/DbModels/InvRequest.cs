@@ -54,6 +54,8 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Item No.")]
         public string ItemNo { get; set; }
 
+        public string ItemName { get; set; }
+
         [Display(Name = "Quantity")]
         public double Quantity { get; set; }
 

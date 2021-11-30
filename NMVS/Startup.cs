@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NMVS.Models;
+using NMVS.Models.ConfigModels;
 using NMVS.Services;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,9 @@ namespace NMVS
             services.AddDbContext<ApplicationDbContext>
                 (options => options.UseSqlServer(Configuration.GetConnectionString("NmvsConnection")));
             services.AddControllersWithViews();
+
+            services.Configure<TempPath>(Configuration.GetSection("TempPath"));
+
             //apply role without log out
             services.Configure<SecurityStampValidatorOptions>(options =>
             {
@@ -52,7 +56,16 @@ namespace NMVS
             services.AddTransient<ISoService, SoService>();
             services.AddTransient<IExcelService, ExcelService>();
             services.AddTransient<IInquiryService, InquiryService>();
+            services.AddDistributedMemoryCache();
+            services.AddSession(opt =>
+            {
+                opt.IdleTimeout = TimeSpan.FromDays(10);
+                opt.Cookie.HttpOnly = true;
+                opt.Cookie.IsEssential = true;
+            }
+            );
             services.AddHttpContextAccessor();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -74,7 +87,7 @@ namespace NMVS
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseSession();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

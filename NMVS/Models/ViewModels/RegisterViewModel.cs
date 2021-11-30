@@ -37,4 +37,27 @@ namespace NMVS.Models.ViewModels
         [StringLength(100)]
         public string Email { set; get; }
     }
+
+    public class ChangePasswordVm
+    {
+
+        [Required]
+        [Display(Name = "Current password")]
+        [DataType(DataType.Password)]
+        [StringLength(50)]
+        public string Password { set; get; }
+
+        [Required]
+        [Display(Name = "New password")]
+        [DataType(DataType.Password)]
+        [StringLength(50)]
+        public string NewPassword { set; get; }
+
+        [Required]
+        [Display(Name = "Confirm password")]
+        [DataType(DataType.Password)]
+        [StringLength(50)]
+        [Compare("NewPassword", ErrorMessage = "Password is not match")]
+        public string ConfirmPassword { set; get; }
+    }
 }

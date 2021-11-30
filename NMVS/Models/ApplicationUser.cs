@@ -11,6 +11,8 @@ namespace NMVS.Models
         public string FullName { set; get; }
         public bool Active { set; get; }
 
+        public string ActiveHostName { set; get; }
+
         public ICollection<ApplicationUserRole> UserRoles { get; set; }
     }
 

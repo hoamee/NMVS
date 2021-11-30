@@ -76,5 +76,26 @@ namespace NMVS.Controllers.Api
             return Ok(commonResponse);
 
         }
+
+
+        [HttpPost]
+        [Route("ResetPassword")]
+        public async Task<IActionResult> ResetPassword(UserRoleVm usr)
+        {
+            var role = _httpContextAccessor.HttpContext.User.IsInRole(Helper.UserManagement);
+            CommonResponse<string> commonResponse = new();
+
+            if (role)
+            {
+                commonResponse = await _userData.ResetPassword(usr.UserName);
+            }
+            else
+            {
+                commonResponse.status = 0;
+            }
+
+            return Ok(commonResponse);
+
+        }
     }
 }

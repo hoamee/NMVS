@@ -11,11 +11,10 @@ using System.Threading.Tasks;
 namespace NMVS.Controllers
 {
     
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly ApplicationDbContext _db;
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db):base(db)
         {
             _logger = logger;
             _db = db;
@@ -61,7 +60,6 @@ namespace NMVS.Controllers
             ViewBag.Hold = listHold.ToArray();
             ViewBag.Used = listUsed.ToArray();
             ViewBag.OutGo = listOutGo.ToArray();
-            ViewBag.Unsolved = _db.AllocateRequests.Where(x => x.IsClosed == null).ToList().Count;
             var receiveLoc = _db.Locs.Where(x => x.LocType == "receive").Select(s=>s.LocCode).ToList();
             ViewBag.Unallocated = _db.ItemMasters.Where(x => receiveLoc.Contains(x.LocCode) && x.PtQty > 0).ToList().Count;
             //ViewBag.UnArranged = _db.Requests.Where(x => x.Arranged < x.Quantity && x.Closed == true).ToList().Count;
@@ -94,5 +92,6 @@ namespace NMVS.Controllers
             ViewBag.message = message;
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
     }
 }

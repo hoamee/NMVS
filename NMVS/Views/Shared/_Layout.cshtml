@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -58,7 +59,59 @@
 
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="~/assets/js/soft-ui-dashboard.min.js?v=1.0.4"></script>
+    <script>
+        function setNotification(noType, noMess, hr) {
+            $('#notification-ul').append(`<li class="mb-2">
+                                    <a class="dropdown-item border-radius-md" href="`+ hr + `">
+                                        <div class="d-flex py-1">
+                                            <div class="my-auto avatar avatar-sm  me-3" >
+                                                <span class="fa fa-warning fa-2x text-primary"></span>
+                                            </div>
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="text-sm font-weight-normal mb-1">
+                                                    <span class="font-weight-bold text-xl">`+ noType + `</span>
+                                                </h6>
+                                                <p class="text-xl mb-0">
+                                                    <i class="fa fa-arrow-right"></i>
+                                                    `+ noMess + `
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>`)
+        }
+        var apiUrl = location.protocol + "//" + location.host;
+        $(document).ready(function () {
 
+            $.ajax({
+                url: '/api/Notifications/GetNotification',
+                method: 'GET',
+                success: function (common) {
+                    if (common.dataenum.length === 0) {
+                        $('#notification-ul').html(`<span class="font-weight-bold">No new notification, you are doing well</span>`);
+                    }
+                    else {
+                        $('#notification-ul').html('');
+                        $('.fa-bell').css('color', 'red');
+                        var i = 0;
+                        $(common.dataenum).each(function (index, item) {
+                            i++;
+                            if (i > 1) {
+                                $('#notification-ul').append('<hr/>');
+                            }
+                            setNotification(item.notificationType, item.message, item.href)
+                        });
+
+                    }
+
+                }
+
+            })
+
+
+        })
+
+    </script>
 </body>
 
 </html>

@@ -321,18 +321,29 @@
                         url: routeURL + '/api/InvRequest/FinishIssueOrder',
                         data: JSON.stringify(alo),
                         success: function (common) {
-                           
-                            Swal.fire({
-                                position: 'center',
-                                icon: 'success',
-                                title: 'Your work has been saved',
-                                message: common.message,
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
-                            setTimeout(function () {
-                                window.location.reload();
-                            }, 1000);
+
+                            if (common.status == 1) {
+                                Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: 'Your work has been saved',
+                                    message: common.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+                            } else {
+                                Swal.fire({
+                                    position: 'center',
+                                    icon: 'error',
+                                    title: 'An error occurred',
+                                    message: common.message,
+                                    showConfirmButton: true
+                                });
+                            }
+                            
                         },
                         failure: function (response) {
                             alert(response);

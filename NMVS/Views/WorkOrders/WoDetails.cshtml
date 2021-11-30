@@ -214,12 +214,12 @@
                                     Assign
                                 </span>
                             </a>
-                            <a class="btn btn-primary" href="/WorkOrders/CloseWo/@Model.WoNbr">
+                            <span class="btn btn-danger" onclick="closeWo();">
                                 <span><i class="bi bi-check"></i></span>
                                 <span>
                                     Close Order
                                 </span>
-                            </a>
+                            </span>
                         </td>
                     }
                 </tr>
@@ -270,6 +270,33 @@
 
     };
 
+    function closeWo() {
+        bootbox.confirm({
+            message: "Are you sure want to close this WO?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (res) {
+                if (res) {
+                    var dialog = bootbox.dialog({
+                        message: '<p><i class="fa fa-spin fa-spinner"></i> Loading...</p>'
+                    });
+
+                    $.get({
+                        url: window.location.href = '/WorkOrders/CloseWo/@Model.WoNbr'
+
+                    });
+                }
+            }
+        });
+    }
 
 
     $(document).ready(function () {

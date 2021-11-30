@@ -1,0 +1,110 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_DocumentsLayout.cshtml";
+    ViewData["Title"] = "Work orders";
+}
+
+
+
+<partial name="_ProgressbarWbutton" />
+<div class="card-body p-5 step">
+    <h4>
+        Overview
+    </h4>
+    <ul>
+        <li>
+            Work order is an order to produce goods. User should be in role "Create WO".
+        </li>
+        <li>
+            Work order bill is a part of work order, use this function to report progress of WO. User should be in role "WO Reporter".
+        </li>
+    </ul>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h3>Create WO</h3>
+
+    <p>
+        Browse to Work orders > Work orders browse <i class="btn btn-outline-info btn-sm">Add new</i>
+    </p>
+    <p class="text-danger">
+        Prodline is required to create a work order. please create at
+        <span class="fa fa-syringe"></span>
+        <span class="nav-link-text ms-1">Prod line</span>
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/gu-menu.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+
+
+    <p>
+        Assign task to a team. Click on <i class="btn btn-primary btn-sm">Assign</i>
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/wo-assign.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+
+    <ul>
+        <li>
+            Fill the Quantity assigned
+        </li>
+        <li>
+            Select Assignee - a reporter who update the progress to system
+        </li>
+        <li>
+            Select due date for this task
+        </li>
+    </ul>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/wo-push-bill.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <h3>Update progress (Role: WO Reporter)</h3>
+
+    <p>
+        Browse to Work orders > Bills to view your assigned task. Click on Update to update progress of this task
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/wo-bill-list.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <p>
+        Fill the completed quantity
+    </p>
+    <div class="col-10" align="center">
+        <img src="~/assets/documentation/wo-bill-form.png" class="img-fluid">
+    </div>
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <p>
+        The progress is updated automatically on Dashboard
+    </p>
+    <img src="~/assets/documentation/wo-dashboard.png" class="img-fluid">
+
+
+</div>
+<div class="card-body p-5 step" style="display: none">
+    <p>
+        Workorder detail is also updated
+    </p>
+    <img src="~/assets/documentation/wo-detail.png" class="img-fluid">
+
+</div>
+
+<div class="card-body p-5 step" style="display: none">
+    <h4 class="text-danger">
+        Do not click on <span class="btn btn-danger btn-sm">Close order</span> 
+        when the work has not finished. Once Work order is close, this WO is no longer update the progress or show up on WO Dashboard
+    </h4>
+</div>
+<script>
+    $(document).ready(function () {
+        $('.side-wo').addClass('active');
+        $('#side-wo').css('color', "white");
+    })
+</script>

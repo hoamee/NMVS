@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NMVS.Common;
 using NMVS.Models;
@@ -16,7 +17,8 @@ namespace NMVS.Services
         RoleManager<ApplicationRole> _roleManager;
         UserManager<ApplicationUser> _userManager;
 
-        public UserDataService(ApplicationDbContext db, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+        public UserDataService(ApplicationDbContext db, UserManager<ApplicationUser> userManager, 
+            RoleManager<ApplicationRole> roleManager)
         {
             _db = db;
             _roleManager = roleManager;
@@ -421,6 +423,39 @@ namespace NMVS.Services
             }
 
             await _db.SaveChangesAsync();
+        }
+
+        public async Task<CommonResponse<string>> ResetPassword(string usrName)
+        {
+            CommonResponse<string> common = new();
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$*";
+            var stringChars = new char[12];
+            var random = new Random();
+
+            for (int i = 0; i < stringChars.Length; i++)
+            {
+                stringChars[i] = chars[random.Next(chars.Length)];
+            }
+            var newPassword = new String(stringChars);
+            var currentUser = await _db.Users.FirstOrDefaultAsync(x=>x.UserName == usrName);
+            if (currentUser != null)
+            {
+                string hashedNewPassword = _userManager.PasswordHasher.HashPassword(currentUser, newPassword);
+                currentUser.PasswordHash = hashedNewPassword;
+                _db.Users.Update(currentUser);
+                await _db.SaveChangesAsync();
+
+                common.dataenum = newPassword;
+                common.status = 1;
+            }
+            else
+            {
+                common.message = "User not found";
+                common.status = -1;
+            }
+
+
+            return common;
         }
     }
 }

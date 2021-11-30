@@ -128,12 +128,10 @@ namespace NMVS.Services
                             }
 
                             if (remainder > 0)
-                            {
-                                if (packCount > 0)
-                                {
+                            { 
                                     AddNoteLine(salesOrder.SoType, noteNbr, line.ItemNo, line.InventoryId, remainder, 1);
                                     itemCount++;
-                                }
+                                
 
                             }
 
@@ -365,7 +363,22 @@ namespace NMVS.Services
                            ConfirmedBy = i.ConfirmedBy
                        }).FirstOrDefault();
 
-            var dets = _db.RequestDets.Where(x => x.RqID == id).ToList();
+            var dets = (from det in _db.RequestDets.Where(x => x.RqID == id)
+                        join it in _db.ItemDatas on det.ItemNo equals it.ItemNo into all
+                        from al in all.DefaultIfEmpty()
+                        select new RequestDet
+                        {
+                            ItemNo = det.ItemNo,
+                            ItemName = al.ItemName,
+                            SpecDate = det.SpecDate,
+                            Quantity = det.Quantity,
+                            Picked = det.Picked,
+                            Arranged = det.Arranged,
+                            MovementNote = det.MovementNote,
+                            RequireDate = det.RequireDate,
+                            DetId = det.DetId,
+
+                        }).ToList();
 
 
             return new RequestDetailVm
@@ -486,6 +499,7 @@ namespace NMVS.Services
                     InType = 2
                 });
             }
+            _db.SaveChanges();
         }
 
         public List<IssueNoteVm> GetListIssueNote()

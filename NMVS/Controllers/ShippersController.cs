@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using NMVS.Models;
 using NMVS.Models.DbModels;
 using NMVS.Models.ViewModels;
+using NMVS.Services;
 
 namespace NMVS.Controllers
 {
@@ -15,9 +16,12 @@ namespace NMVS.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public ShippersController(ApplicationDbContext context)
+        private readonly IRequestService _service;
+
+        public ShippersController(ApplicationDbContext context, IRequestService service)
         {
             _context = context;
+            _service = service;
         }
 
 
@@ -254,38 +258,7 @@ namespace NMVS.Controllers
         {
             if (User.IsInRole("Guard"))
             {
-                var shp = _context.Shippers.Find(id);
-
-                var noteDet = (from d in _context.ShipperDets.Where(x => x.ShpId == id)
-                               join i in _context.ItemDatas on d.ItemNo equals i.ItemNo into all
-                               from a in all.DefaultIfEmpty()
-                               join s in _context.SalesOrders on d.RqId equals s.SoNbr into sOrder
-                               from so in sOrder.DefaultIfEmpty()
-                               join c in _context.Customers on so.CustCode equals c.CustCode into soldTo
-                               from soto in soldTo.DefaultIfEmpty()
-                               join c2 in _context.Customers on so.ShipTo equals c2.CustCode into shipTo
-                               from shto in shipTo.DefaultIfEmpty()
-                               select new ShipperDet
-                               {
-                                   InventoryId = d.InventoryId,
-                                   DetId = d.DetId,
-                                   ItemName = a.ItemName,
-                                   ItemNo = a.ItemNo,
-                                   Quantity = d.Quantity,
-                                   RqId = d.RqId,
-                                   ShpId = d.ShpId,
-                                   SoldTo = soto.CustCode,
-                                   SoldToName = soto.CustName,
-                                   ShipToId = shto.CustCode,
-                                   ShipToAddr = shto.Addr,
-                                   ShipToName = shto.CustName
-                               }).ToList();
-
-                var model = new IssueNoteShipperVm
-                {
-                    Det = noteDet,
-                    Shp = shp
-                };
+                var model = _service.GetVehicleNoteDetail(id);
                 return View(model);
             }
             else

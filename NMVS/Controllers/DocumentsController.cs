@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace NMVS.Controllers
 {
+    [Authorize]
     public class DocumentsController : Controller
     {
         public IActionResult Index()
@@ -77,6 +79,10 @@ namespace NMVS.Controllers
         public IActionResult ProcessRequest() => View();
 
         public IActionResult Vehicle() => View();
+
+        public IActionResult Guard() => View();
+
+        public IActionResult Wo() => View();
 
         public IActionResult DownloadTemplate(string id)
         {

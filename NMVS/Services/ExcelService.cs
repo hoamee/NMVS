@@ -1,7 +1,9 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.Extensions.Options;
 using NMVS.Common;
 using NMVS.Models;
+using NMVS.Models.ConfigModels;
 using NMVS.Models.DbModels;
 using NMVS.Models.ViewModels;
 using OfficeOpenXml;
@@ -17,17 +19,19 @@ namespace NMVS.Services
     public class ExcelService : IExcelService
     {
         private readonly ApplicationDbContext _db;
+        private readonly IOptions<TempPath> _config;
 
-        public ExcelService(ApplicationDbContext db)
+        public ExcelService(ApplicationDbContext db, IOptions<TempPath> config)
         {
             _db = db;
+            _config = config;
         }
 
         public async Task<CommonResponse<string>> GetshipperNote(int shpId, string user)
         {
             CommonResponse<string> common = new();
             ExcelDataHelper _eHelper = new();
-            common.dataenum = @"D:\Temp download\";
+            common.dataenum = _config.Value.Path;
             try
             {
                 Shipper shipper;
@@ -140,7 +144,7 @@ namespace NMVS.Services
                     }
                 }
 
-                common.dataenum = @"D:\Temp download\" + common.message;
+                common.dataenum = _config.Value.Path + common.message;
                 var outputInfo = new FileInfo(common.dataenum);
                 // save changes
                 excel.SaveAs(outputInfo);
@@ -153,9 +157,6 @@ namespace NMVS.Services
                 common.status = -1;
 
             }
-
-
-
             return common;
         }
 
@@ -163,7 +164,7 @@ namespace NMVS.Services
         {
             CommonResponse<string> common = new();
             ExcelDataHelper _eHelper = new();
-            common.dataenum = @"D:\Temp download\";
+            common.dataenum = _config.Value.Path;
             try
             {
                 //Check icoming list exist
@@ -277,7 +278,7 @@ namespace NMVS.Services
                     }
                 }
 
-                common.dataenum = @"D:\Temp download\" + common.message;
+                common.dataenum = _config.Value.Path + common.message;
                 var outputInfo = new FileInfo(common.dataenum);
                 // save changes
                 excel.SaveAs(outputInfo);
@@ -300,7 +301,7 @@ namespace NMVS.Services
         {
             CommonResponse<string> common = new();
             ExcelDataHelper _eHelper = new();
-            common.dataenum = @"D:\Temp download\";
+            common.dataenum = _config.Value.Path;
             try
             {
 
@@ -431,7 +432,7 @@ namespace NMVS.Services
                     writingRow = 21;
                 }
 
-                common.dataenum = @"D:\Temp download\" + common.message;
+                common.dataenum = _config.Value.Path + common.message;
                 var outputInfo = new FileInfo(common.dataenum);
                 // save changes
                 excel.SaveAs(outputInfo);
@@ -455,7 +456,7 @@ namespace NMVS.Services
         {
             CommonResponse<string> common = new();
             ExcelDataHelper _eHelper = new();
-            common.dataenum = @"D:\Temp download\";
+            common.dataenum = _config.Value.Path;
             try
             {
                 //Check icoming list exist
@@ -587,7 +588,7 @@ namespace NMVS.Services
 
                 }
 
-                common.dataenum = @"D:\Temp download\" + common.message;
+                common.dataenum = _config.Value.Path + common.message;
                 var outputInfo = new FileInfo(common.dataenum);
                 // save changes
                 excel.SaveAs(outputInfo);
@@ -610,7 +611,7 @@ namespace NMVS.Services
         {
             CommonResponse<string> common = new();
             ExcelDataHelper _eHelper = new();
-            common.dataenum = @"D:\Temp download\";
+            common.dataenum = _config.Value.Path;
             try
             {
 
@@ -727,7 +728,7 @@ namespace NMVS.Services
                     sheet.Name = "PXK " + note.InId;
                 }
 
-                common.dataenum = @"D:\Temp download\" + common.message;
+                common.dataenum = _config.Value.Path + common.message;
                 var outputInfo = new FileInfo(common.dataenum);
                 // save changes
                 excel.SaveAs(outputInfo);

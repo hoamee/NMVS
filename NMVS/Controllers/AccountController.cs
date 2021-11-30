@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NMVS.Common;
 using NMVS.Models;
@@ -7,6 +8,7 @@ using NMVS.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace NMVS.Controllers
@@ -19,7 +21,9 @@ namespace NMVS.Controllers
         RoleManager<ApplicationRole> _roleManager;
         private readonly IUserDataService _userData;
 
-        public AccountController(ApplicationDbContext db, UserManager<ApplicationUser> userManager,
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public AccountController(IHttpContextAccessor httpContextAccessor, ApplicationDbContext db, UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager, SignInManager<ApplicationUser> signInManager, IUserDataService userDataService)
         {
             _db = db;
@@ -27,12 +31,58 @@ namespace NMVS.Controllers
             _signInManager = signInManager;
             _roleManager = roleManager;
             _userData = userDataService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]        
         public IActionResult AccessDenied(string returnUrl = null)
         {
             return View("_Error403");
+
+        }
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            ViewBag.Status = -1;
+            return View();
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordVm passwordVm)
+        {
+            ViewBag.Status = -1;
+            ViewBag.Message = "";
+            if (ModelState.IsValid)
+            {
+                var user = _db.Users.FirstOrDefault(x => x.UserName == User.Identity.Name);
+                if (user != null)
+                {
+                    var result = await _userManager.ChangePasswordAsync(user, passwordVm.Password, passwordVm.ConfirmPassword);
+
+                    
+                    if (result.Succeeded)
+                    {
+                        ViewBag.Status = 1;
+                    }
+                    else 
+                    {
+                        ViewBag.Status = 0;
+                        var mess = "";
+                        foreach (var item in result.Errors)
+                        {
+                            mess += item.Description + ". ";
+                        }
+                        ViewBag.Message = mess;
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Can not validate user");
+                }
+            }
+            return View(passwordVm);
 
         }
 
@@ -94,10 +144,26 @@ namespace NMVS.Controllers
                     {
                         if (user.Active)
                         {
-
+                            
                             var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, false);
                             if (result.Succeeded)
                             {
+                                var usrHost = Dns.GetHostEntry(HttpContext.Connection.RemoteIpAddress).HostName;
+                                var usr = _db.Users.First(x => x.UserName == user.UserName);
+                                //if (!string.IsNullOrEmpty(usr.ActiveHostName))
+                                //{
+                                //    if (usr.ActiveHostName != usrHost)
+                                //    {
+                                //        ModelState.AddModelError("", "Your account is logged in at device " + usr.ActiveHostName + ", please sign out first");
+                                //        return View();
+                                //    }
+                                //}                                
+                                usr.ActiveHostName = Dns.GetHostEntry(HttpContext.Connection.RemoteIpAddress).HostName;
+                                _db.Update(usr);
+                                HttpContext.Session.SetString("sUserName", user.UserName);
+                                HttpContext.Session.SetString("sUserHost", usrHost);
+                                await _db.SaveChangesAsync();
+                                
                                 return RedirectToAction("Index", "Home");
                             }
                             else if (result.IsLockedOut)
@@ -109,7 +175,7 @@ namespace NMVS.Controllers
                                 var err = "";
                                 try
                                 {
-                                    var test = _db.Users.First(x => x.UserName == User.Identity.Name);
+                                    var test = _db.Users.FirstOrDefault(x => x.UserName == User.Identity.Name);
                                     if (test != null)
                                     {
                                         err = test.UserName;
@@ -130,9 +196,10 @@ namespace NMVS.Controllers
                     }
 
                 }
-            }catch(Exception e)
+            }
+            catch(Exception e)
             {
-                ModelState.AddModelError("", e.ToString());
+                ModelState.AddModelError("", e.Message);
             }
             return View();
         }
@@ -143,6 +210,14 @@ namespace NMVS.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Login");
         }
+
+        public async Task<IActionResult> LogOffConflict(string message)
+        {
+            await _signInManager.SignOutAsync();
+            ViewBag.mess = message;
+            return View();
+        }
+
 
         [HttpGet]
         public IActionResult Register()
