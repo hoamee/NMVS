@@ -25,9 +25,13 @@ namespace NMVS.Controllers
                 var usrName = HttpContext.Session.GetString("sUserName");
                 var usrSession = HttpContext.Session.GetString("sUserHost");
                 var activeHostName = _db.Users.FirstOrDefault(x => x.UserName == usrName).ActiveHostName;
+                if (activeHostName.Contains(".local"))
+                {
+                    activeHostName = activeHostName[0..^6];
+                }
                 if (usrSession != activeHostName)
                 {
-                    filterContext.Result = RedirectToAction("LogOffConflict", "Account", new {message = activeHostName });
+                    filterContext.Result = RedirectToAction("LogOffConflict", "Account", new {message = activeHostName +", yours is: " + usrSession });
                 }
                 base.OnActionExecuting(filterContext);
             }

@@ -148,7 +148,6 @@ namespace NMVS.Controllers
                             var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, false);
                             if (result.Succeeded)
                             {
-                                var usrHost = Dns.GetHostEntry(HttpContext.Connection.RemoteIpAddress).HostName;
                                 var usr = _db.Users.First(x => x.UserName == user.UserName);
                                 //if (!string.IsNullOrEmpty(usr.ActiveHostName))
                                 //{
@@ -158,10 +157,10 @@ namespace NMVS.Controllers
                                 //        return View();
                                 //    }
                                 //}                                
-                                usr.ActiveHostName = Dns.GetHostEntry(HttpContext.Connection.RemoteIpAddress).HostName;
+                                usr.ActiveHostName = HttpContext.Connection.RemoteIpAddress.ToString();
                                 _db.Update(usr);
                                 HttpContext.Session.SetString("sUserName", user.UserName);
-                                HttpContext.Session.SetString("sUserHost", usrHost);
+                                HttpContext.Session.SetString("sUserHost", usr.ActiveHostName);
                                 await _db.SaveChangesAsync();
                                 
                                 return RedirectToAction("Index", "Home");
@@ -172,20 +171,8 @@ namespace NMVS.Controllers
                             }
                             else
                             {
-                                var err = "";
-                                try
-                                {
-                                    var test = _db.Users.FirstOrDefault(x => x.UserName == User.Identity.Name);
-                                    if (test != null)
-                                    {
-                                        err = test.UserName;
-                                    }
-                                }
-                                catch (Exception e)
-                                {
-                                    err = e.ToString();
-                                }
-                                ModelState.AddModelError("", err);
+                                
+                                ModelState.AddModelError("", "Invalid login attempt.");
                                 return View(model);
                             }
                         }

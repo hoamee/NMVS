@@ -19,6 +19,9 @@
     <link href="~/assets/js/free-v4-shims.min.css" rel="stylesheet" />
     <link href="~/assets/js/free.min.css" rel="stylesheet" />
     <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script>
+        var apiUrl = location.protocol + "//" + location.host;
+    </script>
     <!-- CSS Files -->
     <link id="pagestyle" href="~/assets/css/soft-ui-dashboard.min.css?v=1.0.4" rel="stylesheet">
 
@@ -80,7 +83,7 @@
                                     </a>
                                 </li>`)
         }
-        var apiUrl = location.protocol + "//" + location.host;
+        
         $(document).ready(function () {
 
             $.ajax({
