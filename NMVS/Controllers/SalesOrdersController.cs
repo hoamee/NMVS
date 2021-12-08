@@ -216,7 +216,6 @@ namespace NMVS.Controllers
             if (ModelState.IsValid)
             {
                 var dataReady = true;
-                var uq = _context.Unqualifieds.Where(x => x.SoNbr == soDet.SoNbr);
                 if (soDet.SpecDate != null)
                 {
                     soDet.SpecDate = Convert.ToDateTime(soDet.SpecDate);

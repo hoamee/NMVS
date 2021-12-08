@@ -1,0 +1,12 @@
+<script>
+    function saveToClipboard(data) {
+        var aux = document.createElement("div");
+        aux.setAttribute("contentEditable", true);
+        aux.innerHTML = data;
+        aux.setAttribute("onfocus", "document.execCommand('selectAll',false,null)");
+        document.body.appendChild(aux);
+        aux.focus();
+        document.execCommand("copy");
+        document.body.removeChild(aux);
+    }
+</script>

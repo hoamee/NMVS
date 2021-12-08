@@ -46,50 +46,60 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            <tr>
-                                <td>
-                                    <a asp-action="UpdateItem" asp-route-id="@item.ItemNo"><span class="btn btn-sm btn-outline-primary">@item.ItemNo</span></a>
-                                </td>
-                                <td>
+                                <tr>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-auto">
+                                                <a asp-action="UpdateItem" asp-route-id="@item.ItemNo"><span class="btn btn-sm btn-outline-primary">@item.ItemNo</span></a>
+                                            </div>
+
+                                            <div class="col-auto">
+                                                <button class="btn btn-outline-primary btn-sm" onclick="saveToClipboard('@item.ItemNo')">
+                                                    <span class="fa fa-copy" ></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
                                     @Html.DisplayFor(modelItem => item.ItemName)
-                                </td>
-                                <td>
+                                    </td>
+                                    <td>
                                     @Html.DisplayFor(modelItem => item.ItemType)
-                                </td>
-                                <td>
+                                    </td>
+                                    <td>
                                     @Html.DisplayFor(modelItem => item.ItemUm)
-                                </td>
-                                <td>
+                                    </td>
+                                    <td>
                                     @Html.DisplayFor(modelItem => item.ItemPkg)
-                                </td>
-                                <td>
+                                    </td>
+                                    <td>
                                     @Html.DisplayFor(modelItem => item.ItemPkgQty)
-                                </td>
-                                <td class="text-sm font-weight-normal">
+                                    </td>
+                                    <td class="text-sm font-weight-normal">
                                     @if (item.Flammable)
                                     {
-                                        <span class="badge bg-danger">Yes</span>
+                                                <span class="badge bg-danger">Yes</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary">Normal</span>
+                                                <span class="badge bg-secondary">Normal</span>
                                     }
-                                </td>
-                                <td>
+                                    </td>
+                                    <td>
                                     @Html.DisplayFor(modelItem => item.ItemWhUnit)
-                                </td>
+                                    </td>
 
-                                <td class="text-sm font-weight-normal">
+                                    <td class="text-sm font-weight-normal">
                                     @if (item.Active)
                                     {
-                                        <span class="badge bg-success">Yes</span>
+                                                <span class="badge bg-success">Yes</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary">Inactive</span>
+                                                <span class="badge bg-secondary">Inactive</span>
                                     }
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
                         }
                     </tbody>
                 </table>
@@ -115,7 +125,9 @@
 </div>
 <partial name="FileUploadModal" />
 <script src="~/assets/datatable/datatables.min.js"></script>
+<partial name="_ClipboardSave"/>
 <script>
+
 
     $(document).ready(function () {
         $('.nav-item-data').addClass('active');
@@ -125,5 +137,3 @@
         $('#datatable-search').DataTable();
     });
 </script>
-
-    

@@ -16,19 +16,18 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="uploadFiles('formFile');">Save changes</button>
+                <button type="button" id="push-file" class="btn btn-primary" onclick="uploadFiles('formFile');">Save changes</button>
                 
             </div>
         </div>
     </div>
 </div>
 <script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
-<script src="~/assets/js/bootbox/bootbox.min.js"></script>
-<script src="~/assets/js/bootbox/bootbox.locales.min.js"></script>
 <script src="~/assets/js/notify.js"></script>
 <script>
 
     function uploadFiles(inputId) {
+        $('#pushfile').prop('disabled', true);
         var input = document.getElementById(inputId);
         var files = input.files;
         var formData = new FormData();
@@ -48,14 +47,17 @@
         }
 
         if (valid) {
-            
+            Swal.fire({
+                        title: 'Please Wait !',// add html attribute if you want or remove
+                        allowOutsideClick: false,
+                        showConfirmButton: false
+                    })
             $.ajax(
                 {
                     url: "/ItemDatas/UploadList",
                     data: formData,
                     processData: false,
                     contentType: false,
-                    beforeSend: Swal.showLoading(),
                     type: "POST",
                     success: function (common) {
                         if (common.status == -1) {
@@ -72,7 +74,7 @@
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Process completed',
-                                text: 'Finished importing file "<b>' + common.dataenum.fileName + '</b>"',
+                                text: 'Finished importing file "' + common.dataenum.fileName + '"',
                                 footer: ' <span class="text-bold">Processed: ' + common.dataenum.totalRecord + '</br>'
                                     + ' <span class="text-success"><b>Added: ' + common.dataenum.inserted + ' </b></span> </br>'
                                     + ' <span class="text-warning"><b>Updated: ' + common.dataenum.updated + '</b></span> </br>'

@@ -244,6 +244,13 @@ namespace NMVS.Controllers
 
                             return View();
                         }
+                        else
+                        {
+                            foreach (var error in result.Errors)
+                            {
+                                ModelState.AddModelError("", error.Description.ToString()) ;
+                            }
+                        }
                     }
                     catch (Exception)
                     {
