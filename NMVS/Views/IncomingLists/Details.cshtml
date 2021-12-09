@@ -95,7 +95,7 @@
 
                 }
 
-                @if (Model.Icm.Checked >= Model.Icm.ItemCount)
+                @if (Model.Icm.Checked >= Model.Icm.ItemCount && Model.Icm.Closed)
                 {
                     <a class="btn btn-outline-primary" asp-action="DownloadList" asp-route-id="@Model.Icm.IcId">
                         <span class="fa fa-cloud-download">Download receipt note</span>

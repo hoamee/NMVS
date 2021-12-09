@@ -39,7 +39,7 @@ namespace NMVS.Controllers.Api
             {
                 try
                 {
-                    var itemData = _context.ItemDatas.Find(iItem.ItemNo);
+                    var itemData = _context.ItemDatas.Where(x=>x.ItemNo == iItem.ItemNo).FirstOrDefault();
                     if (itemData == null)
                     {
                         common.message = "Item no. not found!";

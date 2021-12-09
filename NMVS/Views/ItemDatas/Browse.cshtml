@@ -46,60 +46,67 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                                <tr>
-                                    <td>
-                                        <div class="row">
-                                            <div class="col-auto">
-                                                <a asp-action="UpdateItem" asp-route-id="@item.ItemNo"><span class="btn btn-sm btn-outline-primary">@item.ItemNo</span></a>
-                                            </div>
-
-                                            <div class="col-auto">
-                                                <button class="btn btn-outline-primary btn-sm" onclick="saveToClipboard('@item.ItemNo')">
-                                                    <span class="fa fa-copy" ></span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
+                            <tr>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                            @item.ItemNo
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                            <li>
+                                                <a asp-action="UpdateItem" asp-route-id="@item.ItemNo"><span
+                                                    class="dropdown-item">Edit.</span></a>
+                                            </li>
+                                            <li>
+                                                <div class="dropdown-item" onclick="saveToClipboard('@item.ItemNo')">
+                                                    <span class="fa fa-copy"></span>
+                                                    Copy
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td>
                                     @Html.DisplayFor(modelItem => item.ItemName)
-                                    </td>
-                                    <td>
+                                </td>
+                                <td>
                                     @Html.DisplayFor(modelItem => item.ItemType)
-                                    </td>
-                                    <td>
+                                </td>
+                                <td>
                                     @Html.DisplayFor(modelItem => item.ItemUm)
-                                    </td>
-                                    <td>
+                                </td>
+                                <td>
                                     @Html.DisplayFor(modelItem => item.ItemPkg)
-                                    </td>
-                                    <td>
+                                </td>
+                                <td>
                                     @Html.DisplayFor(modelItem => item.ItemPkgQty)
-                                    </td>
-                                    <td class="text-sm font-weight-normal">
+                                </td>
+                                <td class="text-sm font-weight-normal">
                                     @if (item.Flammable)
                                     {
-                                                <span class="badge bg-danger">Yes</span>
+                                        <span class="badge bg-danger">Yes</span>
                                     }
                                     else
                                     {
-                                                <span class="badge bg-secondary">Normal</span>
+                                        <span class="badge bg-secondary">Normal</span>
                                     }
-                                    </td>
-                                    <td>
+                                </td>
+                                <td>
                                     @Html.DisplayFor(modelItem => item.ItemWhUnit)
-                                    </td>
+                                </td>
 
-                                    <td class="text-sm font-weight-normal">
+                                <td class="text-sm font-weight-normal">
                                     @if (item.Active)
                                     {
-                                                <span class="badge bg-success">Yes</span>
+                                        <span class="badge bg-success">Yes</span>
                                     }
                                     else
                                     {
-                                                <span class="badge bg-secondary">Inactive</span>
+                                        <span class="badge bg-secondary">Inactive</span>
                                     }
-                                    </td>
-                                </tr>
+                                </td>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -125,7 +132,7 @@
 </div>
 <partial name="FileUploadModal" />
 <script src="~/assets/datatable/datatables.min.js"></script>
-<partial name="_ClipboardSave"/>
+<partial name="_ClipboardSave" />
 <script>
 
 

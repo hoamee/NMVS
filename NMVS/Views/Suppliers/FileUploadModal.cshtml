@@ -16,7 +16,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="uploadFiles('formFile');">Save changes</button>
+                <button type="button" class="btn btn-primary" id="submit-file-btn" onclick="uploadFiles('formFile');">Save changes</button>
             </div>
         </div>
     </div>
@@ -31,6 +31,7 @@
         var files = input.files;
         var formData = new FormData();
         var valid = true;
+        $('#submit-file-btn').prop('disabled', true);
 
         for (var i = 0; i != files.length; i++) {
             var fileExtension = ['xlsx'];

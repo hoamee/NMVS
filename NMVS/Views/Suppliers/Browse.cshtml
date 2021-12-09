@@ -31,23 +31,30 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td >
-                                    <div class="row col-12">
-                                        <div class="col-auto">
-                                            <a class="btn btn-sm btn-outline-primary"
-                                            href="/Suppliers/UpdateSupplier?code=@item.SupCode">@item.SupCode</a>
-                                        </div>
-
-                                        <div class="col-auto">
-                                            <button class="btn btn-outline-primary btn-sm"
-                                            onclick="saveToClipboard('@item.SupCode')">
-                                                <span class="fa fa-copy"></span>
-                                            </button>
-                                        </div>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn dropdown-toggle" type="button"
+                                        id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                            @item.SupCode
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                            <li>
+                                                <a class="dropdown-item" href="/Suppliers/UpdateSupplier?code=@item.SupCode">
+                                                    Edit
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <div class="dropdown-item"  onclick="saveToClipboard('@item.SupCode')">
+                                                    <span class="fa fa-copy"></span>
+                                                    Copy
+                                                </div>
+                                            </li>
+                                        </ul>
                                     </div>
+
                                 </td>
-                                <td >@Html.DisplayFor(m => item.SupDesc)</td>
-                                <td >
+                                <td>@Html.DisplayFor(m => item.SupDesc)</td>
+                                <td>
                                     @if (item.Active)
                                     {
                                         <span class="badge bg-success">Yes</span>
@@ -57,11 +64,11 @@
                                         <span class="badge bg-secondary">Inactive</span>
                                     }
                                 </td>
-                                <td >@Html.DisplayFor(m => item.TaxCode)</td>
-                                <td >@Html.DisplayFor(m => item.Addr)</td>
-                                <td >@Html.DisplayFor(m => item.Email1)</td>
-                                <td >@Html.DisplayFor(m => item.Phone1)</td>
-                                <td >@Html.DisplayFor(m => item.Note)</td>
+                                <td>@Html.DisplayFor(m => item.TaxCode)</td>
+                                <td>@Html.DisplayFor(m => item.Addr)</td>
+                                <td>@Html.DisplayFor(m => item.Email1)</td>
+                                <td>@Html.DisplayFor(m => item.Phone1)</td>
+                                <td>@Html.DisplayFor(m => item.Note)</td>
 
                             </tr>
                         }

@@ -62,7 +62,7 @@ namespace NMVS.Services
             var ptMstr = _context.ItemMasters.ToList();
             foreach (var item in _context.ItemDatas.ToList())
             {
-                var pt = ptMstr.Where(x => x.ItemNo == item.ItemNo);
+                var pt = ptMstr.Where(x => string.Equals(x.ItemNo, item.ItemNo, StringComparison.OrdinalIgnoreCase));
                 double avail = 0;
                 if (pt.Any())
                 {
