@@ -477,7 +477,7 @@ namespace NMVS.Controllers.Api
                     _context.Add(new Shipper
                     {
                         RememberMe = shipper.RememberMe,
-                        DateIn = DateTime.Now.AddDays(1),
+                        DateIn = DateTime.Now.AddHours(1),
                         DrContact = shipper.DrContact,
                         Driver = shipper.Driver,
                         IssueConfirmed = false,

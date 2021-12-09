@@ -24,8 +24,6 @@ namespace NMVS.Controllers
             _service = service;
         }
 
-
-
         // GET: Shippers
         public async Task<IActionResult> Browse()
         {
@@ -267,7 +265,5 @@ namespace NMVS.Controllers
             }
 
         }
-
-
     }
 }

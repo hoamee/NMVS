@@ -303,7 +303,7 @@ namespace NMVS.Controllers
             ViewBag.History = _db.IssueOrders.Where(x => x.DetId == id).ToList();
 
             ViewBag.LocList = new SelectList(_db.Shippers
-                .Where(x => string.IsNullOrEmpty(x.CheckOutBy) && x.IssueConfirmed != true)
+                .Where(x => !string.IsNullOrEmpty(x.CheckInBy) && string.IsNullOrEmpty(x.CheckOutBy) && x.IssueConfirmed != true)
                 .ToList(), "ShpId", "ShpDesc");
 
             if (rq.SpecDate == null)
@@ -435,6 +435,7 @@ namespace NMVS.Controllers
                 return RedirectToAction("Error", "Home", new { common.message });
             }
         }
+       
         public async Task<IActionResult> GetIssueNote(int id)
         {
 
@@ -450,6 +451,7 @@ namespace NMVS.Controllers
                 return RedirectToAction("Error", "Home", new { common.message });
             }
         }
+       
         public async Task<IActionResult> DownloadIssueNoteSO(int id, int so)
         {
 
@@ -492,7 +494,5 @@ namespace NMVS.Controllers
 
             return filename;
         }
-
-
     }
 }
