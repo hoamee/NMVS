@@ -140,7 +140,7 @@
                         <tbody>
                             @foreach (var t in Model.Pt)
                             {
-                                var notes = t.Note.Split('|');
+
                                 <tr>
                                     <td>
                                         @Html.DisplayFor(modelItem => t.ItemNo)
@@ -159,20 +159,25 @@
                                     </td>
                                     <td>
                                         <ul>
-                                            @if (notes.Count() == 1)
+                                            @if (!string.IsNullOrEmpty(t.Note))
                                             {
-                                                @notes[0]
-                                            }
-                                            else
-                                            {
-                                                @foreach (var note in notes)
+                                                var notes = t.Note.Split('|');
+                                                @if (notes.Count() == 1)
                                                 {
-                                                    if (!string.IsNullOrEmpty(note.Trim()))
+                                                    @notes[0]
+                                                }
+                                                else
+                                                {
+                                                    @foreach (var note in notes)
                                                     {
-                                                        <li>@note</li>
+                                                        if (!string.IsNullOrEmpty(note.Trim()))
+                                                        {
+                                                            <li>@note</li>
+                                                        }
                                                     }
                                                 }
                                             }
+
                                         </ul>
                                     </td>
                                     <td id="td-@t.PtId">
@@ -183,7 +188,8 @@
                                         }
                                         @if (t.IsChecked == false)
                                         {
-                                            <button class="btn btn-sm btn-outline-warning" onclick="checkItem(@t.PtId,@t.RcvQty);">Pending QC</button>
+                                            <button class="btn btn-sm btn-outline-warning"
+                                        onclick="checkItem(@t.PtId,@t.RcvQty);">Pending QC</button>
                                         }
                                         @if (t.IsChecked == null)
                                         {
@@ -201,4 +207,3 @@
     </div>
 </div>
 <partial name="AddItemModal" />
-

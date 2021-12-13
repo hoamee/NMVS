@@ -10,14 +10,15 @@
                 <form id="form" name="form" action="/uploader" enctype="multipart/form-data" method="post">
                     <div class="mb-3">
                         <label for="formFile" class="form-label">Item data list</label>
-                        <input class="form-control" type="file" accept=".xlsx" id="formFile" name="formFile" >
+                        <input class="form-control" type="file" accept=".xlsx" id="formFile" name="formFile">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" id="push-file" class="btn btn-primary" onclick="uploadFiles('formFile');">Save changes</button>
-                
+                <button type="button" id="push-file" class="btn btn-primary" onclick="uploadFiles('formFile');">Save
+                    changes</button>
+
             </div>
         </div>
     </div>
@@ -48,54 +49,52 @@
 
         if (valid) {
             Swal.fire({
-                        title: 'Please Wait !',// add html attribute if you want or remove
-                        allowOutsideClick: false,
-                        showConfirmButton: false
-                    })
-            $.ajax(
-                {
-                    url: "/ItemDatas/UploadList",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    type: "POST",
-                    success: function (common) {
-                        if (common.status == -1) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: 'Header error. Please check your file!',
-                                footer: '<a href="/UploadReports/Details/'
-                                    + common.dataenum.uploadId
-                                    + '" class="">View report</a>'
-                            });
-                        } else {
-                            $.notify("Process completed", "success")
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Process completed',
-                                text: 'Finished importing file "' + common.dataenum.fileName + '"',
-                                footer: ' <span class="text-bold">Processed: ' + common.dataenum.totalRecord + '</br>'
-                                    + ' <span class="text-success"><b>Added: ' + common.dataenum.inserted + ' </b></span> </br>'
-                                    + ' <span class="text-warning"><b>Updated: ' + common.dataenum.updated + '</b></span> </br>'
-                                    + ' <span class="text-danger"><b>Errors: ' + common.dataenum.errors + ' </b></span> </br>'
-                                    + '<a href="/UploadReports/Details/'
-                                    + common.dataenum.uploadId
-                                    + '" class="btn btn-outline-primary btn-sm">View report</a>',
-                                allowOutsideClick: false
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location.reload();
-                                }
-                            })
-                        }
-
-                        
-                        $('#' + inputId).val('');
+                title: 'Please Wait !',// add html attribute if you want or remove
+                allowOutsideClick: false,
+                showConfirmButton: false
+            })
+            $.ajax({
+                url: "/ItemDatas/UploadList",
+                data: formData,
+                processData: false,
+                contentType: false,
+                type: "POST",
+                success: function (common) {
+                    if (common.status == -1) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Header error. Please check your file!',
+                            footer: '<a href="/UploadReports/Details/'
+                                + common.dataenum.uploadId
+                                + '" class="">View report</a>'
+                        });
+                    } else {
+                        $.notify("Process completed", "success")
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Process completed',
+                            text: 'Finished importing file "' + common.dataenum.fileName + '"',
+                            footer: ' <span class="text-bold">Processed: ' + common.dataenum.totalRecord + '</br>'
+                                + ' <span class="text-success"><b>Added: ' + common.dataenum.inserted + ' </b></span> </br>'
+                                + ' <span class="text-warning"><b>Updated: ' + common.dataenum.updated + '</b></span> </br>'
+                                + ' <span class="text-danger"><b>Errors: ' + common.dataenum.errors + ' </b></span> </br>'
+                                + '<a href="/UploadReports/Details/'
+                                + common.dataenum.uploadId
+                                + '" class="btn btn-outline-primary btn-sm">View report</a>',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.reload();
+                            }
+                        })
                     }
 
+
+                    $('#' + inputId).val('');
                 }
-            );
+
+            });
         } else {
             $('#' + inputId).val('');
             $('#' + inputId).notify("Please select a file!");

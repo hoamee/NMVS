@@ -1,0 +1,110 @@
+@{
+    ViewData["Title"] = "QR code Generator";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/assets/js/qr/qrcode.js"></script>
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group row col-md-6">
+                    <span class="col-md-9">
+                        <label class="form-label" for="code-side">File (*.csv)</label>
+                        <input type="file" id="file-form" class="form-control" accept=".csv" />
+                    </span>
+                    <span class="col-md-3">
+                        <label class="form-label" for="code-side">Code size (px)</label>
+                        <input type="number" class="form-control" value="250" id="code-size"
+                            placeholder="Code size (px)" />
+                    </span>
+
+                </div>
+                <div class="form-group  col-md-6">
+
+                </div>
+                <div class="form-group col-md-6">
+                    <button class="btn btn-primary" id="generate-qr-code">
+                        Generate code
+                    </button>
+                </div>
+                <div>
+                    <table class="table table-bordered col-12" id="qr-table">
+                        <thead>
+                            <th>
+                                Item code
+                            </th>
+                            <th>
+                                QR code
+                            </th>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#generate-qr-code').on('click', function () {
+            var files = document.getElementById('file-form').files;
+            if (files.length > 0) {
+                processData(files[0]);
+            } else {
+                alert('no file choosen!');
+            }
+
+
+
+        })
+    });
+
+    function processData(allText) {
+
+        var formData = new FormData();
+        formData.append('files',allText);
+        $.ajax({
+            url: apiUrl + "/api/IncomingList/QrListExtract",
+            data: formData,
+            processData: false,
+            contentType: false,
+            type: "POST",
+            success: function (ls) {
+                var i = 0;
+                $.each(ls, function (index, value) {
+                    i++;
+                    var row = value.split(',');
+                    if(row.length == 2){
+                        printCode('qr'+i, row[1], row[0]);
+                    }else{
+                        printCode('qr'+i, '', row[0]);
+                    }
+                });
+            }
+
+        });
+    }
+
+    function printCode(id, name, txt) {
+        var newRowContent = `<tr><td>` + name + `</td> <td> <div id="` + id + `"> </div> </td></tr>`;
+        $("#qr-table tbody").append(newRowContent);
+
+        $('#' + id).css({
+            'width': $('#code-size').val(),
+            'height': $('#code-size').val()
+        })
+
+        // Generate and Output QR Code
+        $('#' + id).qrcode({
+            width: $('#code-size').val(),
+            height: $('#code-size').val(),
+            text: txt
+        });
+    }
+</script>

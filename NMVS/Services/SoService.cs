@@ -86,10 +86,29 @@ namespace NMVS.Services
         {
             var soVm = GetBrowseData().FirstOrDefault(x => x.SoNbr == soNbr);
             var soDets = _context.SoDetails.Where(x => x.SoNbr == soNbr).ToList();
+            var oSoDets = (from so in soDets
+                           join dt in _context.ItemDatas on so.ItemNo equals dt.ItemNo into all
+                           from i in all.DefaultIfEmpty()
+                           select new SoDetVm
+                           {
+                               Discount = so.Discount,
+                               SpecDate = so.SpecDate,
+                               ItemName = i.ItemName,
+                               ItemNo = i.ItemNo,
+                               NetPrice = so.NetPrice,
+                               Quantity = so.Quantity,
+                               RequiredDate = so.RequiredDate,
+                               RqDetId = so.RqDetId,
+                               SalesOrder = so.SalesOrder,
+                               Shipped = so.Shipped,
+                               SodId = so.SodId,
+                               SoNbr = so.SoNbr,
+                               Tax = so.Tax
+                           }).ToList();
 
             return new SoDetailVm
             {
-                SoDets = soDets,
+                SoDets = oSoDets,
                 SoVm = soVm
             };
         }
@@ -345,7 +364,7 @@ namespace NMVS.Services
 
                         if (string.IsNullOrEmpty(itemNo) && (quantity == 0 || !inputNumberCorrect))
                         {
-                           break;
+                            break;
                         }
                         try
                         {
@@ -487,6 +506,6 @@ namespace NMVS.Services
             return common;
         }
 
-        
+
     }
 }

@@ -7,8 +7,10 @@ using NMVS.Models.ViewModels;
 using NMVS.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace NMVS.Controllers.Api
@@ -39,7 +41,7 @@ namespace NMVS.Controllers.Api
             {
                 try
                 {
-                    var itemData = _context.ItemDatas.Where(x=>x.ItemNo == iItem.ItemNo).FirstOrDefault();
+                    var itemData = _context.ItemDatas.Where(x => x.ItemNo == iItem.ItemNo).FirstOrDefault();
                     if (itemData == null)
                     {
                         common.message = "Item no. not found!";
@@ -260,7 +262,18 @@ namespace NMVS.Controllers.Api
 
         }
 
-
+        [HttpPost]
+        [Route("QrListExtract")]
+        public IActionResult QrListExtract(List<IFormFile> files)
+        {
+            List<string> ls = new();
+            using (var reader = new StreamReader(files[0].OpenReadStream()))
+            {
+                while (reader.Peek() >= 0)
+                    ls.Add(reader.ReadLine());
+            }
+            return Ok(ls);
+        }
 
     }
 }

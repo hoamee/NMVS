@@ -69,6 +69,12 @@
         });
         $('#datatable-search').DataTable();
 
+        $('#item-code').click(function () {
+
+            $('#item-modal').modal('toggle');
+            $('#item-browse-modal').modal('toggle');
+        });
+
         $('#close-case').click(function () {
             var icId = parseInt(@Html.Raw(Model.Icm.IcId));
             var pt = {
@@ -140,10 +146,10 @@
                     refDate = NaN;
                 }
                 var pt = {
-                    ItemNo : itemCode,
-                    RecQty : qty,
-                    RefNo : itemRef,
-                    RefDate : refDate,
+                    ItemNo: itemCode,
+                    RecQty: qty,
+                    RefNo: itemRef,
+                    RefDate: refDate,
                     IcId: icId,
                     PtCmt: itemNote
 
@@ -189,7 +195,7 @@
                     }
                 });
 
-               }
+            }
 
         });
     });

@@ -204,6 +204,9 @@
                                 Item No
                             </th>
                             <th>
+                                Item Name
+                            </th>
+                            <th>
                                 Date in
                             </th>
                             <th>
@@ -239,6 +242,9 @@
                                     {
                                         <a class="btn btn-outline-primary btn-sm" href="/SalesOrders/UpdateSodet/@item.SodId">@item.ItemNo</a>
                                     }
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(f => item.ItemName)
                                 </td>
                                 <td>
                                     @Html.DisplayFor(f => item.SpecDate)

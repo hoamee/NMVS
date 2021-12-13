@@ -1,0 +1,57 @@
+<!-- Modal -->
+
+<div class="modal" tabindex="-1" id="item-browse-modal">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table " id="item-tb">
+                    <thead>
+                        <tr>
+                            <th>
+                                Item code
+                            </th>
+                            <th>
+                                Item Name
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            'url': "/api/commonapi/GetItemData",
+            'method': "GET",
+            'contentType': 'application/json'
+        }).done(function (data) {
+            $(data).each(function(index, elem){
+                $('#item-tb tbody').append(`<tr> <td><div class="btn btn-outline-primary" onclick="setItemNo('`+elem.itemNo+`')">`+elem.itemNo+`</div></td> <td>`+elem.itemName+`</td> </tr>`);
+
+            });
+
+            $('#item-tb').dataTable()
+        })
+    });
+
+    function setItemNo(e) {
+        $('#item-code').val(e);
+        $('#item-browse-modal').modal('toggle');
+        $('#item-modal').modal('toggle');
+    }
+</script>

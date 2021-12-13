@@ -1,4 +1,4 @@
-﻿@model NMVS.Models.DbModels.WorkOrder
+﻿@model NMVS.Models.ViewModels.WoVm
 
 @{
     ViewBag.Title = "Work order detail";
@@ -33,6 +33,14 @@
                         </th>
                         <td>
                             :&emsp;@Model.ItemNo
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Item Name
+                        </th>
+                        <td>
+                            :&emsp;@Model.ItemName
                         </td>
                     </tr>
                     <tr>

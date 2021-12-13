@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NMVS.Models;
 using NMVS.Models.DbModels;
+using NMVS.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,19 +51,35 @@ namespace NMVS.Controllers
             }
             WorkOrder workOrder = await _db.WorkOrders.FindAsync(id);
 
+
             var woBills = await _db.WoBills.Where(w => w.WoNbr == id).ToListAsync();
             ViewBag.woBills = woBills;
             if (workOrder == null)
             {
                 return NotFound();
             }
-            return View(workOrder);
+            var wovm = new WoVm
+            {
+                WoNbr = workOrder.WoNbr,
+                Closed = workOrder.Closed,
+                ExpDate = workOrder.ExpDate,
+                ItemName = _db.ItemDatas.FirstOrDefault(x => x.ItemNo == workOrder.ItemNo).ItemName,
+                ItemNo = workOrder.ItemNo,
+                OrdBy = workOrder.OrdBy,
+                OrdDate = workOrder.OrdDate,
+                PrLnId = workOrder.PrLnId,
+                QtyCom = workOrder.QtyCom,
+                QtyOrd = workOrder.QtyOrd,
+                SoNbr = workOrder.SoNbr
+
+            };
+
+            return View(wovm);
         }
 
         // GET: WorkOrders1/Create
         public IActionResult CreateWo()
         {
-            ViewBag.ItemNo = _db.ItemDatas;
             ViewBag.PrLnId = _db.ProdLines;
             return View();
         }
@@ -96,7 +113,6 @@ namespace NMVS.Controllers
                     }
                 }
             }
-            ViewBag.ItemNo = _db.ItemDatas;
             ViewBag.PrLnId = _db.ProdLines;
             return View(workOrder);
         }
@@ -113,7 +129,6 @@ namespace NMVS.Controllers
             {
                 return NotFound();
             }
-            ViewBag.ItemNo = _db.ItemDatas;
             ViewBag.PrLnId = _db.ProdLines;
             return View(workOrder);
         }
@@ -133,8 +148,6 @@ namespace NMVS.Controllers
                 await _db.SaveChangesAsync();
                 return RedirectToAction("WoBrowse");
             }
-
-            ViewBag.ItemNo = _db.ItemDatas;
             ViewBag.PrLnId = _db.ProdLines;
             return View(workOrder);
         }

@@ -41,7 +41,7 @@
                                 <div class="form-group">
                                     @Html.LabelFor(model => model.ItemNo, "Item", htmlAttributes: new { @class = "control-label " })
                                     <div class="">
-                                        @Html.DropDownList("ItemNo", new SelectList(ViewBag.ItemNo, "ItemNo", "ItemName"), new { @class = "form-control" })
+                                        <input asp-for="ItemNo" class="form-control" />
                                         @Html.ValidationMessageFor(model => model.ItemNo, "", new { @class = "text-danger" })
                                     </div>
                                 </div>
@@ -86,6 +86,8 @@
         </div>
     </div>
 </div>
+<script src="~/assets/datatable/datatables.min.js"></script>
+<partial name="SelectItem"/>
 
 <script>
 

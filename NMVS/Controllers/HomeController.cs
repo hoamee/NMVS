@@ -70,6 +70,10 @@ namespace NMVS.Controllers
             return View();
         }
 
+        public IActionResult QrGenerator(){
+            return View();
+        }
+
         public IActionResult Index()
         {
             if (User.Identity.IsAuthenticated)
