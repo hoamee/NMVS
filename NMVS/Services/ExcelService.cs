@@ -64,7 +64,7 @@ namespace NMVS.Services
                                           Quantity = d.Quantity,
                                           PkgQty = a.ItemPkgQty,
                                           ItemUnit = a.ItemUm,
-                                          BatchNo = pt.BatchNo,
+                                          BatchNo = string.IsNullOrEmpty(pt.BatchNo) ? (string.IsNullOrEmpty(pt.RefNo) ? "" : pt.RefNo) : pt.BatchNo,
                                           PkgType = a.ItemPkg,
                                           Um = a.ItemUm,
                                           PackCount = d.PackCount,
@@ -404,7 +404,7 @@ namespace NMVS.Services
                                           Quantity = d.Quantity,
                                           PkgQty = a.ItemPkgQty,
                                           ItemUnit = a.ItemUm,
-                                          BatchNo = pt.BatchNo,
+                                          BatchNo = string.IsNullOrEmpty(pt.BatchNo) ? (string.IsNullOrEmpty(pt.RefNo) ? "" : pt.RefNo) : pt.BatchNo,
                                           DetId = d.PackCount
 
                                       }).ToList();

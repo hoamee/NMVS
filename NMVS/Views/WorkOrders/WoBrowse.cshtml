@@ -1,4 +1,4 @@
-﻿@model IEnumerable<NMVS.Models.DbModels.WorkOrder>
+﻿@model IEnumerable<NMVS.Models.ViewModels.WoVm>
 
 @{
     ViewData["Title"] = "Prod line browse";
@@ -52,7 +52,7 @@
                                     @item.WoNbr
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.ItemNo)
+                                    @Html.DisplayFor(modelItem => item.ItemName)
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.QtyOrd)

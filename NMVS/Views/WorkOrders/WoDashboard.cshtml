@@ -1,4 +1,4 @@
-﻿@model IEnumerable<NMVS.Models.DbModels.WorkOrder>
+﻿@model IEnumerable<NMVS.Models.ViewModels.WoVm>
 
 @{
     ViewData["Title"] = "Work orders dashboard";
@@ -56,6 +56,14 @@
                                 <tr>
                                     <th>
                                         Item
+                                    </th>
+                                    <td>
+                                        :&emsp;@wo.ItemName
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Item code
                                     </th>
                                     <td>
                                         :&emsp;@wo.ItemNo

@@ -22,16 +22,14 @@ namespace NMVS.Controllers
 
         public ActionResult WoDashboard()
         {
-            var woList = _db.WorkOrders.Where(x => x.Closed != true).OrderByDescending(x => x.OrdDate).ToList();
-
-            return View(woList);
+            return View(GetListWo(true));
         }
 
         // GET: WorkOrders1
-        public async Task<IActionResult> WoBrowse()
+        public IActionResult WoBrowse()
         {
-            var workOrders = _db.WorkOrders.OrderByDescending(x => x.OrdDate);
-            return View(await workOrders.ToListAsync());
+
+            return View(GetListWo(null));
         }
 
         public IActionResult CloseWo(string id)
@@ -161,6 +159,38 @@ namespace NMVS.Controllers
             _db.WorkOrders.Remove(workOrder);
             await _db.SaveChangesAsync();
             return RedirectToAction("Index");
+        }
+
+        private List<WoVm> GetListWo(bool? close)
+        {
+            List<WorkOrder> ls;
+            if (close == true)
+            {
+                ls = _db.WorkOrders.Where(x => x.Closed != true).OrderByDescending(x => x.OrdDate).ToList();
+            }
+            else
+            {
+                ls = _db.WorkOrders.OrderByDescending(x => x.OrdDate).ToList();
+            }
+
+            var model = (from wo in ls
+                         join dt in _db.ItemDatas on wo.ItemNo equals dt.ItemNo into all
+                         from d in all.DefaultIfEmpty()
+                         select new WoVm
+                         {
+                             Closed = wo.Closed,
+                             ExpDate = wo.ExpDate,
+                             ItemName = d.ItemName,
+                             ItemNo = d.ItemNo,
+                             OrdBy = wo.OrdBy,
+                             OrdDate = wo.OrdDate,
+                             PrLnId = wo.PrLnId,
+                             QtyCom = wo.QtyCom,
+                             QtyOrd = wo.QtyOrd,
+                             SoNbr = wo.SoNbr,
+                             WoNbr = wo.WoNbr
+                         }).ToList();
+            return model;
         }
     }
 }

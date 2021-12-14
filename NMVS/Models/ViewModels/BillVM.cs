@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,10 +27,10 @@ namespace NMVS.Models.ViewModels
         
         public DateTime? LastUpdate { set; get; }
 
-        
+        [DataType(DataType.Date)]
         public DateTime OrdDate { set; get; }
 
-        
+        [DataType(DataType.Date)]
         public DateTime DueDate { set; get; }
 
         
