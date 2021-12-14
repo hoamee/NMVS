@@ -10,6 +10,7 @@ namespace NMVS.Models.ViewModels
         public int RequestId { set; get; }
         public int OrderId { set; get; }
         public string ItemNo { set; get; }
+        public string ItemName { set; get; }
         public int PtId { set; get; }
         public double Qty { set; get; }
         public double Moved { set; get; }

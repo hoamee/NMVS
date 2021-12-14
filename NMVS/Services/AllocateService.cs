@@ -89,6 +89,7 @@ namespace NMVS.Services
                              ConfirmBy = or.ConfirmedBy,
                              Confirmed = or.Confirm,
                              ItemNo = pt.ItemNo,
+                             ItemName = dt.ItemName,
                              MvmTime = or.MovementTime,
                              OrderId = or.AlcOrdId,
                              PtId = or.PtId,
