@@ -25,5 +25,7 @@ namespace NMVS.Models.ViewModels
         public string ConfirmedBy { set; get; }
 
         public string ConfirmationNote { set; get; }
+
+        public bool closed { set; get; }
     }
 }

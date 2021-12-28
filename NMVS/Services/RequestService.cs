@@ -128,10 +128,10 @@ namespace NMVS.Services
                             }
 
                             if (remainder > 0)
-                            { 
-                                    AddNoteLine(salesOrder.SoType, noteNbr, line.ItemNo, line.InventoryId, remainder, 1);
-                                    itemCount++;
-                                
+                            {
+                                AddNoteLine(salesOrder.SoType, noteNbr, line.ItemNo, line.InventoryId, remainder, 1);
+                                itemCount++;
+
 
                             }
 
@@ -400,11 +400,28 @@ namespace NMVS.Services
                              Note = i.RqCmt,
                              Ref = i.Ref,
                              RqBy = i.RqBy,
-                             SoConfirm = i.SoConfirm
+                             SoConfirm = i.SoConfirm,
+                             Confirmed = i.Confirmed,
+                             closed = i.Closed
                          }).ToList();
 
-
+            foreach(var item in model){
+                item.closed = item.closed == false ? (Unfinished(item.Id) ? true : false) : true;
+            }
             return model;
+        }
+
+        private bool Unfinished(string rqId)
+        {
+            var pickedItem = _db.RequestDets.Where(x => x.RqID == rqId).Sum(x => x.Quantity - x.Picked);
+            if (pickedItem > 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         private int GetNewIssueNoteId(SalesOrder salesOrder, string user, Shipper shipper)
@@ -827,7 +844,7 @@ namespace NMVS.Services
                 }
                 string batchRef;
                 batchRef = _eHelper.GetCellValue(wsPart, wbPart, "C3");
-                var existRequest = _db.InvRequests.FirstOrDefault(x=>x.Ref == batchRef);
+                var existRequest = _db.InvRequests.FirstOrDefault(x => x.Ref == batchRef);
 
                 //if can not find supplier code, break
                 if (string.IsNullOrEmpty(batchRef) || !headerCorrect || existRequest != null)
@@ -848,7 +865,7 @@ namespace NMVS.Services
                     {
                         common.message += " Required date is not recognized.";
                     }
-                   
+
 
                     common.dataenum.TotalRecord = 0;
                     common.dataenum.Updated = 0;

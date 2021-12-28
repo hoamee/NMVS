@@ -51,7 +51,7 @@ namespace NMVS.Controllers.Api
                     var ic = _context.IncomingLists.Find(iItem.IcId);
                     ic.ItemCount++;
                     _context.Update(ic);
-                    _context.Add(new ItemMaster
+                    var newPt = new ItemMaster
                     {
                         ItemNo = iItem.ItemNo,
                         IcId = iItem.IcId,
@@ -59,7 +59,12 @@ namespace NMVS.Controllers.Api
                         RefNo = iItem.RefNo,
                         RefDate = iItem.RefDate == null ? null : iItem.RefDate,
                         PtCmt = iItem.PtCmt
-                    });
+                    };
+
+                    _context.Add(newPt);
+                    _context.SaveChanges();
+                    newPt.ParentId = newPt.PtId;
+                    _context.Update(newPt);
                     _context.SaveChanges();
                     common.status = 1;
                 }

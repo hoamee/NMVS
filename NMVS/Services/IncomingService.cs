@@ -98,7 +98,7 @@ namespace NMVS.Services
                            LastModified = ic.LastModifiedBy
                        }).FirstOrDefault();
 
-            var ptMstr = (from pt in _db.ItemMasters.Where(x => x.IcId == id)
+            var ptMstr = (from pt in _db.ItemMasters.Where(x => x.IcId == id && x.ParentId == x.PtId)
                           join data in _db.ItemDatas on pt.ItemNo equals data.ItemNo
                           into all
                           from a in all.DefaultIfEmpty()

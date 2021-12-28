@@ -34,7 +34,22 @@
                             {
                                 <tr>
                                     <td class="text-sm font-weight-normal">
-                                        <a href="/Customers/UpdateCustomer?code=@item.CustCode"><span class="btn btn-sm btn-outline-primary">@item.CustCode</span></a>
+                                        <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                            @item.CustCode
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                            <li>
+                                                <a href="/Customers/UpdateCustomer?code=@item.CustCode"><span
+                                                    class="dropdown-item">Edit.</span></a>
+                                            </li>
+                                            <li>
+                                                <div class="dropdown-item" onclick="saveToClipboard('@item.CustCode')">
+                                                    <span class="fa fa-copy"></span>
+                                                    Copy
+                                                </div>
+                                            </li>
+                                        </ul>
                                     </td>
                                     <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.ApCode)</td>
                                     <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.AgentNo)</td>
@@ -82,6 +97,7 @@
 </div>
 <partial name="FileUploadModal" />
 <script src="~/assets/datatable/datatables.min.js"></script>
+<partial name="_ClipboardSave" />
 <script type="text/javascript">
 
     $(document).ready(function () {

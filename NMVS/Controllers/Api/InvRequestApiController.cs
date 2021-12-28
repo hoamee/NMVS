@@ -558,6 +558,30 @@ namespace NMVS.Controllers.Api
             }
         }
 
+
+        [Route("RemoveRq")]
+        [HttpPost]
+        public async Task<IActionResult> RemoveRq(JsPickingData rqd)
+        {
+            var common = new CommonResponse<int>();
+            var request = await _context.InvRequests.FindAsync(rqd.whcd);
+            if (request == null)
+            {
+                common.status = 0;
+                common.message = "not found!";
+                return Ok(common);
+            }
+            else
+            {
+                _context.Remove(request);
+                _context.RemoveRange(_context.RequestDets.Where(x => x.RqID == rqd.whcd));
+                await _context.SaveChangesAsync();
+                common.status = 1;
+                common.message = "success!";
+                return Ok(common);
+            }
+        }
+
         [Route("ConfirmRequest")]
         [HttpPost]
         public async Task<IActionResult> ConfirmRequest(JsPickingData rqd)

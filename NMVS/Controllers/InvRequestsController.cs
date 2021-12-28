@@ -76,6 +76,46 @@ namespace NMVS.Controllers
             return View();
         }
 
+        public IActionResult UpdateRequest(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+            var request = _db.InvRequests.Find(id);
+            if (request == null)
+            {
+                return NotFound();
+            }
+            return View(request);
+        }
+
+        [HttpPost]
+        public IActionResult UpdateRequest(InvRequest invRequest)
+        {
+            if (invRequest is null)
+            {
+                ModelState.AddModelError("", "An error occurred");
+            }
+            else
+            {
+
+                try
+                {
+                    _db.Update(invRequest);
+                    _db.SaveChanges();
+                    return RedirectToAction(nameof(History));
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError("", e.ToString());
+                }
+
+            }
+
+            return View();
+        }
+
         public IActionResult RequestDetail(string id)
         {
             if (id == null)
@@ -371,7 +411,8 @@ namespace NMVS.Controllers
             return View(model);
         }
 
-        public IActionResult IssueNoteList() {
+        public IActionResult IssueNoteList()
+        {
             var model = _service.GetListIssueNote();
             return View(model);
         }
@@ -435,7 +476,7 @@ namespace NMVS.Controllers
                 return RedirectToAction("Error", "Home", new { common.message });
             }
         }
-       
+
         public async Task<IActionResult> GetIssueNote(int id)
         {
 
@@ -451,7 +492,7 @@ namespace NMVS.Controllers
                 return RedirectToAction("Error", "Home", new { common.message });
             }
         }
-       
+
         public async Task<IActionResult> DownloadIssueNoteSO(int id, int so)
         {
 

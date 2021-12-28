@@ -232,7 +232,8 @@ namespace NMVS.Controllers
                                                                                  && x.Discount == soDet.Discount &&
                                                                                  soDet.NetPrice == x.NetPrice &&
                                                                                  x.Tax == soDet.Tax
-                                                                                 && x.SpecDate == soDet.SpecDate).FirstOrDefaultAsync();
+                                                                                 && x.SpecDate == soDet.SpecDate
+                                                                                 && x.SoNbr == soDet.SoNbr).FirstOrDefaultAsync();
 
                     var invRq = await _context.InvRequests.FindAsync(soId);
                     if (invRq == null)
