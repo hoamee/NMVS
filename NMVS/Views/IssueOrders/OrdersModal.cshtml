@@ -1,5 +1,6 @@
 ﻿<!-- Modal confirm -->
-<div class="modal fade modal-dialog-scrollable" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade modal-dialog-scrollable" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-body">
@@ -9,42 +10,29 @@
                     <thead>
                         <tr>
                             <th>
-                                ID
-                            </th>
-                            <th>
-                                Type
-                            </th>
-                            <th>
                                 Item
-                            </th>
-                            <th>
-                                From location
                             </th>
                             <th>
                                 Inventory Id
                             </th>
 
                             <th>
-                                To location
+                                Status
                             </th>
                             <th>
-                                Issued
+                                From
                             </th>
                             <th>
-                                Movement by
+                                To
                             </th>
                             <th>
-                                Request Id
+                                Time
                             </th>
                             <th>
-                                Ordered by
+                                Request No.
                             </th>
                             <th>
-                                Movement time
-                            </th>
-
-                            <th>
-
+                                Order by
                             </th>
                         </tr>
                     </thead>
@@ -57,7 +45,8 @@
             <div class="row">
                 <div class="form-group text-xl-center">
                     <label class="form-check-label text-primary ">
-                        Movement Quantity <input type="number" class="form-control" value="0" id="moving-qty" step="0.01" />
+                        Movement Quantity <input type="number" class="form-control" value="0" id="moving-qty"
+                            step="0.01" />
                     </label>
                     <label class="form-check-label text-danger" id="confirm-lbl">
 
@@ -80,7 +69,8 @@
 </div>
 
 <!-- Modal report -->
-<div class="modal fade modal-dialog-scrollable" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+<div class="modal fade modal-dialog-scrollable" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-body">
@@ -90,40 +80,30 @@
                     <thead>
                         <tr>
                             <th>
-                                ID
-                            </th>
-                            <th>
-                                Type
-                            </th>
-                            <th>
                                 Item
-                            </th>
-                            <th>
-                                From Location
                             </th>
                             <th>
                                 Inventory Id
                             </th>
 
                             <th>
+                                Status
+                            </th>
+                            <th>
+                                From
+                            </th>
+                            <th>
                                 To
                             </th>
                             <th>
-                                Issued
+                                Time
                             </th>
                             <th>
-                                Comfirm by
-                            </th>
-                            <th>
-                                Request ID
+                                Request No.
                             </th>
                             <th>
                                 Order by
                             </th>
-                            <th>
-                                Movement time
-                            </th>
-                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -144,7 +124,8 @@
                         </label>
                     </div>
                     <label class="form-label text-danger" for="report-input">Add a note</label>
-                    <textarea aria-multiline="true" cols="40" rows="5" class="form-control" id="report-input"></textarea>
+                    <textarea aria-multiline="true" cols="40" rows="5" class="form-control"
+                        id="report-input"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -158,11 +139,12 @@
 <script>
     var winlocation = window.location.href;
     var routeURL = location.protocol + "//" + location.host;
-    $('.modal-btn').click(function () {
-        $('#table2 #t2-tr').html($(this).closest('tr').html());
-        $('#table2 #t2-tr').children('td:last').remove();
+    function toggleSubmit(issueType, e, item) {
+
+        $('#table2 #t2-tr').html($(e).closest('tr').html());
+        $('#table2 #t2-tr').find('.btn-group').remove();
+        $('#table2 #t2-tr').children('td:first').append(item);
         $('#exampleModal').modal('toggle');
-        var issueType = $(this).closest('tr').find('.exp-type').html().trim();
         if (issueType == "MFG") {
             $('#confirm-lbl').html('Location code <input type="text" placeholder="To location code" class="form-control" id="loc-code" />');
         } else {
@@ -171,13 +153,14 @@
 
 
         $('#reader').html('');
-    });
 
-    $('.report-btn').click(function () {
-        $('#table3 #t3-tr').html($(this).closest('tr').html());
-        $('#table3 #t3-tr').children('td:last').remove();
+    }
+    function toggleReport(e, item) {
+        $('#table3 #t3-tr').html($(e).closest('tr').html());
+        $('#table3 #t3-tr').find('.btn-group').remove();
+        $('#table3 #t3-tr').children('td:first').append(item);
         $('#reportModal').modal('toggle');
-    });
+    };
 
     $(document).ready(function () {
 
@@ -239,7 +222,7 @@
                             url: routeURL + '/api/InvRequest/FinishIssueOrder',
                             data: JSON.stringify(alo),
                             success: function (common) {
-                                
+
                                 Swal.fire({
                                     position: 'center',
                                     icon: 'success',
@@ -292,14 +275,14 @@
             var remainQty = parseFloat($('#table2 #t2-tr').find('.exp-qty').text().trim())
                 - parseFloat($('#table2 #t2-tr').find('.exp-moved').text().trim())
                 - parseFloat($('#table2 #t2-tr').find('.exp-reported').text().trim());
-            
+
 
             if (qty > remainQty) {
                 $('#moving-qty').notify('Report quantity couldn\'t be larger than order quantity');
             }
             else if (qty <= 0 || isNaN(qty)) {
                 $('#moving-qty').notify('Report quantity couldn\'t be less than or equal to 0');
-            }            
+            }
             else {
 
                 if (desInput !== desCode) {
@@ -312,7 +295,6 @@
                         AlcOrdQty: qty
                     };
 
-                    var mess = ""
 
                     $.ajax({
                         contentType: 'application/json; charset=utf-8',
@@ -327,12 +309,13 @@
                                     position: 'center',
                                     icon: 'success',
                                     title: 'Your work has been saved',
-                                    message: common.message,
                                     showConfirmButton: false,
-                                    timer: 2000
+                                    timer: 1000
                                 });
+
+                                $('#exampleModal').modal('toggle');
                                 setTimeout(function () {
-                                    window.location.reload();
+                                    reloadData();
                                 }, 1000);
                             } else {
                                 Swal.fire({
@@ -343,7 +326,7 @@
                                     showConfirmButton: true
                                 });
                             }
-                            
+
                         },
                         failure: function (response) {
                             alert(response);
@@ -351,7 +334,7 @@
 
                     });
 
-                   
+
                     //setTimeout(function () {
                     //    window.location.reload();
                     //}, 1000);
@@ -410,7 +393,7 @@
                                         timer: 2000
                                     });
                                     setTimeout(function () {
-                                        window.location.reload();
+                                        reloadData();
                                     }, 1000);
                                 }
 
@@ -447,7 +430,6 @@
                             },
                             complete: function () {
                                 $('#reportModal').modal('toggle');
-                                window.location.href = window.location.href;
                             }
 
                         });

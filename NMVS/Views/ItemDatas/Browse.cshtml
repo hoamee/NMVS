@@ -21,9 +21,6 @@
                                 @Html.DisplayNameFor(model => model.ItemName)
                             </th>
                             <th>
-                                @Html.DisplayNameFor(model => model.ItemType)
-                            </th>
-                            <th>
                                 @Html.DisplayNameFor(model => model.ItemUm)
                             </th>
                             <th>
@@ -44,70 +41,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>
-                                    <div class="dropdown">
-                                        <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                            @item.ItemNo
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                            <li>
-                                                <a asp-action="UpdateItem" asp-route-id="@item.ItemNo"><span
-                                                    class="dropdown-item">Edit.</span></a>
-                                            </li>
-                                            <li>
-                                                <div class="dropdown-item" onclick="saveToClipboard('@item.ItemNo')">
-                                                    <span class="fa fa-copy"></span>
-                                                    Copy
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.ItemName)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.ItemType)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.ItemUm)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.ItemPkg)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.ItemPkgQty)
-                                </td>
-                                <td class="text-sm font-weight-normal">
-                                    @if (item.Flammable)
-                                    {
-                                        <span class="badge bg-danger">Yes</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary">Normal</span>
-                                    }
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.ItemWhUnit)
-                                </td>
 
-                                <td class="text-sm font-weight-normal">
-                                    @if (item.Active)
-                                    {
-                                        <span class="badge bg-success">Yes</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary">Inactive</span>
-                                    }
-                                </td>
-                            </tr>
-                        }
                     </tbody>
                 </table>
             </div>
@@ -135,7 +69,63 @@
 <partial name="_ClipboardSave" />
 <script>
 
-    $('#datatable-search').DataTable();
+    $.ajax({
+        'url': apiUrl + "/api/ItemData/GetItemDataList",
+        'method': "GET",
+        'contentType': 'application/json'
+    }).done(function (data) {
+        $('#datatable-search').dataTable({
+            "aaData": data,
+            "columns": [
+                {
+                    data: "custCode",
+                    render: function (data, type, item) {
+                        return '<button class="btn dropdown-toggle" type="button"'
+                            + 'data-bs-toggle="dropdown" aria-expanded="false">'
+                            + item.itemNo
+                            + '</button>'
+                            + '<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">'
+                            + '<li>'
+                            + '<a href="/Customers/UpdateItem/' + item.itemNo + '" class="dropdown-item">'
+                            + '<span class="fa fa-pen"> Edit</span></a>'
+                            + '</li>'
+                            + '<li>'
+                            + '<div class="dropdown-item" onclick="saveToClipboard(\'' + item.itemNo + '\')">'
+                            + '<span class="fa fa-copy"></span>'
+                            + '  Copy'
+                            + '</div>'
+                            + '</li>'
+                            + '</ul>'
+                    }
+                },
+                { "data": "itemName" },
+                { "data": "itemUm" },
+                { "data": "itemPkg" },
+                { "data": "itemPkgQty" },
+                { "data": "itemWhUnit" },
+                {
+                    data: "flammable",
+                    render: function (data, type, customer) {
+                        if (customer.itemWhUnit == true) {
+                            return `<span class="badge bg-danger">Flammable<span>`
+                        } else {
+                            return `<span class="badge bg-secondary">Nomarl<span>`
+                        }
+                    }
+                },
+                {
+                    data: "active",
+                    render: function (data, type, customer) {
+                        if (customer.active == true) {
+                            return `<span class="badge bg-success">Active<span>`
+                        } else {
+                            return `<span class="badge bg-secondary">Inactive<span>`
+                        }
+                    }
+                }
+            ]
+        })
+    })
 
     $(document).ready(function () {
         $('.nav-item-data').addClass('active');

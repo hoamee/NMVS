@@ -45,7 +45,8 @@ namespace NMVS.Services
                         Email2 = customer.Email2,
                         Phone1 = customer.Phone1,
                         Phone2 = customer.Phone2,
-                        TaxCode = customer.TaxCode
+                        TaxCode = customer.TaxCode,
+                        ShortName = customer.ShortName
                     });
                     await _db.SaveChangesAsync();
                     commonRespose.status = 1;
@@ -87,7 +88,8 @@ namespace NMVS.Services
                                     AgentNo = c.AgentNo,
                                     TaxCode = c.TaxCode,
                                     ApCode = c.ApCode,
-                                    CustName = c.CustName
+                                    CustName = c.CustName,
+                                    ShortName = c.ShortName
                                 }
 
                          ).ToList();
@@ -234,6 +236,7 @@ namespace NMVS.Services
                             customer.Phone1 = _eHelper.GetCellValue(wsPart, wbPart, "K" + readingRow);
                             customer.Phone2 = _eHelper.GetCellValue(wsPart, wbPart, "L" + readingRow);
                             customer.Note = _eHelper.GetCellValue(wsPart, wbPart, "M" + readingRow);
+                            customer.ShortName = _eHelper.GetCellValue(wsPart, wbPart, "N" + readingRow);
                             customer.Active = true;
                             _db.Update(customer);
                             common.dataenum.Updated++;
@@ -257,7 +260,8 @@ namespace NMVS.Services
                                 Email2 = _eHelper.GetCellValue(wsPart, wbPart, "J" + readingRow),
                                 Phone1 = _eHelper.GetCellValue(wsPart, wbPart, "K" + readingRow),
                                 Phone2 = _eHelper.GetCellValue(wsPart, wbPart, "L" + readingRow),
-                                Note = _eHelper.GetCellValue(wsPart, wbPart, "H" + readingRow),
+                                Note = _eHelper.GetCellValue(wsPart, wbPart, "M" + readingRow),
+                                ShortName = _eHelper.GetCellValue(wsPart, wbPart, "N" + readingRow),
                                 Active = true
                             };
 

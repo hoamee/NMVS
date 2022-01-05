@@ -1,0 +1,205 @@
+﻿@model IEnumerable<NMVS.Models.DbModels.IssueOrder>
+
+@{
+    ViewData["Title"] = "Issue orders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">@ViewData["Title"]</h3>
+            </div>
+            <div class="table-responsive card-body">
+                <table class="table table-flush" id="datatable-search">
+                    <thead>
+                        <tr>
+                            <th>
+                                ID
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.IssueType)
+                            </th>
+                            <th>
+                                Item
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.LocCode)
+                            </th>
+                            <th>
+                                Inventory Id
+                            </th>
+
+                            <th>
+                                @Html.DisplayNameFor(model => model.IssueToDesc)
+                            </th>
+                            <th>
+                                Issued
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ConfirmedBy)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.RqID)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.OrderBy)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.MovementTime)
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            string classColor = "";
+
+                            if (item.ExpOrdQty <= item.MovedQty)
+                            {
+                                classColor = "success";
+                            }
+                            else if (item.MovedQty > 0 && item.MovedQty < item.ExpOrdQty)
+                            {
+
+                                classColor = "warning";
+
+
+                            }
+                            else
+                            {
+                                classColor = "secondary";
+                            }
+                            <tr>
+
+                                <th>
+                                    @Html.DisplayFor(modelItem => item.ExpOrdId)
+                                    <span class="exp-pt-id" hidden> @item.PtId</span>
+                                    <span class="exp-id" hidden> @item.ExpOrdId</span>
+                                    <span class="exp-qty" hidden> @item.ExpOrdQty</span>
+                                    <span class="exp-moved" hidden> @item.MovedQty</span>
+                                    <span class="exp-to-ve" hidden> @item.ToVehicle</span>
+                                    <span class="exp-to-loc" hidden> @item.ToLoc</span>
+                                    <span class="exp-type" hidden> @item.IssueType</span>
+                                    <span class="exp-reported" hidden> @item.Reported</span>
+                                </th>
+                                <td>
+
+                                    @if (item.IssueType == "MFG")
+                                    {
+                                        <div>
+                                            <span class="fa fa-product-hunt" style=" color: orange;"> </span> Production
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            <span class="fa fa-dollar" style=" color: forestgreen;">  </span> Sales
+                                        </div>
+
+                                    }
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ItemNo)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FromLoc)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PtId)
+                                </td>
+
+                                <td>
+                                    <span>
+                                        @Html.DisplayFor(modelItem => item.IssueToDesc)
+                                        @if (!string.IsNullOrEmpty(item.ToLoc))
+                                        {
+                                            <span>(@item.ToLoc)</span>
+                                        }
+                                    </span>
+                                </td>
+                                <td>
+                                    <a class="badge bg-@classColor" href="/Inquiry/MovementReport/I.@item.ExpOrdId">@item.MovedQty/@item.ExpOrdQty</a>
+                                    @if (item.Reported > 0)
+                                    {
+                                        <span class="badge bg-danger"> @item.Reported </span>
+                                    }
+
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ConfirmedBy)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.RqID)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.OrderBy)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.MovementTime)
+                                </td>
+                                <td>
+                                    @if (item.Confirm == true)
+                                    {
+                                        <span class="badge bg-success">Finished</span>
+                                    }
+                                    else if (item.Confirm == false)
+                                    {
+                                        <span class="badge bg-success">Closed</span>
+                                    }
+                                    else
+                                    {
+                                        if (User.IsInRole("Move inventory"))
+                                        {
+
+
+                                            <div class="p-2 bd-highlight">
+                                                <button class="btn btn-info modal-btn">
+                                                    Submit
+                                                </button>
+                                                <button class="btn btn-danger report-btn">
+                                                    Report
+                                                </button>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Incomplete</span>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
+<script src="~/assets/js/notify.js"></script>
+<script src="~/assets/datatable/datatables.min.js"></script>
+<script src="~/assets/js/qr/html5-qrcode.min.js"></script>
+<script>
+    var routeURL = location.protocol + "//" + location.host;
+
+
+    $(document).ready(function () {
+        $('.nav-movement').addClass('active');
+
+        $('.nav-movement > div > span').css('color', 'white');
+        $('.nav-iu').addClass('active');
+        $('#nav-movement').addClass('show');
+        $('#new-sup').click(function () {
+            $('#file-modal').modal('toggle');
+        });
+        $('#datatable-search').DataTable();
+
+    });
+</script>
+<partial name="OrdersModal" />      

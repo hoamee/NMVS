@@ -69,6 +69,9 @@ namespace NMVS.Models.ViewModels
         [Display(Name = "Note")]
         public string Note { set; get; }
 
+        [Display(Name = "Short name")]
+        public string ShortName { set; get; }
+
         [Display(Name = "Active")]
         public bool Active { set; get; }
 

@@ -8,49 +8,23 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <table class="table " id="addr-tb">
+                <table class="table" width="100%" id="addr-tb">
                     <thead>
                         <tr>
                             <th>
                                 Customer code
                             </th>
                             <th>
-                                AP Code
+                                Customer Name
                             </th>
                             <th>
-                                Agent No.
-                            </th>
-                            <th>
-                                Customer name
-                            </th>
-                            <th>
-                                Address
+                                Short Name
                             </th>
                         </tr>
 
                     </thead>
-
                     <tbody>
-                        @foreach (var item in ViewBag.Customers)
-                        {
-                        <tr>
-                            <td>
-                                <button type="button" class="btn btn-outline-primary" onclick="setAddr('@item.CustCode', '@item.Addr')">@item.CustCode</button>
-                            </td>
-                            <td>
-                                @item.ApCode
-                            </td>
-                            <td>
-                                @item.AgentNo
-                            </td>
-                            <td>
-                                @item.CustName
-                            </td>
-                            <td>
-                                @item.Addr
-                            </td>
-                        </tr>
-                        }
+                        
 
                     </tbody>
                 </table>

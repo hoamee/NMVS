@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace NMVS.Migrations
 {
-    public partial class Initialization : Migration
+    public partial class Initialize : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -28,6 +28,7 @@ namespace NMVS.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Active = table.Column<bool>(type: "bit", nullable: false),
+                    ActiveHostName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -54,7 +55,7 @@ namespace NMVS.Migrations
                 {
                     CustCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     ApCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    AgentNo = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false),
+                    AgentNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CustName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Addr = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     City = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
@@ -65,6 +66,7 @@ namespace NMVS.Migrations
                     Phone1 = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     Phone2 = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ShortName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Active = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -219,6 +221,7 @@ namespace NMVS.Migrations
                     DetId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ItemNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ItemName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Quantity = table.Column<double>(type: "float", nullable: false),
                     Picked = table.Column<double>(type: "float", nullable: false),
                     Ready = table.Column<double>(type: "float", nullable: false),
@@ -356,6 +359,7 @@ namespace NMVS.Migrations
                     Phone1 = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     Phone2 = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ShortName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Active = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>

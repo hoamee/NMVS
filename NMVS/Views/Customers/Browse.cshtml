@@ -18,9 +18,8 @@
                         <thead class="thead-light">
                             <tr>
                                 <th>Id</th>
-                                <th>AP code</th>
-                                <th>Agent No.</th>
                                 <th>Name</th>
+                                <th>Short Name</th>
                                 <th>Tax code</th>
                                 <th>Address</th>
                                 <th>Email</th>
@@ -30,47 +29,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model)
-                            {
-                                <tr>
-                                    <td class="text-sm font-weight-normal">
-                                        <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                            @item.CustCode
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                            <li>
-                                                <a href="/Customers/UpdateCustomer?code=@item.CustCode"><span
-                                                    class="dropdown-item">Edit.</span></a>
-                                            </li>
-                                            <li>
-                                                <div class="dropdown-item" onclick="saveToClipboard('@item.CustCode')">
-                                                    <span class="fa fa-copy"></span>
-                                                    Copy
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </td>
-                                    <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.ApCode)</td>
-                                    <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.AgentNo)</td>
-                                    <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.CustName)</td>
-                                    <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.TaxCode)</td>
-                                    <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Addr)</td>
-                                    <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Email1)</td>
-                                    <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Phone1)</td>
-                                    <td class="text-sm font-weight-normal">
-                                        @if (item.Active)
-                                        {
-                                            <span class="badge bg-success">Yes</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">Inactive</span>
-                                        }
-                                    </td>
-                                    <td class="text-sm font-weight-normal">@Html.DisplayFor(m => item.Note)</td>
-                                </tr>
-                            }
+
                         </tbody>
                     </table>
                 </div>
@@ -106,6 +65,54 @@
             $('#file-modal').modal('toggle');
         });
 
-        $('#datatable-search').DataTable();
+        $.ajax({
+            'url': apiUrl + "/api/customers/GetCustomer",
+            'method': "GET",
+            'contentType': 'application/json'
+        }).done(function (data) {
+            $('#datatable-search').dataTable({
+                "aaData": data,
+                "columns": [
+                    {
+                        data: "custCode",
+                        render: function (data, type, customer) {
+                            return '<button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1"'
+                                + 'data-bs-toggle="dropdown" aria-expanded="false">'
+                                + customer.custCode
+                                + '</button>'
+                                + '<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">'
+                                + '<li>'
+                                + '<a href="/Customers/UpdateCustomer?code=' + customer.custCode + '" class="dropdown-item">'
+                                + '<span class="fa fa-pen"> Edit</span></a>'
+                                + '</li>'
+                                + '<li>'
+                                + '<div class="dropdown-item" onclick="saveToClipboard(\'' + customer.custCode + '\')">'
+                                + '<span class="fa fa-copy"></span>'
+                                + '  Copy'
+                                + '</div>'
+                                + '</li>'
+                                + '</ul>'
+                        }
+                    },
+                    { "data": "custName" },
+                    { "data": "shortName" },
+                    { "data": "taxCode" },
+                    { "data": "addr" },
+                    { "data": "email1" },
+                    { "data": "phone1" },
+                    {
+                        data: "active",
+                        render: function (data, type, customer) {
+                            if (customer.active == true) {
+                                return `<span class="badge bg-success">Active<span>`
+                            } else {
+                                return `<span class="badge bg-secondary">Inactive<span>`
+                            }
+                        }
+                    },
+                    { "data": "note" },
+                ]
+            })
+        })
     });
 </script>

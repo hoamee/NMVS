@@ -1,15 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NMVS.Models.ViewModels
 {
+    public class IssueOrderParentVm
+    {
+        public string OrderNo { set; get; }
+        public bool Status { get; set; }
+        public int TotalTasks { set; get; }
+        public int CompletedTasks { set; get; }
+    }
+    
     public class IssueOrderVm
     {
-        
-        
+
+
         public int ExpOrdId { set; get; }
 
         [Display(Name = "Issue Type")]
@@ -54,7 +59,7 @@ namespace NMVS.Models.ViewModels
         [Display(Name = "Ordered by")]
         public string OrderBy { set; get; }
 
-        
+
         [Display(Name = "Movement time")]
         public DateTime? MovementTime { get; set; }
     }

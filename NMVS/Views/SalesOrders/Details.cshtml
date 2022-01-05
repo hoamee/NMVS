@@ -268,12 +268,12 @@
                         }
                     </tbody>
                     <tfoot>
-                        <tr>
+                        @* <tr>
                             <td colspan="6" class="text-center"><b>Total</b></td>
                             <td>
                                 @Model.SoVm.SoCurr
                             </td>
-                        </tr>
+                        </tr> *@
                         @if (!Model.SoVm.Closed && Model.SoVm.SoType != 1)
                         {
                             <tr class="hide-print">

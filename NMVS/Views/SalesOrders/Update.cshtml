@@ -96,6 +96,9 @@
     </div>
 </div>
 
+<script src="~/assets/datatable/datatables.min.js"></script>
+<partial name="CustomerModal" />
+<partial name="AddressModal" />
 <partial name="_ValidationScriptsPartial" />
 <script>
     function setCustomer(no, name) {
@@ -111,6 +114,69 @@
     };
 
     $(document).ready(function () {
+        $('#for-so-div').hide();
+        $.ajax({
+            'url': apiUrl + "/api/Customers/GetCustomerList",
+            'method': "GET",
+            'contentType': 'application/json'
+        }).done(function (data) {
+            $('#customer-tb').dataTable({
+                "aaData": data,
+                "columns": [
+                    {
+                        data: "code",
+                        render: function (data, type, res) {
+                            return '<button type="button" class="btn btn-outline-primary" onclick="setCustomer(\'' + res.code + '\',\'' + res.desc + '\')">' + res.code + '</button>';
+                        }
+                    },
+                    { "data": "desc" },
+                    { "data": "shortName" }
+
+                ],
+                columnDefs: [
+                    {
+                        targets: 2,
+                        searchable: true,
+                        visible: false
+                    }
+                ]
+            });
+
+            $('#addr-tb').dataTable({
+                "aaData": data,
+                "columns": [
+                    {
+                        data: "code",
+                        render: function (data, type, res) {
+                            return '<button type="button" class="btn btn-outline-primary" onclick="setAddr(\''+res.code+'\', \''+res.desc+'\')">'+res.code+'</button>';
+                        }
+                    },
+                    { "data": "desc" },
+                    { "data": "shortName" }
+
+                ],
+                columnDefs: [
+                    {
+                        targets: 2,
+                        searchable: true,
+                        visible: false
+                    }
+                ]
+            });
+        });
+
+        
+
+        $('#SoType').on('change', function () {
+            if ($(this).val() == 0) {
+                $('#so-type').html("SO");
+            }
+            else if ($(this).val() == 2) {
+                $('#so-type').html("WT");
+            }
+
+        });
+
         $('.nav-sale').addClass('active');
 
         $('#CustCode').click(function () {
@@ -125,6 +191,3 @@
 
     });
 </script>
-
-<partial name="CustomerModal" />
-<partial name="AddressModal" />

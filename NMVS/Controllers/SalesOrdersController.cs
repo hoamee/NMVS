@@ -56,7 +56,6 @@ namespace NMVS.Controllers
         // GET: SalesOrders/NewSo
         public IActionResult NewSo()
         {
-            ViewBag.Customers = _custService.GetCustomerList();
             return View();
         }
 
@@ -104,7 +103,6 @@ namespace NMVS.Controllers
                     ModelState.AddModelError("", "SO number already existed");
                 }
             }
-            ViewBag.Customers = _custService.GetCustomerList();
             return View(salesOrder);
         }
 
@@ -121,7 +119,6 @@ namespace NMVS.Controllers
             {
                 return NotFound();
             }
-            ViewBag.Customers = _custService.GetCustomerList();
             return View(salesOrder);
         }
 
@@ -159,7 +156,6 @@ namespace NMVS.Controllers
                 }
                 return RedirectToAction(nameof(Browse));
             }
-            ViewBag.Customers = _custService.GetCustomerList();
             return View(salesOrder);
         }
 
@@ -202,9 +198,7 @@ namespace NMVS.Controllers
         // GET: SalesOrderPartial/Create
         public ActionResult SoDetCreate(string id)
         {
-
             ViewBag.SoNbr = id;
-            ViewBag.ItemList = _soService.GetItemNAvail();
             return View();
         }
 
@@ -290,7 +284,6 @@ namespace NMVS.Controllers
             }
 
             ViewBag.SoNbr = soId;
-            ViewBag.ItemList = _soService.GetItemNAvail();
             return View(soDet);
         }
 

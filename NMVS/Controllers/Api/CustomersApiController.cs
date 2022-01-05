@@ -26,5 +26,21 @@ namespace NMVS.Controllers.Api
 
         }
 
+        [HttpGet]
+        [Route("GetCustomer")]
+        public IActionResult GetCustomer(){
+            return Ok(_customerService.GetCustomerList());
+        }
+
+        [HttpGet]
+        [Route("GetCustomerList")]
+        public IActionResult GetCustomerList(){
+            var custList = _customerService.GetCustomerList().Select(p => new TypeVm{
+                Code = p.CustCode,
+                Desc = p.CustName,
+                ShortName = p.ShortName
+            }).ToList();
+            return Ok(custList);
+        }
     }
 }

@@ -8,7 +8,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <table class="table " id="item-tb">
+                <table class="table " width="100%" id="item-tb">
                     <thead>
                         <tr>
                             <th>
@@ -17,29 +17,12 @@
                             <th>
                                 Item description
                             </th>
-                            <th>
-                                Available
-                            </th>
                         </tr>
 
                     </thead>
 
                     <tbody>
-                        @foreach (var item in ViewBag.ItemList)
-                        {
-                            <tr>
-                                <td>
-                                    <button type="button" class="btn btn-outline-primary" onclick="setItemNo('@item.ItemNo')">@item.ItemNo</button>
-                                </td>
-                                <td>
-                                    @item.Desc
-                                </td>
-                                <td>
-                                    @item.Quantity
-                                </td>
-                            </tr>
-                        }
-
+                        
                     </tbody>
                 </table>
             </div>
@@ -51,3 +34,29 @@
 </div>
 
 
+<script>
+    $(document).ready(function() {
+        $.ajax({
+            'url': apiUrl + "/api/itemdata/ItemDataBrowse",
+            'method': "GET",
+            'contentType': 'application/json'
+        }).done(function (data) {
+            $('#item-tb').dataTable({
+                "aaData": data,
+                "columns": [
+                    {
+                        data: "code",
+                        render: function (data, type, res) {
+                            return '<button type="button" class="btn btn-outline-primary" onclick="setItemNo(\'' + res.code + '\')">' + res.code + '</button>';
+                        }
+                    },
+                    { "data": "desc" }
+
+                ],
+
+            });
+
+
+        });
+    })
+</script>

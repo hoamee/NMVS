@@ -23,37 +23,40 @@ namespace NMVS.Controllers
         public IActionResult Browse()
         {
 
-            var model = (from o in _context.IssueOrders
-                         join loc in _context.Locs on o.LocCode equals loc.LocCode into oloc 
-                         from ol in oloc.DefaultIfEmpty()
-                         join ve in _context.Shippers on o.ToVehicle equals ve.ShpId into vo
-                         from all in vo.DefaultIfEmpty()
-                         join loc2 in _context.Locs on o.ToLoc equals loc2.LocCode into oloc2
-                         from all2 in oloc2.DefaultIfEmpty()
-                         select new IssueOrder
-                         {
-                             ItemNo = o.ItemNo,
-                             RqID = o.RqID,
-                             PtId = o.PtId,
-                             OrderBy = o.OrderBy,
-                             MovementTime = o.MovementTime,
-                             MovedQty = o.MovedQty,
-                             LocCode = o.LocCode,
-                             IssueToDesc = o.IssueType == "MFG" ? all2.LocDesc : all.ShpDesc,
-                             Confirm = o.Confirm,
-                             ConfirmedBy = o.ConfirmedBy,
-                             DetId = o.DetId,
-                             ExpOrdId = o.ExpOrdId,
-                             ExpOrdQty = o.ExpOrdQty,
-                             IssueType = o.IssueType,
-                             ToLoc = o.ToLoc,
-                             ToVehicle = o.ToVehicle,
-                             FromLoc = ol.LocDesc,
-                             Reported = o.Reported
+            // var model = (from o in _context.IssueOrders
+            //              join loc in _context.Locs on o.LocCode equals loc.LocCode into oloc 
+            //              from ol in oloc.DefaultIfEmpty()
+            //              join ve in _context.Shippers on o.ToVehicle equals ve.ShpId into vo
+            //              from all in vo.DefaultIfEmpty()
+            //              join loc2 in _context.Locs on o.ToLoc equals loc2.LocCode into oloc2
+            //              from all2 in oloc2.DefaultIfEmpty()
+            //              select new IssueOrder
+            //              {
+            //                  ItemNo = o.ItemNo,
+            //                  RqID = o.RqID, 
+            //                  PtId = o.PtId,
+            //                  OrderBy = o.OrderBy,
+            //                  MovementTime = o.MovementTime,
+            //                  MovedQty = o.MovedQty,
+            //                  LocCode = o.LocCode,
+            //                  IssueToDesc = o.IssueType == "MFG" ? all2.LocDesc : all.ShpDesc,
+            //                  Confirm = o.Confirm,
+            //                  ConfirmedBy = o.ConfirmedBy,
+            //                  DetId = o.DetId,
+            //                  ExpOrdId = o.ExpOrdId,
+            //                  ExpOrdQty = o.ExpOrdQty,
+            //                  IssueType = o.IssueType,
+            //                  ToLoc = o.ToLoc,
+            //                  ToVehicle = o.ToVehicle,
+            //                  FromLoc = ol.LocDesc,
+            //                  Reported = o.Reported
                              
-                         }).ToList();
+            //              }).ToList();
 
-            return View(model);
+            ViewBag.toVehicle = _context.IssueOrders.Where(x=>x.IssueType != "MFG" && x.Confirm != true).Count();
+            ViewBag.toMfg = _context.IssueOrders.Where(x=>x.IssueType == "MFG" && x.Confirm != true).Count();
+
+            return View();
         }
 
         // GET: IssueOrders/Details/5

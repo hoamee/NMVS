@@ -1,0 +1,166 @@
+﻿<script>
+    function getMfgData() {
+        $('.select-type').fadeOut('slow', function () {
+
+            $('#data-mfg').fadeIn();
+        });
+
+
+        tb = $('#datatable-search').DataTable({
+            ajax: {
+                'url': apiUrl + "/api/IssueOrder/GetMfgOrders",
+                dataSrc: ''
+
+            },
+            "columns": [
+                {
+                    "data": "item",
+                    render: function (data, type, order) {
+                        if (order.quantity > (order.moved + order.reported)) {
+                            return 0;
+                        } else {
+                            return 1;
+                        }
+                    }
+                },
+                {
+                    "data": "item",
+                    render: function (data, type, order) {
+
+                        var btn;
+
+                        if (order.quantity > (order.moved + order.reported)) {
+                            btn = '<div class="btn-group dropend">'
+                                + '<button type="button" class="btn btn-outline-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">'
+                                + order.item
+                                + '</button>'
+                                + '<ul class="dropdown-menu">'
+                                + '<li onclick="toggleSubmit(\'MFG\', this, \'' + order.item + '\')"><p class="dropdown-item">Submit</p></li>'
+                                + '<li onclick="toggleReport(this, \'' + order.item + '\')"><p class="dropdown-item">Report</p></li>'
+                                + '</ul>'
+                                + '</div>';
+                        } else {
+                            btn = '<button type="button" class="btn btn-outline-success" >'
+                                + order.item
+                                + '</button>';
+                        }
+
+                        return btn
+                            + '<span class="exp-pt-id" hidden>' + order.inventoryId + '</span>'
+                            + '<span class="exp-id" hidden>' + order.issueOrderId + '</span>'
+                            + '<span class="exp-to-ve" hidden>0</span>'
+                            + '<span class="exp-qty" hidden>' + order.quantity + '</span>'
+                            + '<span class="exp-moved" hidden>' + order.moved + '</span>'
+                            + '<span class="exp-to-loc" hidden>' + order.toCode + '</span>'
+                            + '<span class="exp-reported" hidden>' + order.reported + '</span>';
+                    }
+                },
+                { "data": "inventoryId" },
+
+                {
+                    "data": "quantity",
+                    render: function (data, type, order) {
+                        var color = '';
+                        if ((order.moved + order.reported) >= order.quantity) {
+                            color = 'success';
+                        } else {
+                            color = 'danger';
+                        }
+                        var rp = '';
+                        if (order.reported > 0) {
+                            rp = '<span class="badge bg-warning">' + order.reported + '</span>';
+                        }
+                        return '<span class="badge bg-' + color + '">'
+                            + order.moved + '/' + order.quantity
+                            + '</span>'
+                            + rp;
+                    }
+
+                },
+                {
+                    "data": "from",
+                    render: function (data, type, order) {
+                        return order.from + ' (' + order.fromCode + ')';
+                    }
+                },
+                {
+                    "data": "to",
+                    render: function (data, type, order) {
+                        return order.to + ' (' + order.toCode + ')';
+                    }
+
+                },
+                {
+                    "data": "time"
+                },
+                { "data": "requestNo" },
+                { "data": "orderBy" }
+
+            ],
+            columnDefs: [
+                {
+                    targets: 0,
+                    searchable: false,
+                    visible: false
+                }
+            ]
+        })
+
+    }
+
+    function getVeData() {
+        $('.select-type').fadeOut('slow', function () {
+
+            $('#data-ve').fadeIn();
+        });
+
+
+        veTb = $('#datatable-ve').DataTable({
+            ajax: {
+                'url': apiUrl + "/api/IssueOrder/GetListVehicle",
+                dataSrc: ''
+
+            },
+            "columns": [
+                {
+                    "data": "desc",
+                    render: function (data, type, ve) {
+                        return '<span class="btn btn-outline-primary">' + ve.desc + '</span>';
+                    }
+                },
+                {
+                    "data": "id"
+                },
+                { "data": "inventoryId" },
+
+                {
+                    "data": "total",
+                    render: function (data, type, ve) {
+                        var color = '';
+                        if (ve.total <= ve.completed) {
+                            color = 'success';
+                        } else {
+                            color = 'danger';
+                        }
+
+                        return '<span class="badge bg-' + color + '">'
+                            + ve.total + '/' + ve.completed
+                            + '</span>'
+                    }
+
+                },
+                {
+                    "data": "date"
+                }
+            ],
+            columnDefs: [
+                {
+                    targets: 0,
+                    searchable: false,
+                    visible: false
+                }
+            ]
+        })
+
+    }
+</script>

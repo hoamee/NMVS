@@ -9,5 +9,6 @@ namespace NMVS.Models.ViewModels
     {
         public string Code { set; get; }
         public string Desc { set; get; }
+        public string ShortName {set;get;}
     }
 }

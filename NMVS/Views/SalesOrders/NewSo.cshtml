@@ -30,9 +30,9 @@
                                 <label asp-for="SoNbr" class="control-label"></label>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text" id="so-type">
-                                        
-                                            <span>SO</span>
-                                        
+
+                                        <span>SO</span>
+
                                     </span>
                                     <input asp-for="SoNbr" class="form-control" placeholder="SO/Transfer number" />
                                 </div>
@@ -112,10 +112,10 @@
         </div>
     </div>
 </div>
+<script src="~/assets/datatable/datatables.min.js"></script>
 <partial name="CustomerModal" />
 <partial name="AddressModal" />
 <partial name="_ValidationScriptsPartial" />
-<script src="~/assets/datatable/datatables.min.js"></script>
 <script>
     function setCustomer(no, name) {
         $('#CustCode').val(no);
@@ -131,8 +131,57 @@
 
     $(document).ready(function () {
         $('#for-so-div').hide();
-        $('#addr-tb').DataTable();
-        $('#customer-tb').DataTable();
+        $.ajax({
+            'url': apiUrl + "/api/Customers/GetCustomerList",
+            'method': "GET",
+            'contentType': 'application/json'
+        }).done(function (data) {
+            $('#customer-tb').dataTable({
+                "aaData": data,
+                "columns": [
+                    {
+                        data: "code",
+                        render: function (data, type, res) {
+                            return '<button type="button" class="btn btn-outline-primary" onclick="setCustomer(\'' + res.code + '\',\'' + res.desc + '\')">' + res.code + '</button>';
+                        }
+                    },
+                    { "data": "desc" },
+                    { "data": "shortName" }
+
+                ],
+                columnDefs: [
+                    {
+                        targets: 2,
+                        searchable: true,
+                        visible: false
+                    }
+                ]
+            });
+
+            $('#addr-tb').dataTable({
+                "aaData": data,
+                "columns": [
+                    {
+                        data: "code",
+                        render: function (data, type, res) {
+                            return '<button type="button" class="btn btn-outline-primary" onclick="setAddr(\''+res.code+'\', \''+res.desc+'\')">'+res.code+'</button>';
+                        }
+                    },
+                    { "data": "desc" },
+                    { "data": "shortName" }
+
+                ],
+                columnDefs: [
+                    {
+                        targets: 2,
+                        searchable: true,
+                        visible: false
+                    }
+                ]
+            });
+        });
+
+        
 
         $('#SoType').on('change', function () {
             if ($(this).val() == 0) {
@@ -158,4 +207,3 @@
 
     });
 </script>
-

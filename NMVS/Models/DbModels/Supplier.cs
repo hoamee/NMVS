@@ -60,6 +60,9 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Note")]
         public string Note { set; get; }
 
+        [Display(Name = "Short name")]
+        public string ShortName { get; set; }
+
         [Display(Name = "Active")]
         public bool Active { set; get; }
     }

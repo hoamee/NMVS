@@ -4,181 +4,106 @@
     ViewData["Title"] = "Issue orders";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<h2>@ViewData["Title"]</h2>
 
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card">
-            <!-- Card header -->
-            <div class="card-header">
-                <h3 class="mb-0">@ViewData["Title"]</h3>
-            </div>
-            <div class="table-responsive card-body">
-                <table class="table table-flush" id="datatable-search">
-                    <thead>
-                        <tr>
-                            <th>
-                                ID
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.IssueType)
-                            </th>
-                            <th>
-                                Item
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.LocCode)
-                            </th>
-                            <th>
-                                Inventory Id
-                            </th>
+<div id="data-header"></div>
 
-                            <th>
-                                @Html.DisplayNameFor(model => model.IssueToDesc)
-                            </th>
-                            <th>
-                                Issued
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.ConfirmedBy)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.RqID)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.OrderBy)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.MovementTime)
-                            </th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            string classColor = "";
+<div class="card" id="data-mfg">
+    <div class="card-body">
+        <table class="table table-flush" id="datatable-search">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>
+                        Item
+                    </th>
+                    <th>
+                        Inventory Id
+                    </th>
 
-                            if (item.ExpOrdQty <= item.MovedQty)
-                            {
-                                classColor = "success";
-                            }
-                            else if (item.MovedQty > 0 && item.MovedQty < item.ExpOrdQty)
-                            {
+                    <th>
+                        Status
+                    </th>
+                    <th>
+                        From
+                    </th>
+                    <th>
+                        To
+                    </th>
+                    <th>
+                        Time
+                    </th>
+                    <th>
+                        Request No.
+                    </th>
+                    <th>
+                        Order by
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
 
-                                classColor = "warning";
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="card" id="data-ve">
+    <div class="card-body">
+        <table class="table table-flush" id="datatable-ve">
+            <thead>
+                <tr>
+                    <th>
+                        Vehicle
+                    </th>
+                    <th>
+                        ID
+                    </th>
+                    <th>
+                        Processed
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                    <th>
+                        Check in date
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
 
-
-                            }
-                            else
-                            {
-                                classColor = "secondary";
-                            }
-                            <tr>
-
-                                <th>
-                                    @Html.DisplayFor(modelItem => item.ExpOrdId)
-                                    <span class="exp-pt-id" hidden> @item.PtId</span>
-                                    <span class="exp-id" hidden> @item.ExpOrdId</span>
-                                    <span class="exp-qty" hidden> @item.ExpOrdQty</span>
-                                    <span class="exp-moved" hidden> @item.MovedQty</span>
-                                    <span class="exp-to-ve" hidden> @item.ToVehicle</span>
-                                    <span class="exp-to-loc" hidden> @item.ToLoc</span>
-                                    <span class="exp-type" hidden> @item.IssueType</span>
-                                    <span class="exp-reported" hidden> @item.Reported</span>
-                                </th>
-                                <td>
-
-                                    @if (item.IssueType == "MFG")
-                                    {
-                                        <div>
-                                            <span class="fa fa-product-hunt" style=" color: orange;"> </span> Production
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <div>
-                                            <span class="fa fa-dollar" style=" color: forestgreen;">  </span> Sales
-                                        </div>
-
-                                    }
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.ItemNo)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.FromLoc)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.PtId)
-                                </td>
-
-                                <td>
-                                    <span>
-                                        @Html.DisplayFor(modelItem => item.IssueToDesc)
-                                        @if (!string.IsNullOrEmpty(item.ToLoc))
-                                        {
-                                            <span>(@item.ToLoc)</span>
-                                        }
-                                    </span>
-                                </td>
-                                <td>
-                                    <a class="badge bg-@classColor" href="/Inquiry/MovementReport/I.@item.ExpOrdId">@item.MovedQty/@item.ExpOrdQty</a>
-                                    @if (item.Reported > 0)
-                                    {
-                                        <span class="badge bg-danger"> @item.Reported </span>
-                                    }
-
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.ConfirmedBy)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.RqID)
-                                </td>
-
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.OrderBy)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.MovementTime)
-                                </td>
-                                <td>
-                                    @if (item.Confirm == true)
-                                    {
-                                        <span class="badge bg-success">Finished</span>
-                                    }
-                                    else if (item.Confirm == false)
-                                    {
-                                        <span class="badge bg-success">Closed</span>
-                                    }
-                                    else
-                                    {
-                                        if (User.IsInRole("Move inventory"))
-                                        {
+            </tbody>
+        </table>
+    </div>
+</div>
 
 
-                                            <div class="p-2 bd-highlight">
-                                                <button class="btn btn-info modal-btn">
-                                                    Submit
-                                                </button>
-                                                <button class="btn btn-danger report-btn">
-                                                    Report
-                                                </button>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">Incomplete</span>
-                                        }
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
 
+<div class="row col-12 d-flex justify-content-center">
+    <div class="card col-4  select-type" onclick="getMfgData()">
+        <!-- Card header -->
+        <div class="card-header d-flex justify-content-center">
+            <h3 class="mb-0">
+                <i class="fas fa-pallet    "></i>
+                Manufacturing
+            </h3>
         </div>
+        <div class="card-body d-flex justify-content-center">
+            <h2>@ViewBag.toMfg</h2>
+        </div>
+
+    </div>
+    <div class="card col-4 ms-4  select-type">
+        <!-- Card header -->
+        <div class="card-header d-flex justify-content-center">
+            <h3 class="mb-0">
+                <span class="fa fa-truck"></span>
+                Vehicle
+            </h3>
+        </div>
+        <div class="card-body d-flex justify-content-center">
+            <h2>@ViewBag.toVehicle</h2>
+        </div>
+
     </div>
 </div>
 <script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
@@ -187,7 +112,9 @@
 <script src="~/assets/js/qr/html5-qrcode.min.js"></script>
 <script>
     var routeURL = location.protocol + "//" + location.host;
+    $('#data-mfg').hide();
 
+    var tb;
 
     $(document).ready(function () {
         $('.nav-movement').addClass('active');
@@ -198,8 +125,12 @@
         $('#new-sup').click(function () {
             $('#file-modal').modal('toggle');
         });
-        $('#datatable-search').DataTable();
 
     });
+
+    function reloadData() {
+        tb.ajax.reload();
+    }
 </script>
 <partial name="OrdersModal" />
+<partial name="DataScriptPartial" />
