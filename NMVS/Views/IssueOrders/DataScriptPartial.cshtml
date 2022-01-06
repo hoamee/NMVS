@@ -125,33 +125,123 @@
                 {
                     "data": "desc",
                     render: function (data, type, ve) {
-                        return '<span class="btn btn-outline-primary">' + ve.desc + '</span>';
+                        return '<span class="btn btn-outline-primary" onclick="showVeDetail(1)">' + ve.desc + '</span>';
                     }
                 },
                 {
-                    "data": "id"
+                    "data": "",
+                    render: function (data, type, ve) {
+                        var color = 'primary';
+                        if ((ve.completed / ve.total) > 0.5)
+                            color = 'warning';
+
+                        if (ve.completed == 0)
+                            color = 'danger';
+                        return '<span class="badge bg-' + color + '">'
+                            + ve.completed
+                            + '</span> / <span class="badge bg-primary">' + ve.total + '</span>';
+                    }
+                },
+                {
+                    "data": "dateIn"
+                },
+            ]
+        })
+
+    }
+
+
+    function showVeDetail(id) {
+        $('#data-ve').fadeOut('slow', function () {
+            $('#ve-header').fadeIn();
+            $('#detail-ve').fadeIn();
+        });
+        var shp = getVeDetail(id);
+
+
+        veTb = $('#datatable-ve-detail').DataTable({
+            ajax: {
+                'url': apiUrl + "/api/IssueOrder/GetVeDetail/" + id,
+                dataSrc: ''
+
+            },
+            "columns": [
+                {
+                    "data": "item",
+                    render: function (data, type, order) {
+                        if (order.quantity > (order.moved + order.reported)) {
+                            return 0;
+                        } else {
+                            return 1;
+                        }
+                    }
+                },
+                {
+                    "data": "item",
+                    render: function (data, type, order) {
+
+                        var btn;
+
+                        if (order.quantity > (order.moved + order.reported)) {
+                            btn = '<div class="btn-group dropend">'
+                                + '<button type="button" class="btn btn-outline-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">'
+                                + order.item
+                                + '</button>'
+                                + '<ul class="dropdown-menu">'
+                                + '<li onclick="toggleSubmit(\'Issue\', this, \'' + order.item + '\')"><p class="dropdown-item">Submit</p></li>'
+                                + '<li onclick="toggleReport(this, \'' + order.item + '\')"><p class="dropdown-item">Report</p></li>'
+                                + '</ul>'
+                                + '</div>';
+                        } else {
+                            btn = '<button type="button" class="btn btn-outline-success" >'
+                                + order.item
+                                + '</button>';
+                        }
+
+                        return btn
+                            + '<span class="exp-pt-id" hidden>' + order.inventoryId + '</span>'
+                            + '<span class="exp-id" hidden>' + order.issueOrderId + '</span>'
+                            + '<span class="exp-to-ve" hidden>' + 1 + '</span>'
+                            + '<span class="exp-qty" hidden>' + order.quantity + '</span>'
+                            + '<span class="exp-moved" hidden>' + order.moved + '</span>'
+                            + '<span class="exp-to-loc" hidden>' + order.toCode + '</span>'
+                            + '<span class="exp-reported" hidden>' + order.reported + '</span>';
+                    }
                 },
                 { "data": "inventoryId" },
 
                 {
-                    "data": "total",
-                    render: function (data, type, ve) {
+                    "data": "quantity",
+                    render: function (data, type, order) {
                         var color = '';
-                        if (ve.total <= ve.completed) {
+                        if ((order.moved + order.reported) >= order.quantity) {
                             color = 'success';
                         } else {
                             color = 'danger';
                         }
-
+                        var rp = '';
+                        if (order.reported > 0) {
+                            rp = '<span class="badge bg-warning">' + order.reported + '</span>';
+                        }
                         return '<span class="badge bg-' + color + '">'
-                            + ve.total + '/' + ve.completed
+                            + order.moved + '/' + order.quantity
                             + '</span>'
+                            + rp;
                     }
 
                 },
                 {
-                    "data": "date"
-                }
+                    "data": "from",
+                    render: function (data, type, order) {
+                        return order.from + ' (' + order.fromCode + ')';
+                    }
+                },
+                {
+                    "data": "time"
+                },
+                { "data": "requestNo" },
+                { "data": "orderBy" }
+
             ],
             columnDefs: [
                 {
@@ -161,6 +251,26 @@
                 }
             ]
         })
+    }
+
+
+
+    function getVeDetail(id) {
+
+        $.ajax({
+            'url': apiUrl + "/api/IssueOrder/GetVeInfo/" + id,
+            'method': "GET",
+            'contentType': 'application/json'
+        }).done(function (shp) {
+            var veHead = $('#ve-header-body')
+            veHead.append('<h3 align="center">Vehicle information</h3>'
+                + '<div class="col-6 ms-5"><table class="col-md-3 col-sm-12">'
+                + '<tr><td>Vehicle ID:</td><th>' + shp.shpId + '</th></tr>'
+                + '<tr><td>Description:</td><th>' + shp.shpDesc + '</th></tr>'
+                + '<tr><td>Driver:</td><th>' + shp.driver + '</th></tr>'
+                + '<tr><td>Contact:</td><th>' + shp.drContact + '</th></tr>'
+                + '</table></div>');
+        });
 
     }
 </script>

@@ -22,7 +22,7 @@
                             <th>
                                 From
                             </th>
-                            <th>
+                            <th id="th-to">
                                 To
                             </th>
                             <th>
@@ -92,7 +92,7 @@
                             <th>
                                 From
                             </th>
-                            <th>
+                            <th id="th-to-rp">
                                 To
                             </th>
                             <th>
@@ -144,6 +144,8 @@
         $('#table2 #t2-tr').html($(e).closest('tr').html());
         $('#table2 #t2-tr').find('.btn-group').remove();
         $('#table2 #t2-tr').children('td:first').append(item);
+        if ($('#detail-ve').is(":visible"))
+            $('th#th-to').remove();
         $('#exampleModal').modal('toggle');
         if (issueType == "MFG") {
             $('#confirm-lbl').html('Location code <input type="text" placeholder="To location code" class="form-control" id="loc-code" />');
@@ -159,7 +161,11 @@
         $('#table3 #t3-tr').html($(e).closest('tr').html());
         $('#table3 #t3-tr').find('.btn-group').remove();
         $('#table3 #t3-tr').children('td:first').append(item);
+        $('th#th-to-rp').remove();
         $('#reportModal').modal('toggle');
+
+
+
     };
 
     $(document).ready(function () {
@@ -231,9 +237,10 @@
                                     showConfirmButton: false,
                                     timer: 2000
                                 });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 1000);
+                                if ($('#detail-ve').is(":visible"))
+                                    veTb.ajax.reload();
+                                else
+                                    reloadData();
 
                             },
                             failure: function (response) {
@@ -315,7 +322,10 @@
 
                                 $('#exampleModal').modal('toggle');
                                 setTimeout(function () {
-                                    reloadData();
+                                    if (desCode == '0')
+                                        reloadData();
+                                    else
+                                        veTb.ajax.reload();
                                 }, 1000);
                             } else {
                                 Swal.fire({
@@ -393,7 +403,10 @@
                                         timer: 2000
                                     });
                                     setTimeout(function () {
-                                        reloadData();
+                                        if ($('#detail-ve').is(":visible"))
+                                            veTb.ajax.reload();
+                                        else
+                                            reloadData();
                                     }, 1000);
                                 }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NMVS.Models;
 using NMVS.Models.DbModels;
 using NMVS.Models.ViewModels;
@@ -23,7 +24,7 @@ namespace NMVS.Controllers.Api
         [Route("GetMfgOrders")]
         public IActionResult GetMfgOrders()
         {
-            var model = (from o in _db.IssueOrders.Where(x => x.IssueType == "MFG")
+            var model = (from o in _db.IssueOrders.Where(x => x.IssueType == "MFG" && x.Confirm != true)
                          join loc in _db.Locs on o.LocCode equals loc.LocCode into oloc
                          from ol in oloc.DefaultIfEmpty()
                          join i in _db.ItemDatas on o.ItemNo equals i.ItemNo into it
@@ -57,21 +58,58 @@ namespace NMVS.Controllers.Api
         [Route("GetListVehicle")]
         public IActionResult GetListVehicle()
         {
+            var isd = _db.IssueOrders.Where(x => x.ToVehicle != null).ToList();
 
-            var model = (from ve in _db.Shippers
-                         join isd in _db.IssueOrders on ve.ShpId equals isd.ToVehicle into veis
-                         from all in veis.DefaultIfEmpty()
-                         group all by ve.ShpId into grouped
-
+            var model = (from ve in _db.Shippers.Where(x => !string.IsNullOrEmpty(x.CheckInBy) && string.IsNullOrEmpty(x.CheckOutBy)).ToList()
                          select new IssueToVehicleDto
                          {
-                            //  Id = grouped.Count,
-                            //  Completed = isd.,
-                            //  Date = ((DateTime)ve.ActualIn).ToString("dd-MM-yy HH:mm:ss"),
-                            //  Desc = ve.ShpDesc,
-                            //  Status = ve.ActualOut == null,
-                            //  Total = a.Count()
+                             Id = ve.ShpId,
+                             Completed = isd.Where(x => x.ToVehicle == ve.ShpId && x.Confirm == true).Count(),
+                             DateIn = ((DateTime)ve.ActualIn).ToString("dd-MM-yy HH:mm:ss"),
+                             Desc = ve.ShpDesc,
+                             Total = isd.Where(x => x.ToVehicle == ve.ShpId).Count()
                          }).ToList();
+
+            return Ok(model);
+        }
+
+        [HttpGet]
+        [Route("GetVeDetail/{id}")]
+        public IActionResult GetVeDetail(int id)
+        {
+            var issueOrders = (from o in _db.IssueOrders.Where(x => x.IssueType == "Issue" && x.ToVehicle == id)
+                               join loc in _db.Locs on o.LocCode equals loc.LocCode into oloc
+                               from ol in oloc.DefaultIfEmpty()
+                               join i in _db.ItemDatas on o.ItemNo equals i.ItemNo into it
+                               from idt in it.DefaultIfEmpty()
+                               select new IssueOrderDto
+                               {
+                                   Item = idt.ItemName,
+                                   RequestNo = o.RqID,
+                                   InventoryId = o.PtId,
+                                   OrderBy = o.OrderBy,
+                                   Time = o.MovementTime.ToString("dd-MM-yy HH:mm:ss"),
+                                   Moved = o.MovedQty,
+                                   FromCode = o.LocCode,
+                                   Confirmed = o.Confirm,
+                                   ConfirmedBy = o.ConfirmedBy,
+                                   IssueOrderId = o.ExpOrdId,
+                                   Quantity = o.ExpOrdQty,
+                                   From = ol.LocDesc,
+                                   Reported = o.Reported
+
+                               }).ToList();
+
+
+
+            return Ok(issueOrders);
+        }
+
+        [HttpGet]
+        [Route("GetVeInfo/{id}")]
+        public IActionResult GetVeInfo(int id)
+        {
+            var model = _db.Shippers.Find(id);
 
             return Ok(model);
         }
