@@ -346,14 +346,9 @@ namespace NMVS.Controllers
                 .Where(x => !string.IsNullOrEmpty(x.CheckInBy) && string.IsNullOrEmpty(x.CheckOutBy) && x.IssueConfirmed != true)
                 .ToList(), "ShpId", "ShpDesc");
 
-            if (rq.SpecDate == null)
-            {
-                return View(_service.GetItemMasterVms(rq));
-            }
-            else
-            {
-                return View(_service.GetItemMasterVms(rq).Where(x => x.DateIn.Date == rq.SpecDate));
-            }
+
+            return View(_service.GetItemMasterVms(rq));
+
         }
 
         public IActionResult PickListMFG(int id)

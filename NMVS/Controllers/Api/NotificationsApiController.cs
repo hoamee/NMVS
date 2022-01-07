@@ -146,14 +146,13 @@ namespace NMVS.Controllers.Api
 
             if (_httpContextAccessor.HttpContext.User.IsInRole(Helper.ArrangeInventory))
             {
-                var receiveLoc = _context.Locs.Where(x => x.LocType == "LocReceive").Select(x=>x.LocCode).ToList();
-                var items = _context.ItemMasters.Where(x => x.PtQty - x.PtHold > 0  && receiveLoc.Contains(x.LocCode)).ToList();
+                var items = _context.ItemMasters.Where(x => x.Passed == true && string.IsNullOrEmpty(x.LocCode) && x.PtQty > 0).ToList();
                 if (items.Any())
                 {
                     common.dataenum.Add(new Notifiaction
                     {
                         notificationType = "Inventory arrangement",
-                        message = items.Count + " unallocated. (At Receive location)",
+                        message = items.Count + " unallocated.",
                         href = "/Allocate/Unallocated"
                     });
                 }

@@ -323,20 +323,23 @@ namespace NMVS.Services
         public List<ItemMasterVm> GetItemMasterVms(RequestDet rq)
         {
 
-            var ptMstr = _db.ItemMasters.Where(i => i.PtQty > 0 && i.ItemNo == rq.ItemNo).OrderBy(x => x.PtDateIn)
-                .ToList();
+            var ptMstr = _db.ItemMasters.Where(i => i.PtQty > 0 && i.ItemNo == rq.ItemNo && i.Passed == true).ToList();
             var itemVm = (from pt in ptMstr
-                          join dt in _db.ItemDatas.ToList() on pt.ItemNo equals dt.ItemNo
-                          join loc in _db.Locs.ToList() on pt.LocCode equals loc.LocCode
+                          join dt in _db.ItemDatas.ToList() on pt.ItemNo equals dt.ItemNo into ptdt
+                          from pd in ptdt.DefaultIfEmpty()
+
+                          join loc in _db.Locs.ToList() on pt.LocCode equals loc.LocCode into ptloc
+                          from ptl in ptloc.DefaultIfEmpty()
                           select new ItemMasterVm
                           {
                               Booked = pt.PtHold,
                               DateIn = pt.PtDateIn,
-                              Loc = loc.LocDesc,
+                              Loc = ptl.LocDesc,
                               Lot = pt.PtLotNo,
-                              Name = dt.ItemName,
-                              No = dt.ItemNo,
-                              PackingType = dt.ItemPkg,
+                              Name = pd.ItemName,
+                              No = pd.ItemNo,
+                              Ref = pt.RefNo,
+                              PackingType = pd.ItemPkg,
                               Ptid = pt.PtId,
                               Qty = pt.PtQty,
                               Sup = pt.SupCode

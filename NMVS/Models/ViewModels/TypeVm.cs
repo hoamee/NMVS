@@ -7,6 +7,7 @@ namespace NMVS.Models.ViewModels
 {
     public class TypeVm
     {
+        public int Id { get; set; }
         public string Code { set; get; }
         public string Desc { set; get; }
         public string ShortName {set;get;}

@@ -50,7 +50,7 @@ namespace NMVS.Services
                 }
                 issueNotes = GetIssueNoteVmByShipper(shpId);
                 List<In01Vm> noteDet = new();
-                foreach(var item in issueNotes)
+                foreach (var item in issueNotes)
                 {
                     var customer = _db.Customers.Find(item.ShipTo);
                     var issueLines = (from d in _db.SoIssueNoteDets.Where(x => x.InId == item.Id && x.InType == item.NoteType)
@@ -179,7 +179,7 @@ namespace NMVS.Services
 
                 var sup = await _db.Suppliers.FindAsync(incoming.SupCode);
                 //Check any item master in list
-                var pt_mstr = (from pt in _db.ItemMasters
+                var pt_mstr = (from pt in _db.ItemMasters.Where(x => x.ParentId == x.PtId)
                                where pt.IcId == icId
                                join dt in _db.ItemDatas on pt.ItemNo equals dt.ItemNo into all
                                from a in all.DefaultIfEmpty()
@@ -557,7 +557,7 @@ namespace NMVS.Services
                     for (int i = ptIndex; i < noteDet.Count; i++)
                     {
                         var packCount = Convert.ToInt32(Math.Ceiling(noteDet[i].Quantity / noteDet[i].PkgQty));
-                        
+
 
                         sheet.Cells["B" + writingRow].Value = noteDet[i].ItemName;
                         sheet.Cells["C" + writingRow].Value = noteDet[i].ItemUnit;

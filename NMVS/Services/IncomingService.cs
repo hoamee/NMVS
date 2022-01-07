@@ -95,7 +95,8 @@ namespace NMVS.Services
                            Checked = ic.Checked,
                            ItemCount = ic.ItemCount,
                            Closed = ic.Closed,
-                           LastModified = ic.LastModifiedBy
+                           LastModified = ic.LastModifiedBy,
+                           ConfirmReceived = ic.ConfirmReceived
                        }).FirstOrDefault();
 
             var ptMstr = (from pt in _db.ItemMasters.Where(x => x.IcId == id && x.ParentId == x.PtId)
@@ -108,12 +109,13 @@ namespace NMVS.Services
                               ItemNo = pt.ItemNo,
                               AcceptQty = pt.Accepted,
                               CheckedBy = pt.Qc,
-                              IsChecked = icm.Closed ? (!string.IsNullOrEmpty(pt.Qc)) : null,
+                              IsChecked = pt.Passed,
                               ItemName = a.ItemName,
                               RcvQty = pt.RecQty,
                               Note = pt.PtCmt,
                               Ref = pt.RefNo,
-                              RefDate = pt.RefDate
+                              AvailQty = pt.PtQty,
+                              RefDate = pt.RefDate,
                           }).ToList();
             IcmListVm icmList = new()
             {
@@ -308,6 +310,7 @@ namespace NMVS.Services
                                 //if existed: add quantity and rec user. Update
                                 if (pt != null)
                                 {
+                                    pt.PtQty += qty;
                                     pt.RecQty += qty;
                                     pt.RecBy = user;
                                     _db.Update(item);
@@ -326,7 +329,7 @@ namespace NMVS.Services
                                         PtDateIn = delDate,
                                         PtHold = 0,
                                         PtLotNo = lot,
-                                        PtQty = 0,
+                                        PtQty = qty,
                                         Accepted = 0,
                                         Qc = "",
                                         RecBy = user,

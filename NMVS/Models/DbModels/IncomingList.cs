@@ -51,6 +51,8 @@ namespace NMVS.Models.DbModels
 
         public string PtNote { set; get; }
 
+        public bool ConfirmReceived { set; get; }
+
         public virtual ICollection<ItemMaster> ItemMasters { set; get; }
 
     }

@@ -8,12 +8,7 @@
                 <table class="table table-striped" id="table2">
                     <thead>
                         <tr>
-                            <th>
-                                Order No.
-                            </th>
-                            <th>
-                                Request No.
-                            </th>
+                           
                             <th>Inventory Id</th>
                             <th>
                                 Item No.
@@ -85,12 +80,7 @@
                 <table class="table table-striped" id="table3">
                     <thead>
                         <tr>
-                            <th>
-                                Order No.
-                            </th>
-                            <th>
-                                Request No.
-                            </th>
+                            
                             <th>Inventory Id</th>
                             <th>
                                 Item No.
@@ -168,9 +158,9 @@
 
             var desCode = $('#table2 .to-code').text().trim();
             var qty = $('#moved-qty').val();
-            var oQty = parseFloat($('#table2 #t2-tr').children('.td-qty').text().trim())
-                - parseFloat($('#table2 #t2-tr').children('.td-moved').text().trim())
-                - parseFloat($('#table2 #t2-tr').children('.td-reported').text().trim());
+            var oQty = parseFloat($('#table2 #t2-tr').find('.ord-qty').text().trim())
+                - parseFloat($('#table2 #t2-tr').find('.ord-moved').text().trim())
+                - parseFloat($('#table2 #t2-tr').find('.ord-reported').text().trim());
 
             if (qty > oQty) {
                 $('#moved-qty').notify('Report quantity couldn\'t be larger than order quantity');
@@ -198,7 +188,7 @@
                         })
                     }
                     else {
-                        var oId = parseInt($('#table2 .td-id').text().trim());
+                        var oId = parseInt($('#table2').find('.ord-no').text().trim());
                         var alo = {
                             AlcOrdId: oId,
                             MovedQty: qty
@@ -262,9 +252,9 @@
             var desCode = $('#table2 .to-code').text().trim();
             var qty = $('#moved-qty').val();
             desInput = $('#loc-code').val().trim();
-            var oQty = parseFloat($('#table2 #t2-tr').children('.td-qty').text().trim())
-                - parseFloat($('#table2 #t2-tr').children('.td-moved').text().trim())
-                - parseFloat($('#table2 #t2-tr').children('.td-reported').text().trim());
+            var oQty = parseFloat($('#table2 #t2-tr').children('.ord-qty').text().trim())
+                - parseFloat($('#table2 #t2-tr').children('.ord-moved').text().trim())
+                - parseFloat($('#table2 #t2-tr').children('.ord-reported').text().trim());
 
             if (qty > oQty) {
                 $('#moved-qty').notify('Report quantity couldn\'t be larger than order quantity');
@@ -278,7 +268,7 @@
                     $('#confirm-lbl input').notify('Incorrect destination! Please check your destination again! ' + desInput + ' - ' + desCode);
                 }
                 else {
-                    var oId = parseInt($('#table2 .td-id').text().trim());
+                    var oId = parseInt($('#table2').find('.ord-no').text().trim());
                     var alo = {
                         AlcOrdId: oId,
                         MovedQty: qty
@@ -324,7 +314,7 @@
                                         Swal.fire({
                                             icon: 'error',
                                             title: 'Oops...',
-                                            text: 'Something went wrong!'
+                                            text: data.message
                                         })
                                     }
 
@@ -355,13 +345,13 @@
 
         $('#send-report').click(function () {
             var cmmt = $("#report-input");
-            var oId = parseInt($('#table3 .td-id').text().trim());
+            var oId = parseInt($('#table3').find('.ord-no').text().trim());
             var unq = $('#unqualified').is(":checked");
-            var oQty = parseFloat($('#table3 #t3-tr').children('.td-qty').text().trim());
+            var oQty = parseFloat($('#table3 #t3-tr').find('.ord-qty').text().trim());
             var qty = $('#input-qty').val();
             var note = cmmt.val().trim();
-            var moved = parseFloat($('#table3 #t3-tr').children('.td-moved').text().trim());
-            var remainQty = oQty - moved - parseFloat($('#table3 #t3-tr').children('.td-reported').text().trim());;
+            var moved = parseFloat($('#table3 #t3-tr').find('.ord-moved').text().trim());
+            var remainQty = oQty - moved - parseFloat($('#table3 #t3-tr').find('.ord-reported').text().trim());;
 
             if (qty > remainQty) {
                 $('#input-qty').notify('Report quantity couldn\'t be larger than remain quantity');

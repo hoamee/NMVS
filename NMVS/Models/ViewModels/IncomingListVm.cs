@@ -39,6 +39,7 @@ namespace NMVS.Models.ViewModels
         public int ItemCount { set; get; }
 
         public int Checked { set; get; }
+        public bool ConfirmReceived { get; set; }
 
         public string LastModified { set; get; }
     }

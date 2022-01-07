@@ -95,7 +95,7 @@
 
                 }
 
-                @if (Model.Icm.Checked >= Model.Icm.ItemCount && Model.Icm.Closed)
+                @if (Model.Pt.Sum(x => x.AvailQty) == 0 && Model.Pt.Count > 0)
                 {
                     <a class="btn btn-outline-primary" asp-action="DownloadList" asp-route-id="@Model.Icm.IcId">
                         <span class="fa fa-cloud-download">Download receipt note</span>
@@ -129,11 +129,10 @@
                                     Ref
                                 </th>
                                 <th>
-                                    Received
+                                    Quantity
                                 </th>
-
                                 <th>
-                                    Accepted
+                                    Received
                                 </th>
                                 <th>
                                     Checked by
@@ -158,7 +157,8 @@
                                         }
                                         else
                                         {
-                                            <span class="btn btn-sm" onclick="getUpdateModal(@t.PtId, '@t.ItemNo', @t.RcvQty, '@t.Ref','@t.RefDate' , '@t.Note')">
+                                            <span class="btn btn-sm"
+                                        onclick="getUpdateModal(@t.PtId, '@t.ItemNo', @t.RcvQty, '@t.Ref','@t.RefDate' , '@t.Note')">
                                                 @t.ItemNo
                                             </span>
                                         }
@@ -184,15 +184,22 @@
                                     <td>
                                         @if (t.IsChecked == true)
                                         {
-                                            <span class="badge bg-success">Checked</span>
+                                            <span class="badge bg-success">PASSED</span>
                                         }
                                         @if (t.IsChecked == false)
                                         {
-                                            <span class="badge bg-warning">Pending QC</span>
+                                            <span class="badge bg-danger">FAILED</span>
                                         }
                                         @if (t.IsChecked == null)
                                         {
-                                            <span class="badge bg-secondary">Open</span>
+                                            @if (Model.Icm.Closed)
+                                            {
+                                                <span class="badge bg-warning">UNDER QC</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Open</span>
+                                            }
                                         }
                                     </td>
                                 </tr>
@@ -224,5 +231,4 @@
 <script src="~/assets/datatable/datatables.min.js"></script>
 <partial name="AddItemModal" />
 <partial name="UpdateItemModal" />
-<partial name="ItemDataBrowse"/>
-
+<partial name="ItemDataBrowse" />

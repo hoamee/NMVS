@@ -16,12 +16,6 @@
                 <table class="table table-flush" id="datatable-search">
                     <thead>
                         <tr>
-                            <th>
-                                Order No.
-                            </th>
-                            <th>
-                                Request No.
-                            </th>
                             <th>Inventory Id</th>
                             <th>
                                 Item No.
@@ -59,20 +53,21 @@
                         @foreach (var item in Model)
                         {
                             <tr id="tr-@item.OrderId">
-                                <td class="td-id">
-                                    @item.OrderId
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.RequestId)
-                                </td>
+                                
                                 <td>
                                     @Html.DisplayFor(modelItem => item.PtId)
                                 </td>
                                 <td>
+                                    
                                     @Html.DisplayFor(modelItem => item.ItemName)
+                                    <span class="ord-no" hidden>@item.OrderId</span>
+                                    <span class="rq-no" hidden>@item.RequestId</span>
+                                    <span class="ord-moved" hidden>@item.Moved</span>
+                                    <span class="ord-qty" hidden>@item.Qty</span>
+                                    <span class="ord-reported" hidden>@item.Reported</span>
                                 </td>
 
-                                <td class="td-qty">
+                                <td class="td-qty">                                    
                                     @Html.DisplayFor(modelItem => item.Qty)
                                 </td>
                                 <td class="td-moved">

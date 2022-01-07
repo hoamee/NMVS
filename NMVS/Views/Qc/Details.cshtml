@@ -120,10 +120,7 @@
                                     Item name
                                 </th>
                                 <th>
-                                    Received
-                                </th>
-                                <th>
-                                    Accepted
+                                    Quantity
                                 </th>
                                 <th>
                                     Checked by
@@ -151,13 +148,10 @@
                                     <td>
                                         @Html.DisplayFor(modelItem => t.RcvQty)
                                     </td>
-                                    <td id="qty-@t.PtId">
-                                        @Html.DisplayFor(modelItem => t.AcceptQty)
-                                    </td>
                                     <td id="user-@t.PtId">
                                         @Html.DisplayFor(modelItem => t.CheckedBy)
                                     </td>
-                                    <td>
+                                    <td id="note-@t.PtId">
                                         <ul>
                                             @if (!string.IsNullOrEmpty(t.Note))
                                             {
@@ -184,16 +178,23 @@
                                         <div id="btn-@t.PtId"></div>
                                         @if (t.IsChecked == true)
                                         {
-                                            <span class="badge bg-success">Checked</span>
+                                            <span class="badge bg-success">PASSED</span>
                                         }
                                         @if (t.IsChecked == false)
                                         {
-                                            <button class="btn btn-sm btn-outline-warning"
-                                        onclick="checkItem(@t.PtId,@t.RcvQty);">Pending QC</button>
+                                            <span class="badge bg-danger">FAILED</span>
                                         }
                                         @if (t.IsChecked == null)
                                         {
-                                            <span class="badge bg-secondary">Pending close</span>
+                                            @if (Model.Icm.Closed)
+                                            {
+                                                <button class="btn btn-sm btn-outline-warning"
+                                        onclick="checkItem(@t.PtId,@t.RcvQty);">Under QC</button>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Pending close</span>
+                                            }
                                         }
                                     </td>
                                 </tr>

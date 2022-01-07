@@ -115,7 +115,7 @@ namespace NMVS.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Receive inventory")]
-        public async Task<IActionResult> UpdateList(int id, [Bind("IcId,SupCode,Po,PoDate,Vehicle,Driver,DeliveryDate,IsWarranty,Closed")] IncomingList incomingList)
+        public async Task<IActionResult> UpdateList(int id, [Bind("IcId,SupCode,Po,PoDate,Vehicle,Driver,DeliveryDate,IsWarranty,Closed,ItemCount")] IncomingList incomingList)
         {
             if (id != incomingList.IcId)
             {

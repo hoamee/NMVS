@@ -19,6 +19,7 @@ namespace NMVS.Models.ViewModels
         public string ItemNo { set; get; }
         public string ItemName { set; get; }
         public double RcvQty { set; get; }
+        public double AvailQty {set;get;}
         public string Ref { set; get; }
         public DateTime? RefDate { set; get; }
         public double AcceptQty { set; get; }

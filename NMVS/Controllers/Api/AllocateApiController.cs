@@ -113,7 +113,8 @@ namespace NMVS.Controllers.Api
                     //Get Item master
                     var pt = _context.ItemMasters.Find(t.id);
                     var fromLoc = _context.Locs.Find(pt.LocCode);
-
+                    var ic = _context.IncomingLists.Find(pt.IcId);
+                    string locCode = "";
 
                     //   2.Add holding to From-item
                     pt.PtHold += t.qty;
@@ -124,15 +125,19 @@ namespace NMVS.Controllers.Api
 
                     //   4. Add Outgo to From-Loc
                     //fromLoc.LocOutgo += t.qty;
+                    if (fromLoc == null)
+                    {
+                        locCode = "NA";
+                    }
 
 
                     _context.AllocateRequests.Add(new AllocateRequest()
                     {
                         PtId = pt.PtId,
-                        AlcFrom = pt.LocCode,
+                        AlcFrom = locCode,
                         LocCode = t.whcd,
                         AlcQty = t.qty,
-                        AlcFromDesc = fromLoc.LocDesc,
+                        AlcFromDesc = locCode == "NA" ? (string.IsNullOrEmpty(ic.Vehicle) ? "Delivery" : ic.Vehicle) : fromLoc.LocCode,
                         MovementTime = t.reqTime
                     });
 
@@ -287,8 +292,19 @@ namespace NMVS.Controllers.Api
                 //   outgo           -= OrderQty
                 //   remain capacity += OrderQty
                 var fromLoc = await _context.Locs.FindAsync(order.AlcOrdFrom);
-                //fromLoc.LocOutgo -= alo.MovedQty;
-                fromLoc.LocRemain += alo.MovedQty;
+                string sLoc = "";
+                if (fromLoc == null)
+                {
+                    sLoc = _context.IncomingLists.Find(pt.IcId).Vehicle;
+                    pt.Accepted += alo.MovedQty;
+                }
+                else
+                {
+                    fromLoc.LocRemain += alo.MovedQty;
+                    sLoc = fromLoc.LocCode;
+                    _context.Update(fromLoc);
+                }
+
 
                 var toPt = _context.ItemMasters.FirstOrDefault(x => x.LocCode == order.LocCode
                     && x.PtDateIn == pt.PtDateIn
@@ -302,7 +318,7 @@ namespace NMVS.Controllers.Api
                     _context.Update(toPt);
                     _context.Add(new InventoryTransac
                     {
-                        From = fromLoc.LocCode,
+                        From = sLoc,
                         To = toLoc.LocCode,
                         LastId = pt.PtId,
                         NewId = toPt.PtId,
@@ -331,7 +347,11 @@ namespace NMVS.Controllers.Api
                         RecQty = pt.RecQty,
                         RefDate = pt.RefDate,
                         RefNo = pt.RefNo,
-                        ParentId = pt.PtId
+                        ParentId = pt.PtId,
+                        Passed = true,
+                        IsRecycled = pt.IsRecycled,
+                        RecycleDate = pt.RecycleDate,
+                        UnqualifiedId = pt.UnqualifiedId
                     };
                     //4. add new item master
                     _context.ItemMasters.Add(newPt);
@@ -339,7 +359,7 @@ namespace NMVS.Controllers.Api
 
                     _context.Add(new InventoryTransac
                     {
-                        From = fromLoc.LocCode,
+                        From = sLoc,
                         To = toLoc.LocCode,
                         LastId = pt.PtId,
                         NewId = newPt.PtId,
@@ -350,13 +370,11 @@ namespace NMVS.Controllers.Api
                     });
                 }
 
-
                 //5. update from-item master
                 pt.PtHold -= alo.MovedQty;
                 pt.PtQty -= alo.MovedQty;
-                
+
                 _context.Update(pt);
-                _context.Update(fromLoc);
                 _context.Update(toLoc);
                 _context.Update(order);
                 await _context.SaveChangesAsync();
@@ -408,35 +426,36 @@ namespace NMVS.Controllers.Api
                         if (report.Retrn)
                         {
                             //increase remain of loc
-                            loc.LocRemain += report.Qty;
+                            if (loc != null)
+                            {
+                                loc.LocRemain += report.Qty;
+                                var unqualified = new Unqualified
+                                {
+                                    Description = report.Note,
+                                    ItemNo = pt.ItemNo,
+                                    Note = "",
+                                    PtId = pt.PtId,
+                                    Quantity = report.Qty
+                                };
 
+                                // add new broken
+                                _context.Unqualifieds.Add(unqualified);
+                                await _context.SaveChangesAsync();
+                                _context.Add(new InventoryTransac
+                                {
+                                    From = pt.LocCode,
+                                    To = "Unqualified",
+                                    LastId = pt.PtId,
+                                    NewId = unqualified.UqId,
+                                    OrderNo = order.AlcOrdId,
+                                    IsAllocate = true,
+                                    MovementTime = DateTime.Now,
+                                    IsDisposed = true
+                                });
+                            }
                             // decrease qty
                             pt.PtQty -= report.Qty;
 
-
-                            var unqualified = new Unqualified
-                            {
-                                Description = report.Note,
-                                ItemNo = pt.ItemNo,
-                                Note = "",
-                                PtId = pt.PtId,
-                                Quantity = report.Qty
-                            };
-
-                            // add new broken
-                            _context.Unqualifieds.Add(unqualified);
-                            await _context.SaveChangesAsync();
-                            _context.Add(new InventoryTransac
-                            {
-                                From = pt.LocCode,
-                                To = "Unqualified",
-                                LastId = pt.PtId,
-                                NewId = unqualified.UqId,
-                                OrderNo = order.AlcOrdId,
-                                IsAllocate = true,
-                                MovementTime = DateTime.Now,
-                                IsDisposed = true
-                            });
                         }
 
                         if (order.AlcOrdQty <= (order.MovedQty + order.Reported))

@@ -1,6 +1,4 @@
-﻿
-
-<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
+﻿<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
 <script src="~/assets/js/bootbox/bootbox.min.js"></script>
 <script src="~/assets/js/notify.js"></script>
 <script src="~/assets/datatable/datatables.min.js"></script>
@@ -8,81 +6,103 @@
     function checkItem(ptId, qty) {
 
         bootbox.confirm({
-            message: 'Please enter the number of <span class="text-danger text-bold">Rejected</span> items.'
-                + ' Leave blank or Zero to accept all </br> <input type="number" value="0" min="0" max="' + qty + '" class="bootbox-input form-control" step="0.01" id="acc-qty" />'
-                + '</br> <textarea aria-multiline="true"  rows="5" placeholder="Add some note for rejected item. (leave blank if no item rejected)" class="form-control" id="report-input" ></textarea>'
-            ,
+            message: '<b>Please confirm the quality of selected item</b>',
             closeButton: false,
+            buttons: {
+                cancel: {
+                    label: '<i class="fa fa-times"></i> Failed',
+                    className: 'btn-danger'
+                },
+                confirm: {
+                    label: '<i class="fa fa-check"></i> Passed',
+                    className: 'btn-success'
+                }
+            },
             callback: function (result) {
+                var pt = {
+                    Id: ptId,
+                    Desc: '',
+                    Code: ''
+                };
+
                 if (result) {
-                    var inputQty = $('#acc-qty').val();
-                    var inputReport = $('#report-input').val().trim();
-                    if (inputQty < 0) {
-                        $.notify("Invalid input, please input value >= 0", { position: "right middle" });
-                    }
-                    else if (inputQty > qty) {
-                        $.notify("Invalid input, please input value <= received quantity",{ position: "right middle" });
-                    }
-                    else if (inputQty > 0 && inputReport == "") {
-                        $.notify("Please describe the reason.", { position: "right middle" });
-                    }
-                    else {
 
-                        var accept = qty - inputQty;
-                        bootbox.confirm({
-                            message: '<h5 > Are your sure to <b class="text-danger">reject ' + inputQty + ' item(s)</b> and <b class="text-danger">accept ' + accept + ' item(s)</b>?</h5>',
-                            closeButton: false,
-                            buttons: {
-                                confirm: {
-                                    label: 'Yes',
-                                    className: 'btn-success'
-                                },
-                                cancel: {
-                                    label: 'No',
-                                    className: 'btn-danger'
-                                }
-                            },
-                            callback: function (cf) {
-                                if (cf) {
+                    pt.Code = 'ok';
+                    $.ajax(
+                        {
+                            url: apiUrl + "/api/IncomingList/QcItem",
+                            data: JSON.stringify(pt),
+                            contentType: 'application/json',
+                            type: "POST",
+                            success: function (common) {
 
-                                    var pt = {
-                                        PtId: ptId,
-                                        PtQty: inputQty,
-                                        PtCmt: inputReport
-                                    };
+                                if (common.status == 1) {
+                                    Swal.fire({
+                                        position: 'center',
+                                        icon: 'success',
+                                        title: 'Your work has been saved',
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    });
 
-                                    $.ajax(
-                                        {
-                                            url: routeURL + "/api/IncomingList/QcItem",
-                                            data: JSON.stringify(pt),
-                                            contentType: 'application/json',
-                                            type: "POST",
-                                            success: function (common) {
-
-                                                if (common.status == 1) {
-                                                    Swal.fire({
-                                                        position: 'center',
-                                                        icon: 'success',
-                                                        title: 'Your work has been saved',
-                                                        showConfirmButton: false,
-                                                        timer: 1500
-                                                    })
-
-                                                    $('#td-' + ptId).html('<span class="badge bg-success">Checked</span>');
-                                                    $('#qty-' + ptId).html(accept);
-                                                    $('#user-' + ptId).html(common.dataenum);
-                                                } else {
-                                                    $.notify(common.message, { position: "right middle" });
-                                                }
-                                            }
-
-                                        }
-                                    );
+                                    $('#td-' + ptId).html('<span class="badge bg-success">PASSED</span>');
+                                    
+                                    $('#user-' + ptId).html(common.dataenum);
+                                } else {
+                                    $.notify(common.message, { position: "right middle" });
                                 }
                             }
-                        });
-                    }
+
+                        }
+                    );
+
+                } else {
+                    bootbox.prompt({
+                        title: "Please leave some reasons for this items",
+                        inputType: 'textarea',
+                        required: true,
+                        centerVertical: true,
+                        callback: function (res) {
+                            if (res != null) {
+                                pt.Code = 'ng';
+                                pt.Desc = res;
+                                $.ajax(
+                                    {
+                                        url: apiUrl + "/api/IncomingList/QcItem",
+                                        data: JSON.stringify(pt),
+                                        contentType: 'application/json',
+                                        type: "POST",
+                                        success: function (common) {
+
+                                            if (common.status == 1) {
+                                                Swal.fire({
+                                                    position: 'center',
+                                                    icon: 'success',
+                                                    title: 'Your work has been saved',
+                                                    showConfirmButton: false,
+                                                    timer: 1500
+                                                });
+
+                                                $('#td-' + ptId).html('<span class="badge bg-danger">FAILED</span>');
+                                                $('#note-' + ptId).html('<span class="text-danger">'+res+'</span>');
+                                                $('#user-' + ptId).html(common.dataenum);
+                                            } else {
+                                                $.notify(common.message, { position: "right middle" });
+                                            }
+                                        }
+
+                                    }
+                                );
+                            }
+                        }
+                    });
+
+
                 }
+
+
+
+
             }
         });
 
@@ -90,13 +110,12 @@
 
 
     };
-    var routeURL = location.protocol + "//" + location.host;
     $(document).ready(function () {
         $('.nav-qc').addClass('active');
 
         $('#datatable-search').DataTable();
 
-        function checkItem (e) {
+        function checkItem(e) {
             var icId = e;
             var pt = {
                 IcId: icId
@@ -118,7 +137,7 @@
                     if (result) {
                         $.ajax(
                             {
-                                url: routeURL + "/api/IncomingList/CloseList",
+                                url: apiUrl + "/api/IncomingList/CloseList",
                                 data: JSON.stringify(pt),
                                 contentType: 'application/json',
                                 type: "POST",
@@ -153,17 +172,17 @@
             var itemNote = $('#item-note').val();
             var icId = parseInt(@Html.Raw(Model.Icm.IcId));
             var pt = {
-                ItemNo : itemCode,
-                RecQty : qty,
-                RefNo : itemRef,
-                RefDate : refDate,
+                ItemNo: itemCode,
+                RecQty: qty,
+                RefNo: itemRef,
+                RefDate: refDate,
                 IcId: icId,
                 PtCmt: itemNote
 
             }
             $.ajax(
                 {
-                    url: routeURL + "/api/IncomingList/AddItem",
+                    url: apiUrl + "/api/IncomingList/AddItem",
                     data: JSON.stringify(pt),
                     contentType: 'application/json',
                     type: "POST",

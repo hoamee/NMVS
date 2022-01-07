@@ -58,7 +58,10 @@ namespace NMVS.Controllers.Api
                         RecQty = iItem.RecQty,
                         RefNo = iItem.RefNo,
                         RefDate = iItem.RefDate == null ? null : iItem.RefDate,
-                        PtCmt = iItem.PtCmt
+                        PtCmt = iItem.PtCmt,
+                        PtQty = iItem.RecQty,
+                        PtDateIn = ic.DeliveryDate,
+                        SupCode = ic.SupCode
                     };
 
                     _context.Add(newPt);
@@ -213,50 +216,46 @@ namespace NMVS.Controllers.Api
 
         [HttpPost]
         [Route("QcItem")]
-        public IActionResult QcItem(ItemMaster item)
+        public IActionResult QcItem(TypeVm item)
         {
             var role = _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
 
-            var receiveLoc = _context.Locs.FirstOrDefault(l => l.LocType == "LocReceive");
             CommonResponse<string> common = new();
             if (role)
             {
-                if (receiveLoc != null)
+                try
                 {
-                    try
+                    var pt = _context.ItemMasters.Find(item.Id);
+                    var ic = _context.IncomingLists.Find(pt.IcId);
+
+                    pt.Qc = _httpContextAccessor.HttpContext.User.Identity.Name;
+
+                    if (item.Code == "ng")
+                    {
+                        pt.PtCmt += string.IsNullOrEmpty(pt.PtCmt) ? item.Desc : " | " + item.Desc;
+                        pt.Passed = false;
+                    }
+                    else if (item.Code == "ok")
                     {
 
-                        var pt = _context.ItemMasters.Find(item.PtId);
-                        pt.Accepted = pt.RecQty - item.PtQty;
-                        pt.PtQty = pt.RecQty - item.PtQty;
-                        pt.Qc = _httpContextAccessor.HttpContext.User.Identity.Name;
-                        pt.LocCode = receiveLoc.LocCode;
-                        if (item.PtQty > 0)
-                        {
-                            pt.PtCmt += string.IsNullOrEmpty(pt.PtCmt) ? item.PtCmt : " | " + item.PtCmt;
-                        }
-                        var ic = _context.IncomingLists.Find(pt.IcId);
-                        ic.Checked++;
-                        receiveLoc.LocRemain -= pt.PtQty;
+                        pt.PtQty = pt.RecQty;
+                        pt.Passed = true;
+                    }
 
-                        _context.Update(pt);
-                        _context.Update(ic);
-                        _context.Update(receiveLoc);
-                        _context.SaveChanges();
-                        common.status = 1;
-                        common.dataenum = _httpContextAccessor.HttpContext.User.Identity.Name;
-                    }
-                    catch (Exception e)
-                    {
-                        common.status = -1;
-                        common.message = e.ToString();
-                    }
+                    ic.Checked++;
+
+                    _context.Update(pt);
+                    _context.Update(ic);
+                    _context.SaveChanges();
+                    common.status = 1;
+                    common.dataenum = _httpContextAccessor.HttpContext.User.Identity.Name;
                 }
-                else
+                catch (Exception e)
                 {
                     common.status = -1;
-                    common.message = "No receving location found, please create one first";
+                    common.message = e.ToString();
                 }
+
             }
             else
             {

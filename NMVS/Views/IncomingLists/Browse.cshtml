@@ -89,7 +89,10 @@
                                     <td>
                                         @if (item.Closed)
                                         {
-                                            <span class="badge bg-warning">QC @Html.DisplayFor(modelItem => item.Checked)/ @Html.DisplayFor(modelItem => item.ItemCount)</span>
+                                            var bg = "warning";
+                                            if(item.Checked >= item.ItemCount)
+                                                bg = "secondary";
+                                            <span class="badge bg-@bg">QC @Html.DisplayFor(modelItem => item.Checked)/ @Html.DisplayFor(modelItem => item.ItemCount)</span>
                                         }
                                         else
                                         {

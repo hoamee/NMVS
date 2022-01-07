@@ -438,6 +438,9 @@ namespace NMVS.Migrations
                     b.Property<bool>("Closed")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("ConfirmReceived")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("DeliveryDate")
                         .HasColumnType("datetime2");
 
@@ -709,6 +712,9 @@ namespace NMVS.Migrations
 
                     b.Property<int>("ParentId")
                         .HasColumnType("int");
+
+                    b.Property<bool?>("Passed")
+                        .HasColumnType("bit");
 
                     b.Property<string>("PtCmt")
                         .HasColumnType("nvarchar(max)");

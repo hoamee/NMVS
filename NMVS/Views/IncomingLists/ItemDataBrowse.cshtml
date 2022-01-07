@@ -40,8 +40,8 @@
             'method': "GET",
             'contentType': 'application/json'
         }).done(function (data) {
-            $(data).each(function(index, elem){
-                $('#item-tb tbody').append(`<tr> <td><div class="btn btn-outline-primary" onclick="setItemNo('`+elem.itemNo+`')">`+elem.itemNo+`</div></td> <td>`+elem.itemName+`</td> </tr>`);
+            $(data).each(function (index, elem) {
+                $('#item-tb tbody').append(`<tr> <td><div class="btn btn-outline-primary" onclick="setItemNo('` + elem.itemNo + `')">` + elem.itemNo + `</div></td> <td>` + elem.itemName + `</td> </tr>`);
 
             });
 
@@ -50,8 +50,13 @@
     });
 
     function setItemNo(e) {
-        $('#item-code').val(e);
+        if ($('#update-item-modal').is(':visible')) {
+            $('#u-item-code').val(e);
+        }
+        if ($('#item-modal').is(':visible')) {
+
+            $('#item-code').val(e);
+        }
         $('#item-browse-modal').modal('toggle');
-        $('#item-modal').modal('toggle');
     }
 </script>

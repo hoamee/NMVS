@@ -69,12 +69,14 @@ namespace NMVS.Models.DbModels
 
         public bool? IsRecycled { set; get; }
 
+        public bool? Passed { set; get; }
+
         public DateTime? RecycleDate { set; get; }
 
         public int? UnqualifiedId { set; get; }
 
         public int ParentId { set; get; }
-        
+
         public string MovementNote { set; get; }
     }
 }

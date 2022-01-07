@@ -76,7 +76,7 @@ namespace NMVS.Services
 
         public List<AllocateOrderVm> GetAllocateOrders()
         {
-            var model = (from or in _db.AllocateOrders
+            var model = (from or in _db.AllocateOrders.Where(x=>x.Confirm != true)
                          join loc in _db.Locs on or.LocCode equals loc.LocCode
                          join pt in _db.ItemMasters on or.PtId equals pt.PtId
                          join dt in _db.ItemDatas on pt.ItemNo equals dt.ItemNo
@@ -165,14 +165,15 @@ namespace NMVS.Services
         public List<AllocateRequestVm> GetRequestList()
         {
             var model = (from al in _db.AllocateRequests
-                         join loc in _db.Locs on al.LocCode equals loc.LocCode
-                         join loc2 in _db.Locs on al.AlcFrom equals loc2.LocCode
+                         join loc in _db.Locs on al.LocCode equals loc.LocCode 
+                         join loc2 in _db.Locs on al.AlcFrom equals loc2.LocCode into tempLoc
+                         from t in tempLoc.DefaultIfEmpty()
                          join pt in _db.ItemMasters on al.PtId equals pt.PtId
                          join dt in _db.ItemDatas on pt.ItemNo equals dt.ItemNo
                          orderby al.IsClosed descending
                          select new AllocateRequestVm
                          {
-                             AlcFrom = loc2.LocCode + "(" + al.AlcFrom + ")",
+                             AlcFrom =  (al.AlcFrom == "NA" ? al.AlcFromDesc : t.LocDesc ),
                              AlcId = al.AlcId,
                              AlcQty = al.AlcQty,
                              AlcTo = loc.LocDesc,
@@ -189,12 +190,11 @@ namespace NMVS.Services
 
         public List<ItemMasterVm> GetUnAllocated()
         {
-            var rcvLoc = _db.Locs.Where(x => x.LocType == "LocReceive").Select(x=>x.LocCode).ToList();
-            var ls = (from item in _db.ItemMasters.Where(x => rcvLoc.Contains(x.LocCode) && x.PtQty > 0)
+            var ls = (from item in _db.ItemMasters.Where(x => x.Passed == true && string.IsNullOrEmpty(x.LocCode) && x.PtQty > 0)
                       join dt in _db.ItemDatas on item.ItemNo equals dt.ItemNo into itemData
 
                       from i in itemData.DefaultIfEmpty()
-                      join loc in _db.Locs on item.LocCode equals loc.LocCode into fullData
+                      join loc in _db.IncomingLists on item.IcId equals loc.IcId into fullData
 
                       from f in fullData.DefaultIfEmpty()
                       join sup in _db.Suppliers on item.SupCode equals sup.SupCode into suppliers
@@ -205,7 +205,7 @@ namespace NMVS.Services
                       {
                           Booked = item.PtHold,
                           DateIn = item.PtDateIn,
-                          Loc = f.LocDesc + " (" + f.LocCode + ")",
+                          Loc = f.Vehicle,
                           Name = i.ItemName,
                           No = i.ItemNo,
                           Ptid = item.PtId,
