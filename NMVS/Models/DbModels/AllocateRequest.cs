@@ -43,5 +43,6 @@ namespace NMVS.Models.DbModels
         public DateTime MovementTime { set; get; }
         [Display(Name = "Completed time")]
         public DateTime? CompletedTime { set; get; }
+        public string Site { set; get; }
     }
 }

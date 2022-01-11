@@ -41,6 +41,8 @@ namespace NMVS.Models.DbModels
         public string ReportedNote { set; get; }
 
         public bool Closed { set; get; }
+
+        public string Site { set; get; }
     }
 
     public class RequestDet
@@ -94,5 +96,9 @@ namespace NMVS.Models.DbModels
         public string RqID { get; set; }
 
         public int? SodId { set; get; }
+
+        public string Site { set; get; }
+
+        
     }
 }

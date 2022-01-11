@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NMVS.Models;
@@ -78,7 +79,8 @@ namespace NMVS.Controllers
         // GET: WorkOrders1/Create
         public IActionResult CreateWo()
         {
-            ViewBag.PrLnId = _db.ProdLines;
+            var workSpace = HttpContext.Session.GetString("susersite");
+            ViewBag.PrLnId = _db.ProdLines.Where(x => x.SiCode == workSpace && x.Active == true);
             return View();
         }
 
@@ -89,6 +91,7 @@ namespace NMVS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateWo([Bind("WoNbr,ItemNo,QtyOrd,QtyCom,SoNbr,OrdBy,OrdDate,ExpDate,PrLnId")] WorkOrder workOrder)
         {
+            var workSpace = HttpContext.Session.GetString("susersite");
             if (ModelState.IsValid)
             {
                 if (workOrder.ExpDate < DateTime.Now.Date)
@@ -97,8 +100,10 @@ namespace NMVS.Controllers
                 }
                 else
                 {
+
                     workOrder.OrdDate = DateTime.Now;
                     workOrder.OrdBy = User.Identity.Name;
+                    workOrder.Site = workSpace;
                     _db.WorkOrders.Add(workOrder);
                     try
                     {
@@ -111,7 +116,7 @@ namespace NMVS.Controllers
                     }
                 }
             }
-            ViewBag.PrLnId = _db.ProdLines;
+            ViewBag.PrLnId = _db.ProdLines.Where(x => x.SiCode == workSpace && x.Active == true);
             return View(workOrder);
         }
 
@@ -127,7 +132,8 @@ namespace NMVS.Controllers
             {
                 return NotFound();
             }
-            ViewBag.PrLnId = _db.ProdLines;
+            var workSpace = HttpContext.Session.GetString("susersite");
+            ViewBag.PrLnId = _db.ProdLines.Where(x => x.SiCode == workSpace && x.Active == true);
             return View(workOrder);
         }
 
@@ -138,15 +144,18 @@ namespace NMVS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditWo([Bind("WoNbr,ItemNo,QtyOrd,QtyCom,SoNbr,OrdBy,OrdDate,ExpDate,PrLnId")] WorkOrder workOrder)
         {
+
+            var workSpace = HttpContext.Session.GetString("susersite");
             if (ModelState.IsValid)
             {
                 workOrder.OrdBy = User.Identity.Name;
                 workOrder.OrdDate = DateTime.Now.Date;
+                workOrder.Site = workSpace;
                 _db.Entry(workOrder).State = EntityState.Modified;
                 await _db.SaveChangesAsync();
                 return RedirectToAction("WoBrowse");
             }
-            ViewBag.PrLnId = _db.ProdLines;
+            ViewBag.PrLnId = _db.ProdLines.Where(x => x.SiCode == workSpace && x.Active == true);
             return View(workOrder);
         }
 
@@ -163,14 +172,15 @@ namespace NMVS.Controllers
 
         private List<WoVm> GetListWo(bool? close)
         {
+            var workSpace = HttpContext.Session.GetString("susersite");
             List<WorkOrder> ls;
             if (close == true)
             {
-                ls = _db.WorkOrders.Where(x => x.Closed != true).OrderByDescending(x => x.OrdDate).ToList();
+                ls = _db.WorkOrders.Where(x => x.Closed != true && x.Site == workSpace).OrderByDescending(x => x.OrdDate).ToList();
             }
             else
             {
-                ls = _db.WorkOrders.OrderByDescending(x => x.OrdDate).ToList();
+                ls = _db.WorkOrders.Where(w => w.Site == workSpace).OrderByDescending(x => x.OrdDate).ToList();
             }
 
             var model = (from wo in ls

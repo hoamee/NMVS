@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace NMVS.Models.ViewModels
 {
-    public class Notifiaction
+    public class Notification
     {
         public string notificationType { set; get; }
         public string message { set; get; }

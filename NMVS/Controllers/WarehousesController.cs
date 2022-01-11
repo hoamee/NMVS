@@ -25,7 +25,21 @@ namespace NMVS.Controllers
         // GET: Warehouses
         public async Task<IActionResult> Browse()
         {
-            return View(await _context.Warehouses.ToListAsync());
+            var model = (from wh in await _context.Warehouses.ToListAsync()
+                         join tp in _context.GeneralizedCodes on wh.Type equals tp.CodeValue into tps
+                         from gen in tps.DefaultIfEmpty()
+                         join si in _context.Sites on wh.SiCode equals si.SiCode into sis
+                         from site in sis.DefaultIfEmpty()
+                         select new Warehouse
+                         {
+                             WhCode = wh.WhCode,
+                             WhDesc = wh.WhDesc,
+                             WhStatus = wh.WhStatus,
+                             WhCmmt = wh.WhCmmt,
+                             SiCode = site.SiName,
+                             Type = gen.CodeDesc
+                         }).ToList();
+            return View(model);
         }
 
         // GET: Warehouses/Details/5

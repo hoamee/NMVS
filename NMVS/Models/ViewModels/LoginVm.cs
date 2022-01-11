@@ -18,5 +18,8 @@ namespace NMVS.Models.ViewModels
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { set; get; }
+
+        [Display(Name = "Work space")]
+        public string Site { set; get; }
     }
 }

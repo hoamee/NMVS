@@ -62,6 +62,8 @@ namespace NMVS.Models.DbModels
         public bool IssueConfirmed { set; get; }
 
         public DateTime? IssueConfirmedTime { set; get; }
+
+        public string Site { set; get; }
     }
 
     public class ShipperDet

@@ -21,11 +21,11 @@ namespace NMVS.Services
             _db = db;
         }
 
-        public List<IncomingListVm> BrowseIncomingList(bool closed)
+        public List<IncomingListVm> BrowseIncomingList(bool closed, string wp)
         {
             if (closed)
             {
-                var model = (from ic in _db.IncomingLists.Where(x => x.Closed == closed)
+                var model = (from ic in _db.IncomingLists.Where(x => x.Closed == closed && x.Site == wp)
                              join sp in _db.Suppliers
                              on ic.SupCode equals sp.SupCode into all
                              from a in all.DefaultIfEmpty()
@@ -50,7 +50,7 @@ namespace NMVS.Services
             }
             else
             {
-                var model = (from ic in _db.IncomingLists
+                var model = (from ic in _db.IncomingLists.Where(x=> x.Site == wp)
                              join sp in _db.Suppliers
                              on ic.SupCode equals sp.SupCode into all
                              from a in all.DefaultIfEmpty()
@@ -140,7 +140,7 @@ namespace NMVS.Services
 
         }
 
-        public async Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user)
+        public async Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user, string wp)
         {
             CommonResponse<UploadReport> common = new();
             common.dataenum = new()
@@ -270,7 +270,8 @@ namespace NMVS.Services
                         LastModifiedBy = user,
                         Po = po,
                         Vehicle = vehicle,
-                        PoDate = poDate
+                        PoDate = poDate,
+                        Site = wp
 
                     };
                     await _db.AddAsync(incomingList);
@@ -336,7 +337,8 @@ namespace NMVS.Services
                                         RecQty = qty,
                                         RefDate = refDate,
                                         SupCode = supCode,
-                                        RefNo = supRef
+                                        RefNo = supRef,
+                                        Site = wp
 
                                     };
                                     incomingList.ItemCount++;
@@ -396,7 +398,7 @@ namespace NMVS.Services
             return common;
         }
 
-        public async Task<CommonResponse<UploadReport>> ImportWarranty(string filepath, string fileName, string user)
+        public async Task<CommonResponse<UploadReport>> ImportWarranty(string filepath, string fileName, string user, string wp)
         {
             CommonResponse<UploadReport> common = new();
             common.dataenum = new()
@@ -526,7 +528,8 @@ namespace NMVS.Services
                         LastModifiedBy = user,
                         Po = po,
                         Vehicle = vehicle,
-                        PoDate = poDate
+                        PoDate = poDate,
+                        Site = wp
 
                     };
                     await _db.AddAsync(incomingList);
@@ -591,7 +594,8 @@ namespace NMVS.Services
                                         RecQty = qty,
                                         RefDate = refDate,
                                         SupCode = supCode,
-                                        RefNo = supRef
+                                        RefNo = supRef,
+                                        Site = wp
 
                                     };
                                     incomingList.ItemCount++;

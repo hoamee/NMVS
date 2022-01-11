@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NMVS.Models;
 
 namespace NMVS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220110091638_AddSiteAttriBute")]
+    partial class AddSiteAttriBute
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -195,9 +197,6 @@ namespace NMVS.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("WorkSpace")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -536,9 +535,6 @@ namespace NMVS.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("RqType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Site")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("SoConfirm")

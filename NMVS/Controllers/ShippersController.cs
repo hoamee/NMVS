@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -27,9 +28,11 @@ namespace NMVS.Controllers
         // GET: Shippers
         public async Task<IActionResult> Browse()
         {
+
             if (User.IsInRole("Register vehicle") || User.IsInRole("Guard"))
             {
-                var model = await _context.Shippers.ToListAsync();
+                var workSpace = HttpContext.Session.GetString("susersite");
+                var model = await _context.Shippers.Where(x=>x.Site == workSpace).ToListAsync();
                 foreach (var item in model)
                 {
                     item.IssueConfirmed = _context.ShipperDets.Where(x => x.ShpId == item.ShpId).Any();
@@ -88,6 +91,8 @@ namespace NMVS.Controllers
                 {
                     try
                     {
+                        var workSpace = HttpContext.Session.GetString("susersite");
+                        shipper.Site = workSpace;
                         _context.Add(shipper);
                         _context.SaveChanges();
                         return RedirectToAction(nameof(Browse));
@@ -150,6 +155,8 @@ namespace NMVS.Controllers
                 {
                     try
                     {
+                        var workSpace = HttpContext.Session.GetString("susersite");
+                        shipper.Site = workSpace;
                         _context.Update(shipper);
                         await _context.SaveChangesAsync();
                     }

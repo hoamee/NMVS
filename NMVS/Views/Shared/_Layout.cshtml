@@ -1,6 +1,6 @@
-﻿
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -27,6 +27,7 @@
 
     <link href="~/assets/datatable/datatables.min.css" rel="stylesheet" />
 </head>
+
 <body class="g-sidenav-show  bg-gray-100">
 
 
@@ -83,13 +84,14 @@
                                     </a>
                                 </li>`)
         }
-        
+
         $(document).ready(function () {
 
             $.ajax({
-                url: '/api/Notifications/GetNotification',
+                url: '/api/Shared/GetNotification',
                 method: 'GET',
                 success: function (common) {
+                    $('#wo-sp').html(common.message);
                     if (common.dataenum.length === 0) {
                         $('#notification-ul').html(`<span class="font-weight-bold">No new notification, you are doing well</span>`);
                     }
@@ -103,6 +105,7 @@
                                 $('#notification-ul').append('<hr/>');
                             }
                             setNotification(item.notificationType, item.message, item.href)
+
                         });
 
                     }

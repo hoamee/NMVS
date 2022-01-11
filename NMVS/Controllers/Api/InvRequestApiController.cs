@@ -33,6 +33,7 @@ namespace NMVS.Controllers.Api
         public async Task<IActionResult> PushPickListSo(List<JsPickingData> js)
         {
             var message = "";
+            var workSpace = HttpContext.Session.GetString("susersite");
             //Test response
             //string s = jsArr[1].id + ", " + jsArr[1].whcd + ", " + jsArr[1].qty;
             //return Json(id);
@@ -69,7 +70,8 @@ namespace NMVS.Controllers.Api
                         DetId = request.DetId,
                         RqID = request.RqID,
                         PtId = pt.PtId,
-                        MovementTime = jsArr.reqTime
+                        MovementTime = jsArr.reqTime,
+                        Site = workSpace
                     });
 
                     _context.Update(request);
@@ -363,6 +365,7 @@ namespace NMVS.Controllers.Api
                         order.Note += report.Note;
                         // 2. add note
                         rqDet.MovementNote += " **" + report.Note;
+                        rqDet.Picked -= report.Qty;
 
                         // decrease item master hold qty
                         var pt = await _context.ItemMasters.FindAsync(order.PtId);
@@ -372,6 +375,7 @@ namespace NMVS.Controllers.Api
                         // decrease loc hold
                         var fromLoc = await _context.Locs.FindAsync(pt.LocCode);
                         //fromLoc.LocOutgo -= report.Qty;
+
 
 
                         if (request.RqType == "MFG")
@@ -704,5 +708,7 @@ namespace NMVS.Controllers.Api
                 return Ok(common);
             }
         }
+
+
     }
 }

@@ -305,9 +305,9 @@ namespace NMVS.Services
             return commonResponse;
         }
 
-        public List<ItemAvailVm> GetItemAvails(string id)
+        public List<ItemAvailVm> GetItemAvails(string id, string wp)
         {
-            var s = (from i in _db.ItemMasters.Where(x => x.ItemNo == id)
+            var s = (from i in _db.ItemMasters.Where(x => x.ItemNo == id && x.Site == wp)
                      join d in _db.ItemDatas on i.ItemNo equals d.ItemNo
                      select new ItemAvailVm
                      {
@@ -323,18 +323,17 @@ namespace NMVS.Services
         public List<ItemMasterVm> GetItemMasterVms(RequestDet rq)
         {
 
-            var ptMstr = _db.ItemMasters.Where(i => i.PtQty > 0 && i.ItemNo == rq.ItemNo && i.Passed == true).ToList();
+            var ptMstr = _db.ItemMasters.Where(i => i.PtQty > 0 && i.ItemNo == rq.ItemNo && i.Passed == true && !string.IsNullOrEmpty(i.LocCode)).ToList();
             var itemVm = (from pt in ptMstr
                           join dt in _db.ItemDatas.ToList() on pt.ItemNo equals dt.ItemNo into ptdt
                           from pd in ptdt.DefaultIfEmpty()
-
                           join loc in _db.Locs.ToList() on pt.LocCode equals loc.LocCode into ptloc
                           from ptl in ptloc.DefaultIfEmpty()
                           select new ItemMasterVm
                           {
                               Booked = pt.PtHold,
                               DateIn = pt.PtDateIn,
-                              Loc = ptl.LocDesc,
+                              Loc = string.IsNullOrEmpty(ptl.LocDesc) ? "" : ptl.LocDesc,
                               Lot = pt.PtLotNo,
                               Name = pd.ItemName,
                               No = pd.ItemNo,
@@ -344,8 +343,6 @@ namespace NMVS.Services
                               Qty = pt.PtQty,
                               Sup = pt.SupCode
                           }).ToList();
-
-
             return itemVm;
         }
 
@@ -392,7 +389,7 @@ namespace NMVS.Services
 
         }
 
-        public List<InvRequestVm> GetRequestList()
+        public List<InvRequestVm> GetRequestList(string wp)
         {
             var model = (from i in _db.InvRequests
                          select new InvRequestVm
@@ -408,7 +405,8 @@ namespace NMVS.Services
                              closed = i.Closed
                          }).ToList();
 
-            foreach(var item in model){
+            foreach (var item in model)
+            {
                 item.closed = item.closed == false ? (Unfinished(item.Id) ? true : false) : true;
             }
             return model;
@@ -794,7 +792,7 @@ namespace NMVS.Services
         }
 
 
-        public async Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user)
+        public async Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user, string wp)
         {
             CommonResponse<UploadReport> common = new();
             common.dataenum = new()
@@ -906,7 +904,8 @@ namespace NMVS.Services
                         RqDate = DateTime.Now,
                         RqID = "MFG-" + batchRef,
                         RqType = "MFG",
-                        SoConfirm = false
+                        SoConfirm = false,
+                        Site = wp
                     };
                     await _db.AddAsync(rq);
                     await _db.SaveChangesAsync();
@@ -977,7 +976,7 @@ namespace NMVS.Services
                                 SpecDate = checkDate ? dateIn : null,
                                 RqID = rq.RqID,
                                 Shipped = null,
-                                RequireDate = requiredDate,
+                                RequireDate = requiredDate
                             };
                             _db.Add(rqDet);
                             common.dataenum.Inserted++;

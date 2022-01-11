@@ -55,5 +55,6 @@ namespace NMVS.Models.DbModels
         public DateTime? CompletedTime { get; set; }
 
         public string MovementNote { set; get; }
+        public string Site { set; get; }
     }
 }

@@ -9,11 +9,11 @@ namespace NMVS.Services
 {
     public interface IRequestService
     {
-        public List<InvRequestVm> GetRequestList();
+        public List<InvRequestVm> GetRequestList(string wp);
 
         public RequestDetailVm GetRequestDetail(string id);
 
-        public List<ItemAvailVm> GetItemAvails(string id);
+        public List<ItemAvailVm> GetItemAvails(string id, string wp);
 
         public List<ItemMasterVm> GetItemMasterVms(RequestDet rq);
 
@@ -22,7 +22,7 @@ namespace NMVS.Services
         
         public IssueNoteShipperVm GetVehicleNoteDetail(int id);
 
-        public Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user);
+        public Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user, string wp);
         public Task<CommonResponse<int>> CloseShipperNote(MfgIssueNote issueNote, string user);
 
         //public Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user);

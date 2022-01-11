@@ -78,5 +78,7 @@ namespace NMVS.Models.DbModels
         public int ParentId { set; get; }
 
         public string MovementNote { set; get; }
+
+        public string Site { set; get; }
     }
 }

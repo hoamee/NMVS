@@ -125,7 +125,7 @@
                 {
                     "data": "desc",
                     render: function (data, type, ve) {
-                        return '<span class="btn btn-outline-primary" onclick="showVeDetail(1)">' + ve.desc + '</span>';
+                        return '<span class="btn btn-outline-primary" onclick="showVeDetail('+ ve.id +')">' + ve.desc + '</span>';
                     }
                 },
                 {
@@ -200,7 +200,7 @@
                         return btn
                             + '<span class="exp-pt-id" hidden>' + order.inventoryId + '</span>'
                             + '<span class="exp-id" hidden>' + order.issueOrderId + '</span>'
-                            + '<span class="exp-to-ve" hidden>' + 1 + '</span>'
+                            + '<span class="exp-to-ve" hidden>' + id + '</span>'
                             + '<span class="exp-qty" hidden>' + order.quantity + '</span>'
                             + '<span class="exp-moved" hidden>' + order.moved + '</span>'
                             + '<span class="exp-to-loc" hidden>' + order.toCode + '</span>'

@@ -23,11 +23,6 @@
                                 <span asp-validation-for="ItemNo" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="SpecDate" class="control-label"></label>
-                                <input asp-for="SpecDate" class="form-control" readonly />
-                                <span asp-validation-for="SpecDate" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
                                 <label asp-for="Quantity" class="control-label"></label>
                                 <input asp-for="Quantity" class="form-control" />
                                 <span asp-validation-for="Quantity" class="text-danger"></span>
@@ -82,39 +77,10 @@
         $('.nav-request').addClass('active');
         $('.nav-rq-his').addClass('active');
         $('#navRequest').addClass('show');
-        $('#new-list').click(function () {
-            $('#file-modal').modal('toggle');
-        });
-        $('#item-tb').DataTable();
 
         $('#ItemNo').click(function () {
             $('#item-modal').modal('toggle');
         });
 
-        $('#SpecDate').click(function () {
-
-            var pt = $('#ItemNo').val();
-            var tb = $('#item-tb2 > tbody');
-            $.ajax({
-                url: "/InvRequests/GetItemMaster/?id=" + pt,
-                method: "GET",
-                success: function (res) {
-                    tb.empty()
-                    if (res.status == 1) {
-                        var i;
-                        for (i = 0; i < res.dataenum.length; ++i) {
-                            tb.append('<tr><td>' + res.dataenum[i].itemNo + '</td>' + '<td>' + res.dataenum[i].desc + '</td>' + '<td> <span class="btn btn-sm btn-outline-primary" onclick="setDate(\'' + res.dataenum[i].sDateIn + '\')">' + res.dataenum[i].sDateIn + '</span></td>' + '<td>' + res.dataenum[i].quantity + '</td></tr>')
-                        }
-                        $('#spec-modal').modal('toggle');
-                    }
-                    if (res.status == -1) {
-                        bootbox.alert({
-                            message: "No item found"
-                        });
-                    }
-                }
-            });
-
-        });
     });
 </script>

@@ -17,7 +17,7 @@ namespace NMVS.Services
             _db = db;
         }
 
-        public CommonResponse<int> ConfirmSelectLoc(List<JsPickingData> jsArr)
+        public CommonResponse<int> ConfirmSelectLoc(List<JsPickingData> jsArr, string wp)
         {
             CommonResponse<int> common = new();
 
@@ -54,7 +54,8 @@ namespace NMVS.Services
                         LocCode = arr.loc,
                         AlcQty = arr.qty,
                         AlcFromDesc = fromLoc.LocDesc,
-                        MovementTime = arr.reqTime
+                        MovementTime = arr.reqTime,
+                        Site = wp
                     });
                     _db.Update(fromLoc);
                     _db.Update(toLoc);
@@ -74,9 +75,9 @@ namespace NMVS.Services
             return common;
         }
 
-        public List<AllocateOrderVm> GetAllocateOrders()
+        public List<AllocateOrderVm> GetAllocateOrders(string wp)
         {
-            var model = (from or in _db.AllocateOrders.Where(x=>x.Confirm != true)
+            var model = (from or in _db.AllocateOrders.Where(x=>x.Confirm != true && x.Site == wp)
                          join loc in _db.Locs on or.LocCode equals loc.LocCode
                          join pt in _db.ItemMasters on or.PtId equals pt.PtId
                          join dt in _db.ItemDatas on pt.ItemNo equals dt.ItemNo
@@ -101,9 +102,9 @@ namespace NMVS.Services
             return model;
         }
 
-        public List<ItemMasterVm> GetAvailItem(string locCode)
+        public List<ItemMasterVm> GetAvailItem(string locCode, string wp)
         {
-            var ls = (from item in _db.ItemMasters.Where(x => !string.IsNullOrEmpty(x.LocCode) && x.LocCode != locCode)
+            var ls = (from item in _db.ItemMasters.Where(x => !string.IsNullOrEmpty(x.LocCode) && x.LocCode != locCode && x.Site == wp)
                       join dt in _db.ItemDatas on item.ItemNo equals dt.ItemNo into itemData
 
                       from i in itemData.DefaultIfEmpty()
@@ -162,9 +163,9 @@ namespace NMVS.Services
             return li;
         }
 
-        public List<AllocateRequestVm> GetRequestList()
+        public List<AllocateRequestVm> GetRequestList(string wp)
         {
-            var model = (from al in _db.AllocateRequests
+            var model = (from al in _db.AllocateRequests.Where(x=>x.Site == wp)
                          join loc in _db.Locs on al.LocCode equals loc.LocCode 
                          join loc2 in _db.Locs on al.AlcFrom equals loc2.LocCode into tempLoc
                          from t in tempLoc.DefaultIfEmpty()
@@ -188,9 +189,10 @@ namespace NMVS.Services
             return model;
         }
 
-        public List<ItemMasterVm> GetUnAllocated()
+        public List<ItemMasterVm> GetUnAllocated(string wp)
         {
-            var ls = (from item in _db.ItemMasters.Where(x => x.Passed == true && string.IsNullOrEmpty(x.LocCode) && x.PtQty > 0)
+            
+            var ls = (from item in _db.ItemMasters.Where(x => x.Passed == true && string.IsNullOrEmpty(x.LocCode) && x.PtQty > 0 && x.Site == wp)
                       join dt in _db.ItemDatas on item.ItemNo equals dt.ItemNo into itemData
 
                       from i in itemData.DefaultIfEmpty()

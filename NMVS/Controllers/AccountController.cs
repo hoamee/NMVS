@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using NMVS.Common;
 using NMVS.Models;
 using NMVS.Models.ViewModels;
 using NMVS.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace NMVS.Controllers
@@ -34,7 +31,7 @@ namespace NMVS.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpGet]        
+        [HttpGet]
         public IActionResult AccessDenied(string returnUrl = null)
         {
             return View("_Error403");
@@ -61,12 +58,12 @@ namespace NMVS.Controllers
                 {
                     var result = await _userManager.ChangePasswordAsync(user, passwordVm.Password, passwordVm.ConfirmPassword);
 
-                    
+
                     if (result.Succeeded)
                     {
                         ViewBag.Status = 1;
                     }
-                    else 
+                    else
                     {
                         ViewBag.Status = 0;
                         var mess = "";
@@ -90,7 +87,7 @@ namespace NMVS.Controllers
         public async Task<IActionResult> Login()
         {
             await _userData.InitRoleAsync();
-            if (_userManager.Users.FirstOrDefault(x=>x.UserName == "nmvadmin") == null)
+            if (_userManager.Users.FirstOrDefault(x => x.UserName == "nmvadmin") == null)
             {
                 var newUser = new ApplicationUser
                 {
@@ -118,7 +115,7 @@ namespace NMVS.Controllers
                     RegVehicle = true,
                     RequestInv = true,
                     UserManagement = true,
-                    WoCreation= true,
+                    WoCreation = true,
                     WoReporter = true,
                     UserName = "nmvadmin"
                 };
@@ -126,13 +123,21 @@ namespace NMVS.Controllers
                 await _userData.SeedingRole(usr);
             }
 
+            ViewBag.SiteList = (from site in _db.Sites
+                                where site.Active == true
+                                select new SiteVm
+                                {
+                                    SiCode = site.SiCode,
+                                    SiDesc = site.SiName
+                                }).ToList();
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginVm model)
         {
-            try {
+            try
+            {
                 if (ModelState.IsValid)
                 {
                     var user = await _userManager.FindByNameAsync(model.UserName);
@@ -144,7 +149,7 @@ namespace NMVS.Controllers
                     {
                         if (user.Active)
                         {
-                            
+
                             var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, false);
                             if (result.Succeeded)
                             {
@@ -158,11 +163,13 @@ namespace NMVS.Controllers
                                 //    }
                                 //}                                
                                 usr.ActiveHostName = HttpContext.Connection.RemoteIpAddress.ToString();
+                                usr.WorkSpace = model.Site;
                                 _db.Update(usr);
                                 HttpContext.Session.SetString("sUserName", user.UserName);
                                 HttpContext.Session.SetString("sUserHost", usr.ActiveHostName);
+                                HttpContext.Session.SetString("susersite", model.Site);
                                 await _db.SaveChangesAsync();
-                                
+
                                 return RedirectToAction("Index", "Home");
                             }
                             else if (result.IsLockedOut)
@@ -171,7 +178,7 @@ namespace NMVS.Controllers
                             }
                             else
                             {
-                                
+
                                 ModelState.AddModelError("", "Invalid login attempt.");
                                 return View(model);
                             }
@@ -184,10 +191,18 @@ namespace NMVS.Controllers
 
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 ModelState.AddModelError("", e.Message);
             }
+
+            ViewBag.SiteList = (from site in _db.Sites
+                                where site.Active == true
+                                select new SiteVm
+                                {
+                                    SiCode = site.SiCode,
+                                    SiDesc = site.SiName
+                                }).ToList();
             return View();
         }
 
@@ -248,7 +263,7 @@ namespace NMVS.Controllers
                         {
                             foreach (var error in result.Errors)
                             {
-                                ModelState.AddModelError("", error.Description.ToString()) ;
+                                ModelState.AddModelError("", error.Description.ToString());
                             }
                         }
                     }
@@ -258,7 +273,7 @@ namespace NMVS.Controllers
                     }
                 }
 
-                
+
 
             }
             return View();

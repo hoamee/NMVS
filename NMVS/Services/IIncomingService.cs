@@ -10,14 +10,14 @@ namespace NMVS.Services
 {
     public interface IIncomingService
     {
-        public List<IncomingListVm> BrowseIncomingList(bool closed);
+        public List<IncomingListVm> BrowseIncomingList(bool closed, string wp);
 
         public IcmListVm GetListDetail(int? id);
 
         public List<TypeVm> GetSupplier();
 
-        public Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user);
+        public Task<CommonResponse<UploadReport>> ImportList(string filepath, string fileName, string user, string wp);
 
-        public Task<CommonResponse<UploadReport>> ImportWarranty(string filepath, string fileName, string user);
+        public Task<CommonResponse<UploadReport>> ImportWarranty(string filepath, string fileName, string user, string wp);
     }
 }

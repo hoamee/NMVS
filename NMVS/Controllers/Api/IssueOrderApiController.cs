@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NMVS.Models;
@@ -15,6 +16,7 @@ namespace NMVS.Controllers.Api
     public class IssueOrderApiController : Controller
     {
         private readonly ApplicationDbContext _db;
+        
         public IssueOrderApiController(ApplicationDbContext db)
         {
             _db = db;
@@ -24,7 +26,8 @@ namespace NMVS.Controllers.Api
         [Route("GetMfgOrders")]
         public IActionResult GetMfgOrders()
         {
-            var model = (from o in _db.IssueOrders.Where(x => x.IssueType == "MFG" && x.Confirm != true)
+            var workSpace = HttpContext.Session.GetString("susersite");
+            var model = (from o in _db.IssueOrders.Where(x => x.IssueType == "MFG" && x.Confirm != true && x.Site == workSpace)
                          join loc in _db.Locs on o.LocCode equals loc.LocCode into oloc
                          from ol in oloc.DefaultIfEmpty()
                          join i in _db.ItemDatas on o.ItemNo equals i.ItemNo into it
@@ -58,7 +61,8 @@ namespace NMVS.Controllers.Api
         [Route("GetListVehicle")]
         public IActionResult GetListVehicle()
         {
-            var isd = _db.IssueOrders.Where(x => x.ToVehicle != null).ToList();
+            var workSpace = HttpContext.Session.GetString("susersite");
+            var isd = _db.IssueOrders.Where(x => x.ToVehicle != null && x.Site == workSpace).ToList();
 
             var model = (from ve in _db.Shippers.Where(x => !string.IsNullOrEmpty(x.CheckInBy) && string.IsNullOrEmpty(x.CheckOutBy)).ToList()
                          select new IssueToVehicleDto
@@ -77,7 +81,8 @@ namespace NMVS.Controllers.Api
         [Route("GetVeDetail/{id}")]
         public IActionResult GetVeDetail(int id)
         {
-            var issueOrders = (from o in _db.IssueOrders.Where(x => x.IssueType == "Issue" && x.ToVehicle == id)
+            var workSpace = HttpContext.Session.GetString("susersite");
+            var issueOrders = (from o in _db.IssueOrders.Where(x => x.IssueType == "Issue" && x.ToVehicle == id && x.Site == workSpace)
                                join loc in _db.Locs on o.LocCode equals loc.LocCode into oloc
                                from ol in oloc.DefaultIfEmpty()
                                join i in _db.ItemDatas on o.ItemNo equals i.ItemNo into it

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace NMVS.Controllers
 {
-    
+
     public class AllocateController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -28,14 +29,17 @@ namespace NMVS.Controllers
         [Authorize(Roles = "Arrange inventory")]
         public IActionResult AllocateRequests()
         {
-            var model = _service.GetRequestList().OrderBy(x => x.IsClosed);
+            var workSpace = HttpContext.Session.GetString("susersite");
+            var model = _service.GetRequestList(workSpace).OrderBy(x => x.IsClosed);
             return View(model);
         }
 
         [Authorize(Roles = "Arrange inventory")]
         public IActionResult NewRequest()
         {
-            var locList = (from loc in _db.Locs
+            var workSpace = HttpContext.Session.GetString("susersite");
+            var whs = _db.Warehouses.Where(x => x.SiCode == workSpace).Select(s => s.WhCode);
+            var locList = (from loc in _db.Locs.Where(x => whs.Contains(x.WhCode))
                            join wh in _db.Warehouses on loc.WhCode equals wh.WhCode into locs
                            from i in locs.DefaultIfEmpty()
                            select new Loc
@@ -46,7 +50,7 @@ namespace NMVS.Controllers
                                LocCap = loc.LocCap,
                                LocCmmt = i.SiCode
                            }).ToList();
-            foreach(var loc in locList)
+            foreach (var loc in locList)
             {
                 var used = _db.ItemMasters.Where(x => x.LocCode == loc.LocCode).Sum(x => x.PtQty);
                 var hold = _db.AllocateOrders.Where(x => x.LocCode == loc.LocCode).Sum(x => x.AlcOrdQty - x.MovedQty - x.Reported)
@@ -67,7 +71,10 @@ namespace NMVS.Controllers
         [Authorize(Roles = "Arrange inventory")]
         public async Task<ActionResult> SelectLoc([Bind("LocCode")] ItemMaster itemMaster)
         {
-            var itemMasters = _service.GetAvailItem(itemMaster.LocCode);
+            if (string.IsNullOrEmpty(itemMaster.LocCode))
+                return RedirectToAction(nameof(NewRequest));
+            var workSpace = HttpContext.Session.GetString("susersite");
+            var itemMasters = _service.GetAvailItem(itemMaster.LocCode, workSpace);
             var loc = await _db.Locs.FindAsync(itemMaster.LocCode);
             loc.LocRemain = await _db.ItemMasters.Where(x => x.LocCode == loc.LocCode).SumAsync(x => x.PtQty);
             loc.LocRemain = loc.LocCap - loc.LocRemain;
@@ -77,14 +84,14 @@ namespace NMVS.Controllers
 
         public IActionResult Orders()
         {
-
-            return View(_service.GetAllocateOrders());
+            var workSpace = HttpContext.Session.GetString("susersite");
+            return View(_service.GetAllocateOrders(workSpace));
         }
         [Authorize(Roles = "Arrange inventory")]
         public IActionResult UnAllocated()
         {
-
-            return View(_service.GetUnAllocated());
+            var workSpace = HttpContext.Session.GetString("susersite");
+            return View(_service.GetUnAllocated(workSpace));
         }
         [Authorize(Roles = "Arrange inventory")]
         public async Task<ActionResult> ConfirmLoc(int id)

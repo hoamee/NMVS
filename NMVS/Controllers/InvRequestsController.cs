@@ -33,10 +33,11 @@ namespace NMVS.Controllers
 
         public IActionResult History()
         {
+            var workSpace = HttpContext.Session.GetString("susersite");
             //if (User.IsInRole("WH Manager") || User.IsInRole("Sales Manager"))
             //{
 
-            return View(_service.GetRequestList());
+            return View(_service.GetRequestList(workSpace));
             //}
             //else
             //{
@@ -53,16 +54,18 @@ namespace NMVS.Controllers
         [HttpPost]
         public IActionResult NewRequest(InvRequest invRequest)
         {
+            var workSpace = HttpContext.Session.GetString("susersite");
             if (invRequest is null)
             {
                 ModelState.AddModelError("", "An error occurred");
             }
             else
             {
-                var checkExist = _db.InvRequests.FirstOrDefault(x => x.Ref == invRequest.Ref);
+                var checkExist = _db.InvRequests.FirstOrDefault(x => x.Ref == invRequest.Ref && x.Site == workSpace);
                 if (checkExist is null)
                 {
                     invRequest.RqID = "MFG-" + invRequest.Ref;
+                    invRequest.Site = workSpace;
                     _db.Add(invRequest);
                     _db.SaveChanges();
                     return RedirectToAction(nameof(History));
@@ -93,6 +96,7 @@ namespace NMVS.Controllers
         [HttpPost]
         public IActionResult UpdateRequest(InvRequest invRequest)
         {
+            var workSpace = HttpContext.Session.GetString("susersite");
             if (invRequest is null)
             {
                 ModelState.AddModelError("", "An error occurred");
@@ -102,6 +106,7 @@ namespace NMVS.Controllers
 
                 try
                 {
+                    invRequest.Site = workSpace;
                     _db.Update(invRequest);
                     _db.SaveChanges();
                     return RedirectToAction(nameof(History));
@@ -134,31 +139,7 @@ namespace NMVS.Controllers
 
         public IActionResult RequestDetCreate(string id)
         {
-            List<ItemAvailVm> ls = new();
-            var ptMstr = _db.ItemMasters.ToList();
-            foreach (var item in _db.ItemDatas.ToList())
-            {
-                var pt = ptMstr.Where(x => x.ItemNo == item.ItemNo);
-                double avail = 0;
-                if (pt.Any())
-                {
-                    var hold = pt.Sum(x => x.PtHold);
-                    var qty = pt.Sum(x => x.PtQty);
-                    avail = qty - hold;
-                }
-
-                ls.Add(new ItemAvailVm
-                {
-                    ItemNo = item.ItemNo,
-                    Quantity = avail,
-                    Desc = item.ItemName
-                });
-            }
-
-            ViewBag.ItemList = ls;
-
             ViewBag.RqId = id;
-
             return View();
         }
 
@@ -167,52 +148,13 @@ namespace NMVS.Controllers
         {
             if (ModelState.IsValid)
             {
-                bool valid = true;
-                if (det.SpecDate != null)
-                {
-                    var pt = _db.ItemMasters.Where(x => x.ItemNo == det.ItemNo && det.SpecDate == x.PtDateIn.Date).Sum(x => x.PtQty - x.PtHold);
-
-                    if (pt < det.Quantity || det.Quantity <= 0)
-                    {
-                        ModelState.AddModelError("", "Quantity should be less or equal to available quantity. And greater than 0");
-                        valid = false;
-                    }
-                }
-
-                if (valid)
-                {
-                    det.Arranged = 0;
-                    det.Issued = 0;
-                    det.Picked = 0;
-                    _db.RequestDets.Add(det);
-                    _db.SaveChanges();
-                    return RedirectToAction("RequestDetail", new { id = det.RqID });
-                }
+                det.Arranged = 0;
+                det.Issued = 0;
+                det.Picked = 0;
+                _db.RequestDets.Add(det);
+                _db.SaveChanges();
+                return RedirectToAction("RequestDetail", new { id = det.RqID });
             }
-
-            List<ItemAvailVm> ls = new();
-            var ptMstr = _db.ItemMasters.ToList();
-            foreach (var item in _db.ItemDatas.ToList())
-            {
-                var pt = ptMstr.Where(x => x.ItemNo == item.ItemNo);
-                double avail = 0;
-                if (pt.Any())
-                {
-                    var hold = pt.Sum(x => x.PtHold);
-                    var qty = pt.Sum(x => x.PtQty);
-                    avail = qty - hold;
-                }
-
-                ls.Add(new ItemAvailVm
-                {
-                    ItemNo = item.ItemNo,
-                    Quantity = avail,
-                    Desc = item.ItemName
-                });
-            }
-
-            ViewBag.ItemList = ls;
-
             ViewBag.RqId = det.RqID;
 
             return View();
@@ -229,28 +171,6 @@ namespace NMVS.Controllers
             {
                 return NotFound();
             }
-            List<ItemAvailVm> ls = new();
-            var ptMstr = _db.ItemMasters.ToList();
-            foreach (var item in _db.ItemDatas.ToList())
-            {
-                var pt = ptMstr.Where(x => x.ItemNo == item.ItemNo);
-                double avail = 0;
-                if (pt.Any())
-                {
-                    var hold = pt.Sum(x => x.PtHold);
-                    var qty = pt.Sum(x => x.PtQty);
-                    avail = qty - hold;
-                }
-
-                ls.Add(new ItemAvailVm
-                {
-                    ItemNo = item.ItemNo,
-                    Quantity = avail,
-                    Desc = item.ItemName
-                });
-            }
-
-            ViewBag.ItemList = ls;
 
             ViewBag.RqId = det.RqID;
 
@@ -262,51 +182,17 @@ namespace NMVS.Controllers
         {
             if (ModelState.IsValid)
             {
-                bool valid = true;
-                if (det.SpecDate != null)
-                {
-                    var pt = _db.ItemMasters.Where(x => x.ItemNo == det.ItemNo && det.SpecDate == x.PtDateIn.Date).Sum(x => x.PtQty - x.PtHold);
 
-                    if (pt < det.Quantity || det.Quantity <= 0)
-                    {
-                        ModelState.AddModelError("", "Quantity should be less or equal to available quantity. And greater than 0");
-                        valid = false;
-                    }
-                }
+                det.Arranged = 0;
+                det.Issued = 0;
+                det.Picked = 0;
+                _db.RequestDets.Update(det);
+                _db.SaveChanges();
+                return RedirectToAction("RequestDetail", new { id = det.RqID });
 
-                if (valid)
-                {
-                    det.Arranged = 0;
-                    det.Issued = 0;
-                    det.Picked = 0;
-                    _db.RequestDets.Update(det);
-                    _db.SaveChanges();
-                    return RedirectToAction("RequestDetail", new { id = det.RqID });
-                }
             }
 
-            List<ItemAvailVm> ls = new();
-            var ptMstr = _db.ItemMasters.ToList();
-            foreach (var item in _db.ItemDatas.ToList())
-            {
-                var pt = ptMstr.Where(x => x.ItemNo == item.ItemNo);
-                double avail = 0;
-                if (pt.Any())
-                {
-                    var hold = pt.Sum(x => x.PtHold);
-                    var qty = pt.Sum(x => x.PtQty);
-                    avail = qty - hold;
-                }
 
-                ls.Add(new ItemAvailVm
-                {
-                    ItemNo = item.ItemNo,
-                    Quantity = avail,
-                    Desc = item.ItemName
-                });
-            }
-
-            ViewBag.ItemList = ls;
 
             ViewBag.RqId = det.RqID;
 
@@ -316,8 +202,8 @@ namespace NMVS.Controllers
         public IActionResult GetItemMaster(string id)
         {
             CommonResponse<List<ItemAvailVm>> commonResponse = new();
-
-            commonResponse.dataenum = _service.GetItemAvails(id);
+            var workSpace = HttpContext.Session.GetString("susersite");
+            commonResponse.dataenum = _service.GetItemAvails(id, workSpace);
             if (commonResponse.dataenum.Any())
             {
                 commonResponse.status = 1;
@@ -335,15 +221,19 @@ namespace NMVS.Controllers
 
         public IActionResult PickListSO(int id)
         {
+            var workSpace = HttpContext.Session.GetString("susersite");
             var rq = _db.RequestDets.Find(id);
 
             ViewBag.DetId = id;
             ViewBag.RqId = rq.RqID;
-            ViewBag.qty = rq.Quantity - rq.Arranged;
+            ViewBag.qty = rq.Quantity - rq.Picked;
             ViewBag.History = _db.IssueOrders.Where(x => x.DetId == id).ToList();
 
             ViewBag.LocList = new SelectList(_db.Shippers
-                .Where(x => !string.IsNullOrEmpty(x.CheckInBy) && string.IsNullOrEmpty(x.CheckOutBy) && x.IssueConfirmed != true)
+                .Where(x => !string.IsNullOrEmpty(x.CheckInBy)
+                    && string.IsNullOrEmpty(x.CheckOutBy)
+                    && x.IssueConfirmed != true
+                    && x.Site == workSpace)
                 .ToList(), "ShpId", "ShpDesc");
 
 
@@ -354,14 +244,16 @@ namespace NMVS.Controllers
         public IActionResult PickListMFG(int id)
         {
             var rq = _db.RequestDets.Find(id);
-
+            var workSpace = HttpContext.Session.GetString("susersite");
             ViewBag.DetId = id;
             ViewBag.RqId = rq.RqID;
             ViewBag.qty = rq.Quantity - rq.Picked;
             ViewBag.History = _db.IssueOrders.Where(x => x.DetId == id).ToList();
+            var whs = _db.Warehouses.Where(x => x.SiCode == workSpace).Select(s => s.WhCode);
 
             ViewBag.LocList = new SelectList(_db.Locs
-                .Where(x => x.LocType == "MFG")
+                .Where(x => x.LocType == "MFG"
+                    && whs.Contains(x.WhCode))
                 .ToList(), "LocCode", "LocDesc");
 
             if (rq.SpecDate == null)
@@ -456,6 +348,22 @@ namespace NMVS.Controllers
             }
         }
 
+        public async Task<IActionResult> DownloadPreShipperNote(string id)
+        {
+
+            var common = await _excelService.GetPreShipperNote(id, User.Identity.Name);
+            if (common.status == 1)
+            {
+                var filePath = common.dataenum;
+                var fs = System.IO.File.OpenRead(filePath);
+                return File(fs, "application /vnd.ms-excel", common.message);
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home", new { common.message });
+            }
+        }
+
         public async Task<IActionResult> DownloadIssueNoteByShipper(int id, int so)
         {
 
@@ -505,6 +413,7 @@ namespace NMVS.Controllers
         }
         public async Task<JsonResult> UploadList(IList<IFormFile> files)
         {
+            var workSpace = HttpContext.Session.GetString("susersite");
             var common = new CommonResponse<UploadReport>();
             foreach (IFormFile source in files)
             {
@@ -515,7 +424,7 @@ namespace NMVS.Controllers
                 using (FileStream output = System.IO.File.Create("uploads/" + filename))
                     await source.CopyToAsync(output);
 
-                common = await _service.ImportList("uploads/" + filename, filename, User.Identity.Name);
+                common = await _service.ImportList("uploads/" + filename, filename, User.Identity.Name, workSpace);
 
             }
 

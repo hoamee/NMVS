@@ -43,6 +43,8 @@ namespace NMVS.Models.DbModels
 
         public bool? Closed { set; get; }
 
+        public string Site { set; get; }
+
     }
 
     public class WoBill

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -50,11 +51,11 @@ namespace NMVS.Controllers
             //                  ToVehicle = o.ToVehicle,
             //                  FromLoc = ol.LocDesc,
             //                  Reported = o.Reported
-                             
-            //              }).ToList();
 
-            ViewBag.toVehicle = _context.IssueOrders.Where(x=>x.IssueType != "MFG" && x.Confirm != true).Count();
-            ViewBag.toMfg = _context.IssueOrders.Where(x=>x.IssueType == "MFG" && x.Confirm != true).Count();
+            //              }).ToList();
+            var workSpace = HttpContext.Session.GetString("susersite");
+            ViewBag.toVehicle = _context.IssueOrders.Where(x => x.IssueType != "MFG" && x.Confirm != true && x.Site == workSpace).Count();
+            ViewBag.toMfg = _context.IssueOrders.Where(x => x.IssueType == "MFG" && x.Confirm != true && x.Site == workSpace).Count();
 
             return View();
         }

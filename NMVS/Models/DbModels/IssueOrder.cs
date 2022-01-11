@@ -70,5 +70,7 @@ namespace NMVS.Models.DbModels
 
         [Display(Name = "Note")]
         public string Note { set; get; }
+
+        public string Site { set; get; }
     }
 }

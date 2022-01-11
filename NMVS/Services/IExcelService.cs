@@ -11,6 +11,7 @@ namespace NMVS.Services
         public Task<CommonResponse<string>> GetReceiptNote(int icId, string user);
 
         public Task<CommonResponse<string>> GetshipperNote(int shpId, string user);
+        public Task<CommonResponse<string>> GetPreShipperNote(string shpId, string user);
 
         public Task<CommonResponse<string>> GetIssueNoteSo(int shpId, string user, int noteId, int sot);
         public Task<CommonResponse<string>> GetIssueNoteMFG(int shpId, string user);

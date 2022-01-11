@@ -32,10 +32,13 @@ namespace NMVS.Controllers.Api
         [Route("GetInventory")]
         public IActionResult GetInventory(ItemInquiryVm vm)
         {
+            var workSpace = _httpContextAccessor.HttpContext.Session.GetString("susersite");
+            var whs = _context.Warehouses.Where(x=>x.SiCode == workSpace).Select(x=>x.WhCode);
+            var locs = _context.Locs.Where(x=>whs.Contains(x.WhCode)).Select(s=>s.LocCode);
             CommonResponse<List<ItemMasterVm>> common = new();
             try
             {
-                var ls = (from item in _context.ItemMasters.Where(x => !string.IsNullOrEmpty(x.LocCode))
+                var ls = (from item in _context.ItemMasters.Where(x => !string.IsNullOrEmpty(x.LocCode) && locs.Contains(x.LocCode))
                           join dt in _context.ItemDatas on item.ItemNo equals dt.ItemNo into itemData
 
                           from i in itemData.DefaultIfEmpty()
@@ -104,6 +107,7 @@ namespace NMVS.Controllers.Api
             CommonResponse<int> common = new();
             try
             {
+                var workSpace = _httpContextAccessor.HttpContext.Session.GetString("susersite");
                 //Test response
                 //string s = jsArr[1].id + ", " + jsArr[1].whcd + ", " + jsArr[1].qty;
                 //return Json(s);
@@ -138,7 +142,8 @@ namespace NMVS.Controllers.Api
                         LocCode = t.whcd,
                         AlcQty = t.qty,
                         AlcFromDesc = locCode == "NA" ? (string.IsNullOrEmpty(ic.Vehicle) ? "Delivery" : ic.Vehicle) : fromLoc.LocCode,
-                        MovementTime = t.reqTime
+                        MovementTime = t.reqTime,
+                        Site = workSpace
                     });
 
                     //Meeting 3 remove. No no
@@ -161,7 +166,8 @@ namespace NMVS.Controllers.Api
         [Route("ConfirmSelectLoc")]
         public IActionResult ConfirmSelectLoc(List<JsPickingData> jsArr)
         {
-            return Ok(_alcService.ConfirmSelectLoc(jsArr));
+            var workSpace = _httpContextAccessor.HttpContext.Session.GetString("susersite");
+            return Ok(_alcService.ConfirmSelectLoc(jsArr, workSpace));
         }
 
         [HttpPost]
@@ -170,6 +176,7 @@ namespace NMVS.Controllers.Api
         {
             var request = await _context.AllocateRequests.FindAsync(alc.AlcId);
             CommonResponse<int> commonResponse = new();
+            var workSpace = _httpContextAccessor.HttpContext.Session.GetString("susersite");
             try
             {
                 if (request != null)
@@ -183,7 +190,8 @@ namespace NMVS.Controllers.Api
                         AlcOrdQty = request.AlcQty,
                         OrderBy = User.Identity.Name,
                         RequestID = alc.AlcId,
-                        MovementTime = request.MovementTime
+                        MovementTime = request.MovementTime,
+                        Site = workSpace
                     };
 
                     _context.AllocateOrders.Add(AllocateOrder);
@@ -351,7 +359,8 @@ namespace NMVS.Controllers.Api
                         Passed = true,
                         IsRecycled = pt.IsRecycled,
                         RecycleDate = pt.RecycleDate,
-                        UnqualifiedId = pt.UnqualifiedId
+                        UnqualifiedId = pt.UnqualifiedId,
+                        Site = pt.Site
                     };
                     //4. add new item master
                     _context.ItemMasters.Add(newPt);

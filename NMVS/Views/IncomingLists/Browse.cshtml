@@ -56,7 +56,8 @@
                             {
                                 <tr>
                                     <td>
-                                        <a asp-action="Details" asp-route-id="@item.IcId"><span class="btn btn-sm btn-outline-primary">@item.IcId</span></a>
+                                        <a asp-action="Details" asp-route-id="@item.IcId"><span
+                                            class="btn btn-sm btn-outline-primary">@item.IcId</span></a>
                                     </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.Supplier)
@@ -90,9 +91,10 @@
                                         @if (item.Closed)
                                         {
                                             var bg = "warning";
-                                            if(item.Checked >= item.ItemCount)
+                                            if (item.Checked >= item.ItemCount)
                                                 bg = "secondary";
-                                            <span class="badge bg-@bg">QC @Html.DisplayFor(modelItem => item.Checked)/ @Html.DisplayFor(modelItem => item.ItemCount)</span>
+                                            <span class="badge bg-@bg">QC @Html.DisplayFor(modelItem => item.Checked)/
+                                                @Html.DisplayFor(modelItem => item.ItemCount)</span>
                                         }
                                         else
                                         {
@@ -137,6 +139,8 @@
         $('#new-list').click(function () {
             $('#file-modal').modal('toggle');
         });
-        $('#datatable-search').DataTable();
+        $('#datatable-search').DataTable({
+            "order": [[8, 'asc']]
+        });
     });
 </script>

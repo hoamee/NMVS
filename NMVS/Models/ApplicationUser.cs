@@ -13,6 +13,8 @@ namespace NMVS.Models
 
         public string ActiveHostName { set; get; }
 
+        public string WorkSpace { set; get; }
+
         public ICollection<ApplicationUserRole> UserRoles { get; set; }
     }
 

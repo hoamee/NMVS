@@ -55,5 +55,7 @@ namespace NMVS.Models.DbModels
 
         public virtual ICollection<ItemMaster> ItemMasters { set; get; }
 
+        public string Site {set;get;}
+
     }
 }

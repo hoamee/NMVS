@@ -35,8 +35,9 @@ namespace NMVS.Controllers
         // GET: IncomingLists
         public IActionResult Browse()
         {
+            var workspace = HttpContext.Session.GetString("susersite");
 
-            return View(_service.BrowseIncomingList(false));
+            return View(_service.BrowseIncomingList(false, workspace));
         }
 
         [Authorize(Roles = "Receive inventory")]
@@ -78,6 +79,7 @@ namespace NMVS.Controllers
                 if (ModelState.IsValid)
                 {
                     incomingList.LastModifiedBy = User.Identity.Name;
+                    incomingList.Site = HttpContext.Session.GetString("susersite");
                     _context.Add(incomingList);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
@@ -85,7 +87,7 @@ namespace NMVS.Controllers
             }
             catch (Exception)
             {
-                ModelState.AddModelError("", "An error occured. Please check whether the ID is null or used before" );
+                ModelState.AddModelError("", "An error occured. Please check whether the ID is null or used before");
             }
             ViewBag.Suppliers = _service.GetSupplier();
             return View(incomingList);
@@ -127,6 +129,7 @@ namespace NMVS.Controllers
                 try
                 {
                     incomingList.LastModifiedBy = User.Identity.Name;
+                    incomingList.Site = HttpContext.Session.GetString("susersite");
                     _context.Update(incomingList);
                     await _context.SaveChangesAsync();
                 }
@@ -188,6 +191,7 @@ namespace NMVS.Controllers
         public async Task<JsonResult> UploadList(IList<IFormFile> files)
         {
             var common = new CommonResponse<UploadReport>();
+            var wp = HttpContext.Session.GetString("susersite");
             foreach (IFormFile source in files)
             {
                 string filename = ContentDispositionHeaderValue.Parse(source.ContentDisposition).FileName.Trim('"');
@@ -197,7 +201,7 @@ namespace NMVS.Controllers
                 using (FileStream output = System.IO.File.Create("uploads/" + filename))
                     await source.CopyToAsync(output);
 
-                common = await _service.ImportList("uploads/" + filename, filename, User.Identity.Name);
+                common = await _service.ImportList("uploads/" + filename, filename, User.Identity.Name, wp);
 
             }
 

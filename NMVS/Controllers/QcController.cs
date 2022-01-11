@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using NMVS.Models;
 using NMVS.Services;
 using System;
@@ -22,8 +23,8 @@ namespace NMVS.Controllers
         // GET: IncomingLists
         public IActionResult Browse()
         {
-
-            return View(_service.BrowseIncomingList(true));
+            var workSpace = HttpContext.Session.GetString("susersite");
+            return View(_service.BrowseIncomingList(true, workSpace));
         }
 
         // GET: IncomingLists/Details/5

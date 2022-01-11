@@ -39,7 +39,7 @@
                                         Description
                                     </th>
                                     <th>
-                                        Date in
+                                        Batch/ref
                                     </th>
 
                                     <th>
@@ -70,7 +70,7 @@
                                             @Html.DisplayFor(modelItem => item.Name)
                                         </td>
                                         <td class="td-date">
-                                            @Html.DisplayFor(modelItem => item.DateIn)
+                                            @Html.DisplayFor(modelItem => item.Ref)
                                         </td>
                                         <td class="td-loccode">
                                             @Html.DisplayFor(modelItem => item.Loc)
@@ -295,7 +295,7 @@
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
                 type: 'POST',
-                url: routeURL + '/api/Allocate/PushPickListSo',
+                url: routeURL + '/api/InvRequest/PushPickListSo',
                 data: JSON.stringify(jsArr),
                 onBegin: $('#confirm-end').prop('disabled', true),
                 success: function (data) {

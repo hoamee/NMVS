@@ -58,28 +58,13 @@ namespace NMVS.Services
 
         public List<ItemAvailVm> GetItemNAvail()
         {
-            List<ItemAvailVm> ls = new();
-            var ptMstr = _context.ItemMasters.ToList();
-            foreach (var item in _context.ItemDatas.ToList())
-            {
-                var pt = ptMstr.Where(x => string.Equals(x.ItemNo, item.ItemNo, StringComparison.OrdinalIgnoreCase));
-                double avail = 0;
-                if (pt.Any())
-                {
-                    var hold = pt.Sum(x => x.PtHold);
-                    var qty = pt.Sum(x => x.PtQty);
-                    avail = qty - hold;
-                }
+            List<ItemAvailVm> ls = (from dt in _context.ItemDatas.ToList()
+                                    select new ItemAvailVm
+                                    {
+                                        ItemNo = dt.ItemNo,
+                                        Desc = dt.ItemName
+                                    }).ToList();
 
-                ls.Add(new ItemAvailVm
-                {
-                    ItemNo = item.ItemNo,
-                    Quantity = avail,
-                    Desc = item.ItemName
-                });
-
-
-            }
             return ls;
         }
         public SoDetailVm GetSoDetail(string soNbr)
