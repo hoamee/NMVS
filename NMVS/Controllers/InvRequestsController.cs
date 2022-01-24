@@ -30,20 +30,17 @@ namespace NMVS.Controllers
             _excelService = excelService;
         }
 
+        public IActionResult SoRequests(){
+            var workSpace = HttpContext.Session.GetString("susersite");
+
+            return View(_service.GetSoRequests(workSpace, false));
+        }
 
         public IActionResult History()
         {
             var workSpace = HttpContext.Session.GetString("susersite");
-            //if (User.IsInRole("WH Manager") || User.IsInRole("Sales Manager"))
-            //{
 
-            return View(_service.GetRequestList(workSpace));
-            //}
-            //else
-            //{
-            //    var requests = _db.InvRequests.Where(w => w.RqBy == User.Identity.Name);
-            //    return View(requests.ToList());
-            //}
+            return View(_service.GetMfgRequests(workSpace, false));
         }
 
         public IActionResult NewRequest()
@@ -64,7 +61,7 @@ namespace NMVS.Controllers
                 var checkExist = _db.InvRequests.FirstOrDefault(x => x.Ref == invRequest.Ref && x.Site == workSpace);
                 if (checkExist is null)
                 {
-                    invRequest.RqID = "MFG-" + invRequest.Ref;
+                    invRequest.RqID = invRequest.Ref;
                     invRequest.Site = workSpace;
                     _db.Add(invRequest);
                     _db.SaveChanges();
@@ -348,7 +345,7 @@ namespace NMVS.Controllers
             }
         }
 
-        public async Task<IActionResult> DownloadPreShipperNote(string id)
+        public async Task<IActionResult> DownloadPreShipperNote(int id)
         {
 
             var common = await _excelService.GetPreShipperNote(id, User.Identity.Name);

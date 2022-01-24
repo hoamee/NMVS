@@ -32,7 +32,10 @@ namespace NMVS.Controllers.Api
         [Route("PushPickListSo")]
         public async Task<IActionResult> PushPickListSo(List<JsPickingData> js)
         {
-            var message = "";
+            CommonResponse<string> response = new();
+            response.message = "Success";
+            response.status = 1;
+
             var workSpace = HttpContext.Session.GetString("susersite");
             //Test response
             //string s = jsArr[1].id + ", " + jsArr[1].whcd + ", " + jsArr[1].qty;
@@ -57,6 +60,17 @@ namespace NMVS.Controllers.Api
                     // 4. Add Outgo to From-Loc
                     //fromLoc.LocOutgo += jsArr.qty;
 
+                    if (shp == null)
+                    {
+                        var toLoc = _context.Locs.Find(jsArr.whcd);
+                        if (toLoc == null)
+                        {
+                            response.message = "No to location found. Please create or select a MFG location before continue";
+                            response.status = -1;
+
+                            return Ok(response);
+                        }
+                    }
 
                     _context.IssueOrders.Add(new IssueOrder()
                     {
@@ -78,15 +92,17 @@ namespace NMVS.Controllers.Api
                     _context.Update(pt);
                     _context.Update(fromLoc);
                     _context.SaveChanges();
-                    message = "Success!";
+                    response.message = "Success!";
                 }
                 catch (Exception e)
                 {
-                    message = e.ToString();
+                    await Common.MonitoringService.SendErrorMessage(e.ToString());
+                    response.message = "An error occurred...";
+                    response.status = -1;
                 }
             }
 
-            return Ok(message);
+            return Ok(response);
         }
 
         [HttpPost]
@@ -464,6 +480,7 @@ namespace NMVS.Controllers.Api
         [HttpPost]
         public async Task<IActionResult> ConfirmCheckOut(JsPickingData shpr)
         {
+            var workSpace = HttpContext.Session.GetString("susersite");
             CommonResponse<int> common = new();
             try
             {
@@ -489,7 +506,8 @@ namespace NMVS.Controllers.Api
                         Loc = shipper.Loc,
                         ShpVia = shipper.ShpVia,
                         ShpTo = shipper.ShpTo,
-                        RegisteredBy = User.Identity.Name
+                        RegisteredBy = User.Identity.Name,
+                        Site = workSpace
 
                     });
                 }

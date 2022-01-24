@@ -9,7 +9,9 @@ namespace NMVS.Services
 {
     public interface IRequestService
     {
-        public List<InvRequestVm> GetRequestList(string wp);
+        public List<InvRequestVm> GetSoRequests(string wp, bool closed);
+
+        public List<InvRequestVm> GetMfgRequests(string wp, bool closed);
 
         public RequestDetailVm GetRequestDetail(string id);
 

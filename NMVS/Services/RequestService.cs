@@ -389,9 +389,40 @@ namespace NMVS.Services
 
         }
 
-        public List<InvRequestVm> GetRequestList(string wp)
+        public List<InvRequestVm> GetSoRequests(string wp, bool closed)
         {
-            var model = (from i in _db.InvRequests
+            var model = (from i in _db.InvRequests.Where(x => x.RqType == "Issue" && x.Closed == closed)
+                         join s in _db.SalesOrders on i.RqID equals s.SoNbr
+                         join c1 in _db.Customers on s.CustCode equals c1.CustCode into all1
+                         from a1 in all1.DefaultIfEmpty()
+                         join c2 in _db.Customers on s.ShipTo equals c2.CustCode into all2
+                         from a2 in all2.DefaultIfEmpty()
+                         select new InvRequestVm
+                         {
+                             RqType = i.RqType,
+                             Date = i.RqDate,
+                             Id = i.RqID,
+                             Note = i.RqCmt,
+                             SoldTo = a1.CustName,
+                             ShipTo = a2.CustName,
+                             Ref = i.Ref,
+                             RqBy = i.RqBy,
+                             SoConfirm = i.SoConfirm,
+                             Confirmed = i.Confirmed,
+                             closed = i.Closed
+                         }).ToList();
+
+            foreach (var item in model)
+            {
+                item.closed = item.closed == false ? (Unfinished(item.Id) ? true : false) : true;
+            }
+            return model;
+        }
+        
+        public List<InvRequestVm> GetMfgRequests(string wp, bool closed)
+        {
+            var model = (from i in _db.InvRequests.Where(x => x.RqType == "MFG" && x.Closed == closed)
+                         
                          select new InvRequestVm
                          {
                              RqType = i.RqType,
@@ -902,7 +933,7 @@ namespace NMVS.Services
                         RqBy = user,
                         RqCmt = note,
                         RqDate = DateTime.Now,
-                        RqID = "MFG-" + batchRef,
+                        RqID = batchRef,
                         RqType = "MFG",
                         SoConfirm = false,
                         Site = wp

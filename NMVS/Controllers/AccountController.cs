@@ -138,6 +138,14 @@ namespace NMVS.Controllers
         {
             try
             {
+                ViewBag.SiteList = (from site in _db.Sites
+                                where site.Active == true
+                                select new SiteVm
+                                {
+                                    SiCode = site.SiCode,
+                                    SiDesc = site.SiName
+                                }).ToList();
+
                 if (ModelState.IsValid)
                 {
                     var user = await _userManager.FindByNameAsync(model.UserName);
@@ -163,11 +171,15 @@ namespace NMVS.Controllers
                                 //    }
                                 //}                                
                                 usr.ActiveHostName = HttpContext.Connection.RemoteIpAddress.ToString();
-                                usr.WorkSpace = model.Site;
                                 _db.Update(usr);
                                 HttpContext.Session.SetString("sUserName", user.UserName);
                                 HttpContext.Session.SetString("sUserHost", usr.ActiveHostName);
-                                HttpContext.Session.SetString("susersite", model.Site);
+                                if (!string.IsNullOrEmpty(model.Site))
+                                {
+                                    HttpContext.Session.SetString("susersite", model.Site);
+
+                                    usr.WorkSpace = model.Site;
+                                }
                                 await _db.SaveChangesAsync();
 
                                 return RedirectToAction("Index", "Home");
@@ -196,13 +208,7 @@ namespace NMVS.Controllers
                 ModelState.AddModelError("", e.Message);
             }
 
-            ViewBag.SiteList = (from site in _db.Sites
-                                where site.Active == true
-                                select new SiteVm
-                                {
-                                    SiCode = site.SiCode,
-                                    SiDesc = site.SiName
-                                }).ToList();
+            
             return View();
         }
 

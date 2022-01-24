@@ -54,8 +54,12 @@ namespace NMVS.Controllers
 
             //              }).ToList();
             var workSpace = HttpContext.Session.GetString("susersite");
-            ViewBag.toVehicle = _context.IssueOrders.Where(x => x.IssueType != "MFG" && x.Confirm != true && x.Site == workSpace).Count();
-            ViewBag.toMfg = _context.IssueOrders.Where(x => x.IssueType == "MFG" && x.Confirm != true && x.Site == workSpace).Count();
+            ViewBag.toVehicle = _context.IssueOrders.Where(x => x.IssueType != "MFG" 
+                && x.Confirm != true 
+                && x.Site == workSpace).Count();
+            ViewBag.toMfg = _context.IssueOrders.Where(x => x.IssueType == "MFG" 
+                && x.Confirm != true 
+                && x.Site == workSpace).Count();
 
             return View();
         }

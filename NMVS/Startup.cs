@@ -31,6 +31,7 @@ namespace NMVS
             services.AddDbContext<ApplicationDbContext>
                 (options => options.UseSqlServer(Configuration.GetConnectionString("NmvsConnection")));
             services.AddControllersWithViews();
+            services.AddHttpClient();
 
             services.Configure<TempPath>(Configuration.GetSection("TempPath"));
 

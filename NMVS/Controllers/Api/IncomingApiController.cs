@@ -35,7 +35,9 @@ namespace NMVS.Controllers.Api
         [Route("AddItem")]
         public IActionResult AddItem(ItemMaster iItem)
         {
-            var role = _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
+            var http =_httpContextAccessor.HttpContext;
+            var role = http.User.Identity.IsAuthenticated;
+            var workSpace = http.Session.GetString("susersite");
             CommonResponse<int> common = new();
             if (role)
             {
@@ -61,7 +63,8 @@ namespace NMVS.Controllers.Api
                         PtCmt = iItem.PtCmt,
                         PtQty = iItem.RecQty,
                         PtDateIn = ic.DeliveryDate,
-                        SupCode = ic.SupCode
+                        SupCode = ic.SupCode,
+                        Site = workSpace
                     };
 
                     _context.Add(newPt);

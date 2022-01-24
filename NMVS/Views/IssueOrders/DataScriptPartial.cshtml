@@ -125,7 +125,7 @@
                 {
                     "data": "desc",
                     render: function (data, type, ve) {
-                        return '<span class="btn btn-outline-primary" onclick="showVeDetail('+ ve.id +')">' + ve.desc + '</span>';
+                        return '<span class="btn btn-outline-primary" onclick="showVeDetail(' + ve.id + ')">' + ve.desc + '</span>';
                     }
                 },
                 {
@@ -149,13 +149,13 @@
         })
 
     }
-    
+
     function showVeDetail(id) {
         $('#data-ve').fadeOut('slow', function () {
             $('#ve-header').fadeIn();
             $('#detail-ve').fadeIn();
         });
-        var shp = getVeDetail(id);
+        var shp = GetVeInfo(id);
 
 
         veTb = $('#datatable-ve-detail').DataTable({
@@ -252,7 +252,7 @@
         })
     }
 
-    function getVeDetail(id) {
+    function GetVeInfo(id) {
 
         $.ajax({
             'url': apiUrl + "/api/IssueOrder/GetVeInfo/" + id,
@@ -267,7 +267,18 @@
                 + '<tr><td>Driver:</td><th>' + shp.driver + '</th></tr>'
                 + '<tr><td>Contact:</td><th>' + shp.drContact + '</th></tr>'
                 + '</table></div>');
+            if (shp.issueConfirmed) {
+                veHead.append('<button class="btn btn-outline-primary" onclick="downloadPreShipperNote(' + shp.shpId + ')">'
+                    + '<span class="fa fa-cloud-download"></span>'
+                    + ' Download Pre-Shipper note'
+                    + '</button>'
+                );
+            }
         });
 
+    }
+
+    function downloadPreShipperNote(shpId) {
+        window.location.href = '/InvRequests/DownloadPreShipperNote/' + shpId;
     }
 </script>

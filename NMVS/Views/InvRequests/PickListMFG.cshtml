@@ -89,8 +89,11 @@
                                                 @Html.DisplayFor(modelItem => item.Booked)
                                             </td>
                                             <td class="td-input">
-                                                @{ var maxInput = item.Qty - item.Booked;}
-                                                <input type="number" class="form-control val-input" step="0.01" max="@maxInput" min="0" />
+                                                @{
+                                                    var maxInput = item.Qty - item.Booked;
+                                                }
+                                                <input type="number" class="form-control val-input" step="0.01" max="@maxInput"
+                                            min="0" />
                                             </td>
                                             <td>
                                                 <input type="button" class="btn btn-sm btn-success add-btn" value="Add" />
@@ -175,6 +178,17 @@
 </div>
 
 <script>
+
+    function initCheck() {
+        if ($("#LocList").val() == null) {
+            bootbox.alert("No MFG location configured. Please create MFG locations before continue");
+            $('.add-btn').prop('disabled', true);
+        }
+    }
+
+    $(document).ready(function () {
+        initCheck();
+    });
 
     function removeRow(loc, tr, qty) {
         var confirmation = confirm("Are you sure want to remove this row?");
@@ -280,14 +294,14 @@
             $('.modal-body #selected-table > tbody  > tr').each(function () {
                 wid += eachRow;
                 var code = $(this).children('.whl-code').text().trim();
-                    var quantity = parseFloat($(this).children('.qty').text());
+                var quantity = parseFloat($(this).children('.qty').text());
                 var loc = $("#to-loc-code").text().trim();
-                    var rqTime = $('#req-time').val();
+                var rqTime = $('#req-time').val();
 
                 var record = { id: code, qty: quantity, whcd: loc, shipper: 0, reqTime: rqTime, det: @Html.Raw(ViewBag.DetId) };
                 jsArr.push(record);
                 progress.text(wid + "%");
-                progress.width(wid+"%")
+                progress.width(wid + "%")
 
             });
             $('#upload-lb').text("Pushing Data...");
@@ -302,8 +316,17 @@
                 data: JSON.stringify(jsArr),
                 onBegin: $('#confirm-end').prop('disabled', true),
                 success: function (data) {
-
-                    console.log(data);
+                    if (data.status == 1) {
+                        $('#upload-lb').text("Done!");
+                        progress.text("100%");
+                        progress.width("100%")
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                    if (data.status == -1) {
+                        $('#upload-lb').text(data.message);
+                    }
                 },
                 failure: function (response) {
                     console.log(response);
@@ -311,19 +334,15 @@
 
             });
 
-            $('#upload-lb').text("Done!");
-            progress.text("100%");
-            progress.width("100%")
-            setTimeout(function () {
-                window.location.reload();
-            }, 1000);
+
         });
     });
 
 </script>
 
 <!-- Modal -->
-<div class="modal fade modal-dialog-scrollable" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade modal-dialog-scrollable" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-body">
@@ -337,8 +356,9 @@
                 </div>
                 <label class="form-label" for="upload-progress" id="upload-lb"></label>
                 <div class="progress" style="height: 30px;">
-                    <div class="progress-bar"  id="upload-progress" role="progressbar" style="width: 0%; height: 100%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                    
+                    <div class="progress-bar" id="upload-progress" role="progressbar" style="width: 0%; height: 100%"
+                        aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+
                 </div>
             </div>
             <div class="modal-footer">
@@ -349,11 +369,12 @@
     </div>
 </div>
 
-<div class="modal fade modal-dialog-scrollable" id="history-modal" tabindex="-1" aria-labelledby="history-modalLabel" aria-hidden="true">
+<div class="modal fade modal-dialog-scrollable" id="history-modal" tabindex="-1" aria-labelledby="history-modalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-body">
-                <h3 class="modal-title" id="history-modalLabel">Allocate history</h3>
+                <h3 class="modal-title" id="history-modalLabel">Pick list history</h3>
                 <hr />
                 <table class="table table-striped" id="table1">
                     <thead>

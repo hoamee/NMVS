@@ -13,6 +13,9 @@ namespace NMVS.Models.ViewModels
 
         public DateTime Date { set; get; }
 
+        public string SoldTo {set;get;}
+        public string ShipTo {set;get;}
+
         public string Ref { set; get; }
 
         public string Note { set; get; }

@@ -16,7 +16,7 @@ namespace NMVS.Controllers.Api
     public class IssueOrderApiController : Controller
     {
         private readonly ApplicationDbContext _db;
-        
+
         public IssueOrderApiController(ApplicationDbContext db)
         {
             _db = db;
@@ -64,7 +64,7 @@ namespace NMVS.Controllers.Api
             var workSpace = HttpContext.Session.GetString("susersite");
             var isd = _db.IssueOrders.Where(x => x.ToVehicle != null && x.Site == workSpace).ToList();
 
-            var model = (from ve in _db.Shippers.Where(x => !string.IsNullOrEmpty(x.CheckInBy) && string.IsNullOrEmpty(x.CheckOutBy)).ToList()
+            var model = (from ve in _db.Shippers.Where(x => !string.IsNullOrEmpty(x.CheckInBy) && string.IsNullOrEmpty(x.CheckOutBy) && x.Site == workSpace).ToList()
                          select new IssueToVehicleDto
                          {
                              Id = ve.ShpId,
@@ -115,6 +115,12 @@ namespace NMVS.Controllers.Api
         public IActionResult GetVeInfo(int id)
         {
             var model = _db.Shippers.Find(id);
+            var realatedIssueOrder = _db.IssueOrders.Where(x=>x.ToVehicle == id).Count();
+            if(realatedIssueOrder > 0){
+                model.IssueConfirmed = true;
+            }else{
+                model.IssueConfirmed = false;
+            }
 
             return Ok(model);
         }

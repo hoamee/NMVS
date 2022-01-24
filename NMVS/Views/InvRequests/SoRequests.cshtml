@@ -1,4 +1,4 @@
-﻿@model IEnumerable<NMVS.Models.ViewModels.InvRequestVm>
+@model IEnumerable<NMVS.Models.ViewModels.InvRequestVm>
 
 @{
     ViewData["Title"] = "Request history";
@@ -19,13 +19,18 @@
                             <tr>
                                 <th>
                                     ID
-                                </th>
-                               
-                                <th>
-                                    Created on
-                                </th>
+                                </th>                                
                                 <th>
                                     Status
+                                </th>
+                                <th>
+                                    Sold-to
+                                </th>
+                                <th>
+                                    Ship-to
+                                </th>
+                                <th>
+                                    Created on
                                 </th>
                                 <th>
                                     Note
@@ -39,11 +44,7 @@
                                 <tr>
                                     <td>
                                         <a href="/InvRequests/RequestDetail/@item.Id"><div class="btn btn-outline-info">@Html.DisplayFor(modelItem => item.Id)</div></a>
-                                    </td>
-                                    
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Date)
-                                    </td>
+                                    </td>                                    
                                     <td>
                                         @if (item.closed)
                                         {
@@ -67,6 +68,15 @@
                                         }
                                     </td>
                                     <td>
+                                        @Html.DisplayFor(modelItem => item.SoldTo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Date)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ShipTo)
+                                    </td>
+                                    <td>
                                         @Html.DisplayFor(modelItem => item.Note)
                                     </td>
 
@@ -77,25 +87,7 @@
                     </table>
                 </div>
             </div>
-            @if (User.IsInRole("Request inventory"))
-            {
-                <div class="card-footer">
-
-                    <div class="row col-12">
-                        <span class="col-auto">
-                            <a asp-action="NewRequest" class="btn btn-sm btn-outline-info">
-                                Add new
-                            </a>
-                        </span>
-                        <span class="col-auto">
-                            <button class="btn btn-sm btn-outline-info" id="new-list">
-                                <span class="fa fa-cloud-upload"></span>
-                                <span>Upload</span>
-                            </button>
-                        </span>
-                    </div>
-                </div>
-            }
+            
         </div>
     </div>
 </div>
@@ -106,7 +98,7 @@
     $(document).ready(function () {
         $('.nav-request').addClass('active');
         $('.nav-request > div > span').css('color','white');
-        $('.nav-rq-his-mfg').addClass('active');
+        $('.nav-rq-his-so').addClass('active');
         $('#navRequest').addClass('show');
         $('#new-list').click(function () {
             $('#file-modal').modal('toggle');

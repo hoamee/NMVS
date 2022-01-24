@@ -32,7 +32,7 @@ namespace NMVS.Controllers
             if (User.IsInRole("Register vehicle") || User.IsInRole("Guard"))
             {
                 var workSpace = HttpContext.Session.GetString("susersite");
-                var model = await _context.Shippers.Where(x=>x.Site == workSpace).ToListAsync();
+                var model = await _context.Shippers.Where(x => x.Site == workSpace).ToListAsync();
                 foreach (var item in model)
                 {
                     item.IssueConfirmed = _context.ShipperDets.Where(x => x.ShpId == item.ShpId).Any();
@@ -68,7 +68,9 @@ namespace NMVS.Controllers
         {
             if (User.IsInRole("Register vehicle") || User.IsInRole("Guard"))
             {
-                ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
+                var workSpace = HttpContext.Session.GetString("susersite");
+                var whCode = _context.Warehouses.Select(x => x.WhCode).ToList();
+                ViewBag.Loc = _context.Locs.Where(x => x.Direct == true && whCode.Contains(x.WhCode)).ToList();
                 return View();
             }
             else
@@ -87,11 +89,12 @@ namespace NMVS.Controllers
         {
             if (User.IsInRole("Register vehicle") || User.IsInRole("Guard"))
             {
+                var workSpace = HttpContext.Session.GetString("susersite");
                 if (ModelState.IsValid)
                 {
                     try
                     {
-                        var workSpace = HttpContext.Session.GetString("susersite");
+
                         shipper.Site = workSpace;
                         _context.Add(shipper);
                         _context.SaveChanges();
@@ -102,7 +105,8 @@ namespace NMVS.Controllers
                         ModelState.AddModelError("", e.ToString());
                     }
                 }
-                ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
+                var whCode = _context.Warehouses.Select(x => x.WhCode).ToList();
+                ViewBag.Loc = _context.Locs.Where(x => x.Direct == true && whCode.Contains(x.WhCode)).ToList();
                 return View(shipper);
             }
             else
@@ -127,7 +131,9 @@ namespace NMVS.Controllers
                 {
                     return NotFound();
                 }
-                ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
+                var workSpace = HttpContext.Session.GetString("susersite");
+                var whCode = _context.Warehouses.Select(x => x.WhCode).ToList();
+                ViewBag.Loc = _context.Locs.Where(x => x.Direct == true && whCode.Contains(x.WhCode)).ToList();
                 return View(shipper);
             }
             else
@@ -150,12 +156,12 @@ namespace NMVS.Controllers
                 {
                     return NotFound();
                 }
-
+                var workSpace = HttpContext.Session.GetString("susersite");
                 if (ModelState.IsValid)
                 {
                     try
                     {
-                        var workSpace = HttpContext.Session.GetString("susersite");
+
                         shipper.Site = workSpace;
                         _context.Update(shipper);
                         await _context.SaveChangesAsync();
@@ -173,7 +179,9 @@ namespace NMVS.Controllers
                     }
                     return RedirectToAction(nameof(Browse));
                 }
-                ViewBag.Loc = _context.Locs.Where(x => x.Direct == true).ToList();
+
+                var whCode = _context.Warehouses.Select(x => x.WhCode).ToList();
+                ViewBag.Loc = _context.Locs.Where(x => x.Direct == true && whCode.Contains(x.WhCode)).ToList();
                 return View(shipper);
             }
             else
@@ -227,9 +235,10 @@ namespace NMVS.Controllers
 
         public async Task<IActionResult> CheckIn()
         {
+            var wp = HttpContext.Session.GetString("susersite");
             if (User.IsInRole("Guard"))
             {
-                return View(await _context.Shippers.ToListAsync());
+                return View(await _context.Shippers.Where(x=>x.Site == wp).ToListAsync());
             }
             else
             {

@@ -104,18 +104,7 @@ namespace NMVS.Services
             string header = input.Substring(0, 2);
             if (soType == 0)
             {
-                if (header == "WT" || header == "WR")
-                {
-                    return "SO" + nbr;
-                }
-                else if (header != "SO")
-                {
-                    return "SO" + input;
-                }
-                else
-                {
-                    return input;
-                }
+                return input;
             }
             else if (soType == 2)
             {

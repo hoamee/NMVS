@@ -843,13 +843,14 @@ namespace NMVS.Services
         }
 
 
-        public async Task<CommonResponse<string>> GetPreShipperNote(string rqId, string user)
+        public async Task<CommonResponse<string>> GetPreShipperNote(int shpId, string user)
         {
             CommonResponse<string> common = new();
             ExcelDataHelper _eHelper = new();
             common.dataenum = "";
-            var issueList = await _db.IssueOrders.Where(x => x.RqID == rqId).ToListAsync();
-            var shpList = issueList.Select(x => x.ToVehicle).Distinct().ToList();
+            var issueList = await _db.IssueOrders.Where(x => x.ToVehicle == shpId).ToListAsync();
+            var shp = await _db.Shippers.FindAsync(shpId);
+            var rqId = issueList[0].RqID;
             var so = await _db.SalesOrders.FindAsync(rqId);
             var soldTo = await _db.Customers.FindAsync(so.Customer);
             var shipTo = await _db.Customers.FindAsync(so.ShipTo);
@@ -863,54 +864,48 @@ namespace NMVS.Services
             string templatePath = "xlsx/SPN01_Shipper note.xlsx";
             FileInfo fileInfo = new(templatePath);
             ExcelPackage excel = new(fileInfo);
-            foreach (var shpId in shpList)
+
+            try
             {
-                try
+
+                var itemList = (from it in issueList
+                                join pt in _db.ItemMasters on it.PtId equals pt.PtId into ptmstr
+                                from ptm in ptmstr.DefaultIfEmpty()
+                                join dt in itemData on it.ItemNo equals dt.ItemNo into itemNData
+                                from all in itemNData.DefaultIfEmpty()
+                                select new In01Vm
+                                {
+                                    ItemName = all.ItemName,
+                                    Quantity = it.ExpOrdQty,
+                                    PkgQty = all.ItemPkgQty,
+                                    PkgType = all.ItemPkg,
+                                    BatchNo = ptm.RefNo
+                                }).ToList();
+
+
+                if (itemList.Count == 0)
                 {
-                    if (shpId == 0)
-                        continue; //Skip while shipper is 0 (MFG movement)
-
-                    Shipper shipper = _db.Shippers.Find((int)shpId);
-                    if (shipper == null)
-                        continue; //Skip if not found shipper
-
-                    var itemList = (from it in issueList.Where(x => x.ToVehicle == shpId).ToList()
-                                    join pt in _db.ItemMasters on it.PtId equals pt.PtId into ptmstr
-                                    from ptm in ptmstr.DefaultIfEmpty()
-                                    join dt in itemData on it.ItemNo equals dt.ItemNo into itemNData
-                                    from all in itemNData.DefaultIfEmpty()
-                                    select new In01Vm
-                                    {
-                                        ItemName = all.ItemName,
-                                        Quantity = it.ExpOrdQty,
-                                        PkgQty = all.ItemPkgQty,
-                                        PkgType = all.ItemPkg,
-                                        BatchNo = ptm.RefNo
-                                    }).ToList();
+                    common.message = "No item in list";
+                    common.status = 0;
+                }
 
 
-                    if (itemList.Count == 0)
+                ExcelWorksheet temp = excel.Workbook.Worksheets.Copy("ORDER", shp.ShpDesc);
+
+
+                temp.Cells["A5"].Value += " " + date.ToString("dd-MM-yyyy");
+                temp.Cells["A6"].Value += " " + shp.Driver + " (" + shp.DrContact + ")";
+                temp.Cells["C6"].Value += " " + shp.ShpDesc;
+
+                int writingRow = 10;
+                for (int i = 0; i < itemList.Count; i++)
+                {
+                    var packCount = Convert.ToInt32(Math.Floor(itemList[i].Quantity / itemList[i].PkgQty));
+                    double remainder = itemList[i].Quantity % itemList[i].PkgQty;
+
+
+                    if (packCount > 0)
                     {
-                        common.message = "No item in list";
-                        common.status = 0;
-                        continue;
-                    }
-
-                    ExcelWorksheet temp = excel.Workbook.Worksheets.Copy("ORDER", shipper.ShpDesc);
-
-
-                    temp.Cells["A5"].Value += " " + date.ToString("dd-MM-yyyy");
-                    temp.Cells["A6"].Value += " " + shipper.Driver + " (" + shipper.DrContact + ")";
-                    temp.Cells["C6"].Value += " " + shipper.ShpDesc;
-
-                    int ptIndex = 0;
-                    int writingRow = 10;
-                    for (int i = ptIndex; i < itemList.Count; i++)
-                    {
-                        var packCount = Convert.ToInt32(Math.Floor(itemList[i].Quantity / itemList[i].PkgQty));
-                        double remainder = itemList[i].Quantity % itemList[i].PkgQty;
-
-
                         temp.Cells["B" + writingRow].Value = shipTo.CustName;
                         temp.Cells["C" + writingRow].Value = itemList[i].ItemName;
                         temp.Cells["D" + writingRow].Value = itemList[i].PkgQty;
@@ -918,34 +913,39 @@ namespace NMVS.Services
                         temp.Cells["F" + writingRow].Value = packCount;
                         temp.Cells["G" + writingRow].Value = itemList[i].PkgQty * packCount;
                         temp.Cells["H" + writingRow].Value = itemList[i].BatchNo;
-
-                        if (remainder > 0)
-                        {
-                            writingRow++;
-                            temp.Cells["B" + writingRow].Value = shipTo.CustName;
-                            temp.Cells["C" + writingRow].Value = itemList[i].ItemName;
-                            temp.Cells["D" + writingRow].Value = itemList[i].PkgQty;
-                            temp.Cells["E" + writingRow].Value = itemList[i].PkgType;
-                            temp.Cells["F" + writingRow].Value = 1;
-                            temp.Cells["G" + writingRow].Value = remainder;
-                            temp.Cells["H" + writingRow].Value = itemList[i].BatchNo;
-                        }
-
-                        ptIndex++;
-                        writingRow++;
                     }
 
+                    if (remainder > 0)
+                    {
+                        if (packCount > 0)
+                        {
+                            writingRow++;
+                        }
+                        temp.Cells["B" + writingRow].Value = shipTo.CustName;
+                        temp.Cells["C" + writingRow].Value = itemList[i].ItemName;
+                        temp.Cells["D" + writingRow].Value = itemList[i].PkgQty;
+                        temp.Cells["E" + writingRow].Value = itemList[i].PkgType;
+                        temp.Cells["F" + writingRow].Value = 1;
+                        temp.Cells["G" + writingRow].Value = remainder;
+                        temp.Cells["H" + writingRow].Value = itemList[i].BatchNo;
+                    }
 
-
+                    writingRow++;
                 }
-                catch (Exception e)
-                {
-                    common.message = e.ToString();
-                    common.status = -1;
 
-                }
+
 
             }
+            catch (Exception e)
+            {
+                common.message = e.ToString();
+                common.status = -1;
+                await Common.MonitoringService.SendErrorMessage(e.ToString());
+                return common;
+
+            }
+
+
             var fst = excel.Workbook.Worksheets.FirstOrDefault(x => x.Name == "ORDER");
             excel.Workbook.Worksheets.Delete(fst);
             //remove first (template) sheet
