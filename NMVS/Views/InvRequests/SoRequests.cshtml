@@ -19,7 +19,7 @@
                             <tr>
                                 <th>
                                     ID
-                                </th>                                
+                                </th>
                                 <th>
                                     Status
                                 </th>
@@ -43,26 +43,34 @@
                             {
                                 <tr>
                                     <td>
-                                        <a href="/InvRequests/RequestDetail/@item.Id"><div class="btn btn-outline-info">@Html.DisplayFor(modelItem => item.Id)</div></a>
-                                    </td>                                    
+                                        <a href="/InvRequests/RequestDetail/@item.Id">
+                                            <div class="btn btn-outline-info">@Html.DisplayFor(modelItem => item.Id)</div>
+                                        </a>
+                                    </td>
                                     <td>
                                         @if (item.closed)
                                         {
                                             <span class="badge bg-secondary">Closed</span>
-                                        }else{
+                                        }
+                                        else
+                                        {
                                             if (item.SoConfirm)
                                             {
                                                 if (item.Confirmed == null)
                                                 {
                                                     <span class="badge bg-warning">Unconfirmed</span>
-                                                }else if (item.Confirmed == false)
+                                                }
+                                                else if (item.Confirmed == false)
                                                 {
                                                     <span class="badge bg-danger">Rejected</span>
-                                                }else if (item.Confirmed == true)
+                                                }
+                                                else if (item.Confirmed == true)
                                                 {
                                                     <span class="badge bg-success">Picking</span>
                                                 }
-                                            }else{
+                                            }
+                                            else
+                                            {
                                                 <span class="badge bg-secondary">Pending submit</span>
                                             }
                                         }
@@ -70,11 +78,12 @@
                                     <td>
                                         @Html.DisplayFor(modelItem => item.SoldTo)
                                     </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Date)
-                                    </td>
+
                                     <td>
                                         @Html.DisplayFor(modelItem => item.ShipTo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Date)
                                     </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.Note)
@@ -87,7 +96,7 @@
                     </table>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </div>
@@ -97,13 +106,13 @@
 
     $(document).ready(function () {
         $('.nav-request').addClass('active');
-        $('.nav-request > div > span').css('color','white');
+        $('.nav-request > div > span').css('color', 'white');
         $('.nav-rq-his-so').addClass('active');
         $('#navRequest').addClass('show');
         $('#new-list').click(function () {
             $('#file-modal').modal('toggle');
         });
         $('#datatable-search').DataTable();
-        
+
     });
 </script>

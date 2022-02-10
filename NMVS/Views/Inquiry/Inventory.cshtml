@@ -21,7 +21,7 @@
                             <input class="form-check-input" id="Available" type="checkbox" /> Show only available
                         </label>
                     </div>
-                    <button type="button" class="btn btn-outline-primary" id="search-btn">
+                    <button type="button" class="btn btn-outline-primary" onclick="fetchTable()" id="search-btn">
                         <span class="fa fa-search"></span>
                         Search
                     </button>
@@ -44,7 +44,7 @@
                                     Item Name
                                 </th>
                                 <th>
-                                    Parent Id
+                                    Batch/Ref
                                 </th>
                                 <th>
                                     Location
@@ -76,6 +76,65 @@
         $('#ItemNo').val(sup);
         $('#item-modal').modal('toggle');
     };
+
+    var dtTb;
+    var init = true;
+
+
+
+    function fetchTable() {
+
+        Swal.showLoading();
+        var avail = 0;
+        var ptPart = $('#ItemNo').val().trim();
+        if (ptPart.length == 0) {
+            ptPart = "na";
+        }
+
+        if ($('#Available').is(":checked")) {
+            avail = 1;
+        } else {
+            avail = 0;
+        }
+
+        if (init) {
+            dtTb = $('#result-table').DataTable({
+                ajax: {
+                    'url': apiUrl + "/api/Allocate/GetInventory/" + ptPart + "/" + avail,
+                    dataSrc: ''
+
+                },
+                "columns": [
+                    {
+                        "data": "ptid",
+                        render: function (data, type, res) {
+                            return '<a href="/Inquiry/InventoryDetail/' + res.ptid + '">' + res.ptid + ' </a>'
+                        }
+                    },
+                    { "data": "no" },
+                    { "data": "name" },
+                    { "data": "lot" },
+                    { "data": "loc" },
+                    { "data": "qty" },
+                    { "data": "booked" },
+                    { "data": "sup" }
+
+                ]
+            });
+
+            init = false;
+        } else {
+            dtTb.ajax.url(apiUrl + "/api/Allocate/GetInventory/" + ptPart + "/" + avail).load();
+        }
+        Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: 'Query completed',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    }
+
     $(document).ready(function () {
         $('.nav-inquiry').addClass('active');
         $('.nav-item-inquiry').addClass('active');
@@ -84,60 +143,6 @@
 
         $('#ItemNo').click(function () {
             $('#item-modal').modal('toggle');
-        });
-
-        $('#search-btn').click(function () {
-            var itemNo = $('#ItemNo').val();
-            var avail = $('#Available').is(":checked")
-
-            var vm = {
-                ItemNo: itemNo,
-                Available: avail
-            };
-
-            var routeURL = location.protocol + "//" + location.host;
-            var tb = $('#result-table > tbody');
-            $.ajax(
-                {
-                    contentType: 'application/json; charset=utf-8',
-                    dataType: 'json',
-                    type: 'POST',
-                    url: routeURL + '/api/Allocate/GetInventory',
-                    data: JSON.stringify(vm),
-                    beforeSend: function () {
-                        Swal.showLoading();
-                    },
-                    type: "POST",
-                    success: function (res) {
-                        if (res.status == 1) {
-                            tb.empty();
-                            for (i = 0; i < res.dataenum.length; ++i) {
-                                tb.append('<tr><td><a href="/Inquiry/InventoryDetail/' + res.dataenum[i].ptid + '">' + res.dataenum[i].ptid + ' </a></td>'
-                                    + '<td>' + res.dataenum[i].no + '</td>'
-                                    + '<td>' + res.dataenum[i].name + '</td>'
-                                    + '<td>' + res.dataenum[i].parent + '</td>'
-                                    + '<td>' + res.dataenum[i].loc + '</td>'
-                                    + '<td>' + res.dataenum[i].qty + '</td>'
-                                    + '<td>' + res.dataenum[i].booked + '</td>'
-                                    + '<td>' + res.dataenum[i].sup + '</td></tr>'
-                                );
-                            }
-
-                            Swal.fire({
-                                position: 'center',
-                                icon: 'success',
-                                title: 'Query completed',
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-
-                        } else {
-
-                        }
-                    }
-
-                }
-            );
         });
     });
 </script>

@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace NMVS.Controllers
 {
-    
+
     public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db):base(db)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db) : base(db)
         {
             _logger = logger;
             _db = db;
@@ -23,7 +23,7 @@ namespace NMVS.Controllers
         public ActionResult Dashboard()
         {
             var listWh = _db.Warehouses.Where(x => x.Type != "MFG").ToList();
-            var listLoc = _db.Locs.Where(x=>x.LocType != "MFG").ToList();
+            var listLoc = _db.Locs.Where(x => x.LocType != "MFG").ToList();
             var listRemain = new List<double>();
             var listUsed = new List<double>();
             var listHold = new List<double>();
@@ -60,7 +60,7 @@ namespace NMVS.Controllers
             ViewBag.Hold = listHold.ToArray();
             ViewBag.Used = listUsed.ToArray();
             ViewBag.OutGo = listOutGo.ToArray();
-            var receiveLoc = _db.Locs.Where(x => x.LocType == "receive").Select(s=>s.LocCode).ToList();
+            var receiveLoc = _db.Locs.Where(x => x.LocType == "receive").Select(s => s.LocCode).ToList();
             ViewBag.Unallocated = _db.ItemMasters.Where(x => receiveLoc.Contains(x.LocCode) && x.PtQty > 0).ToList().Count;
             //ViewBag.UnArranged = _db.Requests.Where(x => x.Arranged < x.Quantity && x.Closed == true).ToList().Count;
             //ViewBag.UnPicked = _db.Requests.Count(x => x.Picked < x.Quantity);
@@ -70,7 +70,8 @@ namespace NMVS.Controllers
             return View();
         }
 
-        public IActionResult QrGenerator(){
+        public IActionResult QrGenerator()
+        {
             return View();
         }
 
@@ -82,7 +83,7 @@ namespace NMVS.Controllers
 
                 return View();
             }
-            return RedirectToAction("Login","Account");
+            return RedirectToAction("Login", "Account");
         }
 
         public IActionResult Privacy()
@@ -91,9 +92,10 @@ namespace NMVS.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error(string message)
+        public async Task<IActionResult> Error(string message)
         {
             ViewBag.message = message;
+            await Common.MonitoringService.SendErrorMessage(message);
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 

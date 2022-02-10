@@ -1,5 +1,4 @@
-﻿
-@model NMVS.Models.DbModels.ItemMaster
+﻿@model NMVS.Models.DbModels.ItemMaster
 
 @{
     ViewData["Title"] = "New allocate request";
@@ -24,7 +23,8 @@
                                 <label asp-for="LocCode" class="control-label">Target Loc.</label>
                                 <div class="row">
                                     <div class="col-md-3">
-                                        <input asp-for="LocCode" class="form-control " onclick="showLoc()" readonly required />
+                                        <input asp-for="LocCode" class="form-control " onclick="showLoc()" readonly
+                                            required />
                                     </div>
                                     <div class="col-auto">
                                         <p class="text-success text-bold" id="loc-name"></p>
@@ -69,6 +69,4 @@
 
 
     });
-
-
-
+</script>

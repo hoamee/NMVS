@@ -58,7 +58,7 @@ namespace NMVS.Controllers
                     {
                         //Get ordered Qty
                         var maximumQty = sodet.Sum(x => x.Quantity);
-                        var wrNbr = "WR" + so.SoNbr[2..];
+                        var wrNbr = "WR-" + so.SoNbr;
                         var dets = _context.SoDetails.Where(x => x.SoNbr == wrNbr);
                         double unshippedQty = 0;
                         if (dets.Any())
@@ -174,8 +174,6 @@ namespace NMVS.Controllers
                         }
 
                     }
-
-
                 }
             }
             return View(uq);

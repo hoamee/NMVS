@@ -363,7 +363,6 @@ namespace NMVS.Controllers
 
         public async Task<IActionResult> DownloadIssueNoteByShipper(int id, int so)
         {
-
             var common = await _excelService.GetIssueNoteSo(id, User.Identity.Name, 0, so);
             if (common.status == 1)
             {
@@ -408,6 +407,7 @@ namespace NMVS.Controllers
                 return RedirectToAction("Error", "Home", new { common.message });
             }
         }
+
         public async Task<JsonResult> UploadList(IList<IFormFile> files)
         {
             var workSpace = HttpContext.Session.GetString("susersite");
@@ -424,8 +424,6 @@ namespace NMVS.Controllers
                 common = await _service.ImportList("uploads/" + filename, filename, User.Identity.Name, workSpace);
 
             }
-
-
             return Json(common);
         }
 

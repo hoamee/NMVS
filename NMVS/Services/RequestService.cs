@@ -39,6 +39,7 @@ namespace NMVS.Services
                         common.status = -1;
                         return common;
                     }
+
                     shipper.IssueConfirmedTime = DateTime.Now;
                     shipper.IssueConfirmed = true;
 
@@ -131,14 +132,8 @@ namespace NMVS.Services
                             {
                                 AddNoteLine(salesOrder.SoType, noteNbr, line.ItemNo, line.InventoryId, remainder, 1);
                                 itemCount++;
-
-
                             }
-
-
-
                         }
-
                     }
 
 
@@ -418,11 +413,11 @@ namespace NMVS.Services
             }
             return model;
         }
-        
+
         public List<InvRequestVm> GetMfgRequests(string wp, bool closed)
         {
             var model = (from i in _db.InvRequests.Where(x => x.RqType == "MFG" && x.Closed == closed)
-                         
+
                          select new InvRequestVm
                          {
                              RqType = i.RqType,

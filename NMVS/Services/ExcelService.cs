@@ -850,12 +850,6 @@ namespace NMVS.Services
             common.dataenum = "";
             var issueList = await _db.IssueOrders.Where(x => x.ToVehicle == shpId).ToListAsync();
             var shp = await _db.Shippers.FindAsync(shpId);
-            var rqId = issueList[0].RqID;
-            var so = await _db.SalesOrders.FindAsync(rqId);
-            var soldTo = await _db.Customers.FindAsync(so.Customer);
-            var shipTo = await _db.Customers.FindAsync(so.ShipTo);
-            var invRequest = await _db.InvRequests.FindAsync(rqId);
-            var itemData = await _db.ItemDatas.ToListAsync();
 
 
             //excel config
@@ -867,23 +861,7 @@ namespace NMVS.Services
 
             try
             {
-
-                var itemList = (from it in issueList
-                                join pt in _db.ItemMasters on it.PtId equals pt.PtId into ptmstr
-                                from ptm in ptmstr.DefaultIfEmpty()
-                                join dt in itemData on it.ItemNo equals dt.ItemNo into itemNData
-                                from all in itemNData.DefaultIfEmpty()
-                                select new In01Vm
-                                {
-                                    ItemName = all.ItemName,
-                                    Quantity = it.ExpOrdQty,
-                                    PkgQty = all.ItemPkgQty,
-                                    PkgType = all.ItemPkg,
-                                    BatchNo = ptm.RefNo
-                                }).ToList();
-
-
-                if (itemList.Count == 0)
+                if (issueList.Count == 0)
                 {
                     common.message = "No item in list";
                     common.status = 0;
@@ -898,21 +876,29 @@ namespace NMVS.Services
                 temp.Cells["C6"].Value += " " + shp.ShpDesc;
 
                 int writingRow = 10;
-                for (int i = 0; i < itemList.Count; i++)
+                for (int i = 0; i < issueList.Count; i++)
                 {
-                    var packCount = Convert.ToInt32(Math.Floor(itemList[i].Quantity / itemList[i].PkgQty));
-                    double remainder = itemList[i].Quantity % itemList[i].PkgQty;
+                    var rqId = issueList[i].RqID;
+                    var so = await _db.SalesOrders.FindAsync(rqId);
+                    var shipTo = await _db.Customers.FindAsync(so.ShipTo);
+                    var invRequest = await _db.InvRequests.FindAsync(rqId);                    
+                    var itemData = _db.ItemDatas.Find(issueList[i].ItemNo);
+                    var pt = _db.ItemMasters.Find(issueList[i].PtId);
+                    string batchNo = string.IsNullOrEmpty(pt.BatchNo) ? (string.IsNullOrEmpty(pt.RefNo) ? "" : pt.RefNo) : pt.BatchNo;
+
+                    var packCount = Convert.ToInt32(Math.Floor(issueList[i].ExpOrdQty / itemData.ItemPkgQty));
+                    double remainder = issueList[i].ExpOrdQty % itemData.ItemPkgQty;
 
 
                     if (packCount > 0)
                     {
                         temp.Cells["B" + writingRow].Value = shipTo.CustName;
-                        temp.Cells["C" + writingRow].Value = itemList[i].ItemName;
-                        temp.Cells["D" + writingRow].Value = itemList[i].PkgQty;
-                        temp.Cells["E" + writingRow].Value = itemList[i].PkgType;
+                        temp.Cells["C" + writingRow].Value = itemData.ItemName;
+                        temp.Cells["D" + writingRow].Value = itemData.ItemPkgQty;
+                        temp.Cells["E" + writingRow].Value = itemData.ItemPkg;
                         temp.Cells["F" + writingRow].Value = packCount;
-                        temp.Cells["G" + writingRow].Value = itemList[i].PkgQty * packCount;
-                        temp.Cells["H" + writingRow].Value = itemList[i].BatchNo;
+                        temp.Cells["G" + writingRow].Value = itemData.ItemPkgQty * packCount;
+                        temp.Cells["H" + writingRow].Value = batchNo;
                     }
 
                     if (remainder > 0)
@@ -922,12 +908,12 @@ namespace NMVS.Services
                             writingRow++;
                         }
                         temp.Cells["B" + writingRow].Value = shipTo.CustName;
-                        temp.Cells["C" + writingRow].Value = itemList[i].ItemName;
-                        temp.Cells["D" + writingRow].Value = itemList[i].PkgQty;
-                        temp.Cells["E" + writingRow].Value = itemList[i].PkgType;
+                        temp.Cells["C" + writingRow].Value = itemData.ItemName;
+                        temp.Cells["D" + writingRow].Value = itemData.ItemPkgQty;
+                        temp.Cells["E" + writingRow].Value = itemData.ItemPkg;
                         temp.Cells["F" + writingRow].Value = 1;
                         temp.Cells["G" + writingRow].Value = remainder;
-                        temp.Cells["H" + writingRow].Value = itemList[i].BatchNo;
+                        temp.Cells["H" + writingRow].Value = batchNo;
                     }
 
                     writingRow++;
@@ -957,7 +943,5 @@ namespace NMVS.Services
             common.status = 1;
             return common;
         }
-
-
     }
 }

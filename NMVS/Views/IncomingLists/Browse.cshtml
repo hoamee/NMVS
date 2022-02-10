@@ -40,9 +40,6 @@
                                     @Html.DisplayNameFor(model => model.DeliveryDate)
                                 </th>
                                 <th>
-                                    @Html.DisplayNameFor(model => model.IsWarranty)
-                                </th>
-                                <th>
                                     Status
                                 </th>
                                 <th>
@@ -76,16 +73,6 @@
                                     </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.DeliveryDate)
-                                    </td>
-                                    <td class="text-sm font-weight-normal">
-                                        @if (item.IsWarranty)
-                                        {
-                                            <span class="badge bg-success">Yes</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">No</span>
-                                        }
                                     </td>
                                     <td>
                                         @if (item.Closed)

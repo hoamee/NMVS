@@ -101,29 +101,20 @@ namespace NMVS.Services
         public string GetSoNbr(string input, int soType)
         {
             string nbr = input[2..];
-            string header = input.Substring(0, 2);
+            string header = input.Substring(0, 3);
             if (soType == 0)
             {
                 return input;
             }
             else if (soType == 2)
             {
-                if (header == "SO" || header == "WR")
-                {
-                    return "WT" + nbr;
-                }
-                else if (header != "WT")
-                {
-                    return "WT" + input;
-                }
-                else
-                {
+                
                     return input;
-                }
+                
             }
             else if (soType == 1)
             {
-                var checkParentSO = _context.SalesOrders.Find("SO" + nbr);
+                var checkParentSO = _context.SalesOrders.Find(input);
                 if (checkParentSO == null)
                 {
                     return "";
@@ -140,13 +131,13 @@ namespace NMVS.Services
                         return "uq404";
                     }
                 }
-                if (header == "SO" || header == "WR")
+                if (header == "WR-")
                 {
-                    return "WR" + nbr;
+                    return input;
                 }
-                else if (header != "WR")
+                else if (header != "WR-")
                 {
-                    return "WR" + input;
+                    return "WR-" + input;
                 }
                 else
                 {

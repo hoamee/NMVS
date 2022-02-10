@@ -28,14 +28,14 @@ namespace NMVS.Controllers.Api
             _alcService = allocateService;
         }
 
-        [HttpPost]
-        [Route("GetInventory")]
-        public IActionResult GetInventory(ItemInquiryVm vm)
+        [HttpGet]
+        [Route("GetInventory/{itemNo}/{avail}")]
+        public IActionResult GetInventory(string itemNo, int avail)
         {
             var workSpace = _httpContextAccessor.HttpContext.Session.GetString("susersite");
             var whs = _context.Warehouses.Where(x=>x.SiCode == workSpace).Select(x=>x.WhCode);
             var locs = _context.Locs.Where(x=>whs.Contains(x.WhCode)).Select(s=>s.LocCode);
-            CommonResponse<List<ItemMasterVm>> common = new();
+            List<ItemMasterVm> dataEnum = new();
             try
             {
                 var ls = (from item in _context.ItemMasters.Where(x => !string.IsNullOrEmpty(x.LocCode) && locs.Contains(x.LocCode))
@@ -60,43 +60,42 @@ namespace NMVS.Controllers.Api
                               Qty = item.PtQty,
                               PackingType = i.ItemPkg,
                               Sup = s.SupDesc,
-                              Lot = item.PtLotNo,
+                              Lot = string.IsNullOrEmpty(item.BatchNo) ? item.RefNo : item.BatchNo,
                               RcvBy = item.RecBy,
                               Parent = item.ParentId
                           }).ToList();
 
-                if (string.IsNullOrEmpty(vm.ItemNo))
+                if (itemNo == "na")
                 {
-                    if (vm.Available)
+                    if (avail == 1)
                     {
-                        common.dataenum = ls.Where(x => x.Qty > 0).ToList();
+                        dataEnum = ls.Where(x => x.Qty > 0).ToList();
 
                     }
                     else
                     {
-                        common.dataenum = ls;
+                        dataEnum = ls;
                     }
-                    common.status = 1;
+                    
                 }
                 else
                 {
-                    if (vm.Available)
+                    if (avail == 1)
                     {
-                        common.dataenum = ls.Where(x => x.Qty > 0 && x.No == vm.ItemNo).ToList();
+                        dataEnum = ls.Where(x => x.Qty > 0 && x.No == itemNo).ToList();
                     }
                     else
                     {
-                        common.dataenum = ls.Where(x => x.No == vm.ItemNo).ToList();
+                        dataEnum = ls.Where(x => x.No == itemNo).ToList();
                     }
-                    common.status = 1;
+                    
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                common.status = -1;
-                common.message = e.ToString();
+                
             }
-            return Ok(common);
+            return Ok(dataEnum);
         }
 
 
@@ -412,7 +411,6 @@ namespace NMVS.Controllers.Api
                     var request = await _context.AllocateRequests.FindAsync(order.RequestID);
                     if (request != null)
                     {
-
                         // 1. decrease request qty
                         // 2. add note
                         request.AlcCmmt += "**Order " + report.OrId + ": report quantity of " + report.Qty + ". Message:" + report.Note + ", By " + _httpContextAccessor.HttpContext.User.Identity.Name + "; ";

@@ -4,16 +4,14 @@
 }
 
 <h1 class="text-danger">Error.</h1>
+<h2>Error code: 500</h2>
 <h2 class="text-danger">An error occurred while processing your request.</h2>
 
-@if (Model.ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
-}
 
-<h3>Development Mode</h3>
 <p>
+    Error message: 
     @ViewBag.message
+</p>
+<p>
+    To enhance service, this error message is also reported to NMV technical team.
 </p>
