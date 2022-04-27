@@ -140,12 +140,12 @@ namespace NMVS.Controllers
             try
             {
                 ViewBag.SiteList = (from site in _db.Sites
-                                where site.Active == true
-                                select new SiteVm
-                                {
-                                    SiCode = site.SiCode,
-                                    SiDesc = site.SiName
-                                }).ToList();
+                                    where site.Active == true
+                                    select new SiteVm
+                                    {
+                                        SiCode = site.SiCode,
+                                        SiDesc = site.SiName
+                                    }).ToList();
 
                 if (ModelState.IsValid)
                 {
@@ -181,6 +181,12 @@ namespace NMVS.Controllers
 
                                     usr.WorkSpace = model.Site;
                                 }
+                                else
+                                {
+                                    if(!string.IsNullOrEmpty(user.WorkSpace)){
+                                        HttpContext.Session.SetString("susersite", usr.WorkSpace);
+                                    }
+                                }
                                 await _db.SaveChangesAsync();
 
                                 return RedirectToAction("Index", "Home");
@@ -209,7 +215,7 @@ namespace NMVS.Controllers
                 ModelState.AddModelError("", e.Message);
             }
 
-            
+
             return View();
         }
 
