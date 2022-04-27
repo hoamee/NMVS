@@ -1,0 +1,304 @@
+@{
+    ViewData["Title"] = "Issue Unplanned";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            @* ========= RequestNo ========= *@
+            <div class="col-md-3 col-sm-5">
+                <label for="so-no" class="control-label">Request No</label>
+                <select id="so-no" class="form-control">
+                    <option value="">Select request no.</option>
+                </select>
+            </div>
+            @* ========= Item No ========= *@
+            <div id="item-section" class="col-sm-5 col-md-3">
+                <label for="item-no" class="control-label">Item No</label>
+                <select id="item-no" class="form-control" disabled>
+
+                </select>
+            </div>
+        </div>
+        <div id="loc-qty" style="display: none;">
+            <div class="row">
+                @* ========= Select location ========= *@
+                <div class="col-md-3 col-sm-5">
+                    <label for="loc-code" class="control-label">Select location</label>
+                    <select id="loc-code" class="form-control" disabled>
+                    </select>
+                </div>
+                @* ========= Input quantity ========= *@
+                <div class="col-sm-5 col-md-3">
+                    <label for="item-qty" class="control-label">Quantity</label>
+                    <input type="number" step="0.01" class="form-control" id="item-qty" disabled />
+                </div>
+            </div>
+        </div>
+        <div id="div-vehicle" style="display: none;">
+            <div class="row">
+                @* ========= Select vehicle ========= *@
+                <div class="col-md-3 col-sm-5">
+                    <label for="s-vehicle" class="control-label">Select vehicle</label>
+                    <select id="s-vehicle" class="form-control" disabled>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        @* ========= Controller button ========= *@
+        <div class="row mt-2 btn-group">
+            <div class="col-auto">
+                <button class="btn btn-outline-primary" id="next-btn" onclick="nextstep()">
+                    Next
+                </button>
+                <button class="btn btn-outline-secondary" onclick="resetData()">
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <div>
+            <h3 id="step-count">
+
+            </h3>
+            <p id="form-dt"></p>
+        </div>
+    </div>
+</div>
+<script src="~/assets/js/sweetalert/sweetalert2.all.min.js"></script>
+<script src="~/assets/js/notify.js"></script>
+<script>
+    var formData = {
+        soNbr: null,
+        itemNo: null,
+        qty: null,
+        location: null,
+        vehicle: null,
+    }
+    var locDiv = $("#loc-qty");
+    var step = 0;
+    var itemList = null;
+
+
+
+    const nextstep = () => {
+
+        if (step === 0) {
+
+            if (fetchItemList()) {
+                step++;
+                $("#so-no").prop("disabled", "disabled");
+                $("#item-no").prop("disabled", false);
+            }
+            return;
+        }
+
+        if (step === 1) {
+            setItemNo();
+            $("#item-no").prop("disabled", "disabled");
+            fetchLocationList();
+            step++;
+            return;
+        }
+
+        if (step === 2) {
+            setLocation();
+            $("#loc-code").prop("disabled", true);
+            $("#item-qty").prop("disabled", false);
+            var maxQty = itemList.find(e => e.locCode == formData.location).quantity;
+            $("#item-qty").attr("placeholder", "Maximum: " + maxQty);
+            $("#item-qty").attr("max", maxQty);
+
+            step++;
+            return;
+        }
+
+        if (step === 3) {
+            var iQty = $("#item-qty");
+            var maxQty = itemList.find(e => e.locCode == formData.location).quantity;
+            var inputQty = iQty.val();
+            if (maxQty < inputQty || inputQty <= 0) {
+                iQty.notify("Quantity couldn't be larger than: " + maxQty + ", and should be larger than 0");
+                return;
+            } else {
+                formData.qty = inputQty;
+                $("#item-qty").prop("disabled", true);
+                fetchVehicleList();
+                $('#next-btn').text('Submit');
+
+            }
+            step++;
+            return;
+        }
+
+        if (step === 4) {
+            setVehicle();
+            submitData();
+
+        }
+
+        if (step === 5) {
+
+
+
+        }
+
+
+    }
+
+    const resetData = () => {
+        window.location.reload();
+    }
+
+    const setVehicle = () => {
+        var str = $("#s-vehicle option:selected").val();
+        formData.vehicle = str;
+    }
+
+    const fetchItemList = () => {
+        var str = $("#so-no option:selected").val();
+        if (str.length === 0) {
+            $("#so-no").notify('Please select request number')
+            return false;
+        }
+        if (str.length > 0) {
+            Swal.showLoading();
+            $.get(apiUrl + '/api/UnplannedIssue/getItemList/' + str,  // url
+                function (dt, stt, jq) {  // success callback
+                    $.each(dt, function (index, value) {
+                        if (value.itemNo.length > 0) {
+
+                            $("#item-no").append(
+                                '<option value="' + value.itemNo + '">'
+                                + value.itemName
+                                + '</option>'
+
+                            );
+                        }
+                    });
+                });
+            formData.soNbr = str;
+
+            Swal.close();
+
+            return true;
+        }
+    }
+
+    const submitData = () => {
+        $.ajax({
+            contentType: 'application/json; charset=utf-8',
+            type: 'POST',
+            url: apiUrl + '/api/UnplannedIssue/submitIssue',
+            data: JSON.stringify(formData),
+            success: function () {
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Your work has been saved',
+                    showConfirmButton: true,
+                    allowOutsideClick: false
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/Inquiry/MovementReport/issue unplanned " + formData.soNbr
+                    }
+                })
+
+                
+            }
+        });
+    }
+
+    const setLocation = () => {
+        var str = $("#loc-code option:selected").val();
+        formData.location = str;
+    }
+
+    const setItemNo = () => {
+        var str = $("#item-no option:selected").val();
+        formData.itemNo = str;
+    }
+
+    @* initial request data *@
+        $.get(apiUrl + '/api/UnplannedIssue/getSoList',  // url
+            function (data, textStatus, jqXHR) {  // success callback
+                Swal.showLoading();
+                $.each(data, function (index, value) {
+                    if (value.length > 0) {
+                        $('#so-no').append(
+                            '<option value="' + value + '">'
+                            + value
+                            + '</option>'
+
+                        );
+                    }
+                });
+                Swal.close();
+
+            });
+
+    @* Request location with available item *@
+    const fetchLocationList = () => {
+        Swal.showLoading();
+        $.get(apiUrl + '/api/UnplannedIssue/GetLocationList/' + formData.itemNo,  // url
+            function (dt, stt, jq) {  // success callback
+
+                if (dt.length > 0) {
+                    $.each(dt, function (index, value) {
+                        itemList = dt;
+                        if (value.locCode.length > 0) {
+
+                            $("#loc-code").append(
+                                '<option value="' + value.locCode + '">'
+                                + value.locName
+                                + '</option>'
+
+                            );
+                        }
+                    });
+
+                    $("#loc-code").prop("disabled", false);
+                } else {
+                    $("#loc-qty").html('<p class="text-danger">No item available</p>')
+
+                }
+                locDiv.show();
+                Swal.close();
+
+
+            });
+
+
+    }
+
+    @* Request vehicle with available item *@
+    const fetchVehicleList = () => {
+        Swal.showLoading();
+        $.get(apiUrl + '/api/UnplannedIssue/getvehicles',  // url
+            function (dt, stt, jq) {  // success callback
+
+                if (dt.length > 0) {
+                    $.each(dt, function (index, value) {
+
+
+                        $("#s-vehicle").append(
+                            '<option value="' + value.shpId + '">'
+                            + value.shpDesc
+                            + '</option>'
+
+                        );
+
+                    });
+
+                    $("#s-vehicle").prop("disabled", false);
+                } else {
+                    $("#div-vehicle").html('<p class="text-danger">No vehicle available</p>')
+
+                }
+                $("#div-vehicle").show();
+                Swal.close();
+            });
+    }
+
+</script>

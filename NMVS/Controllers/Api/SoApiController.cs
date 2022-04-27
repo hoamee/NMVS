@@ -103,19 +103,15 @@ namespace NMVS.Controllers.Api
             {
                 return NotFound();
             }
-            
-                saleOrder.Confirm = false;
-                _context.Update(saleOrder);
-                var invRequest = await _context.InvRequests.FindAsync(data.whcd);
-                if (invRequest != null)
-                {
-                    _context.Remove(invRequest);
-                }
-            var rqDet = _context.RequestDets.Where(x => x.RqID == saleOrder.SoNbr);
-            if (rqDet.Any())
+
+            saleOrder.Confirm = false;
+            _context.Update(saleOrder);
+            var invRequest = await _context.InvRequests.FindAsync(data.whcd);
+            if (invRequest != null)
             {
-                _context.RemoveRange(rqDet);
+                _context.Remove(invRequest);
             }
+
             saleOrder.ApprovalNote = data.loc;
             saleOrder.ConfirmBy = _httpContextAccessor.HttpContext.User.Identity.Name;
             saleOrder.Closed = false;
@@ -139,6 +135,30 @@ namespace NMVS.Controllers.Api
             rq.Closed = true;
             saleOrder.ApprovalNote = data.loc;
             saleOrder.ConfirmBy = _httpContextAccessor.HttpContext.User.Identity.Name;
+            saleOrder.Completed = true;
+            //Merge with Issue order
+            var soDets = _context.SoDetails.Where(x => x.SoNbr == rq.RqID);
+            foreach (var det in soDets)
+            {
+                var rqDet = await _context.RequestDets.FindAsync(det.RqDetId);
+                if (det.Shipped == 0 && rqDet.Arranged == 0)
+                {
+                    _context.Remove(det);
+                    _context.Remove(rqDet);
+                }
+                else if (det.Shipped != rqDet.Arranged)
+                {
+                    det.Shipped = rqDet.Arranged;
+                }
+
+                if (det.Quantity != det.Shipped)
+                    det.Quantity = det.Shipped;
+
+
+                _context.Update(det);
+            }
+
+
             _context.Update(saleOrder);
             _context.Update(rq);
             await _context.SaveChangesAsync();
@@ -161,6 +181,7 @@ namespace NMVS.Controllers.Api
                 return NotFound();
             }
             saleOrder.Closed = true;
+            saleOrder.Confirm = null;
             saleOrder.UpdatedBy = _httpContextAccessor.HttpContext.User.Identity.Name;
             saleOrder.UpdatedOn = DateTime.Now;
             _context.Update(saleOrder);
@@ -170,5 +191,5 @@ namespace NMVS.Controllers.Api
         }
     }
 
-    
+
 }

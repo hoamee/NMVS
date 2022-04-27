@@ -28,10 +28,11 @@ namespace NMVS.Services
             return locTypes;
         }
 
-        public List<TypeVm> GetWhList()
+        public List<TypeVm> GetWhList(string wp)
         {
             var whs = (from wh in _db.Warehouses
                        where wh.WhStatus == true
+                       && wh.SiCode == wp
                             select new TypeVm
                             {
                                 Code = wh.WhCode,

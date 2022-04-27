@@ -10,6 +10,6 @@ namespace NMVS.Services
     {
         public List<TypeVm> GetLocTypes();
 
-        public List<TypeVm> GetWhList();
+        public List<TypeVm> GetWhList(string wp);
     }
 }

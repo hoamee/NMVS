@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NMVS.Models;
 using NMVS.Models.DbModels;
@@ -49,7 +49,8 @@ namespace NMVS.Controllers
         // GET: Locs/Create
         public IActionResult AddLoc()
         {
-            ViewBag.Whs = _service.GetWhList();
+            var wp = HttpContext.Session.GetString("susersite");
+            ViewBag.Whs = _service.GetWhList(wp);
             ViewBag.LocType = _service.GetLocTypes();
             return View();
         }
@@ -72,10 +73,11 @@ namespace NMVS.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Location code \"" + loc.LocCode+ "\" is already existed. Please make another choice");
+                    ModelState.AddModelError("", "Location code \"" + loc.LocCode + "\" is already existed. Please make another choice");
                 }
             }
-            ViewBag.Whs = _service.GetWhList();
+            var wp = HttpContext.Session.GetString("susersite");
+            ViewBag.Whs = _service.GetWhList(wp);
             ViewBag.LocType = _service.GetLocTypes();
             return View(loc);
         }
@@ -87,7 +89,8 @@ namespace NMVS.Controllers
             {
                 return NotFound();
             }
-            ViewBag.Whs = _service.GetWhList();
+            var wp = HttpContext.Session.GetString("susersite");
+            ViewBag.Whs = _service.GetWhList(wp);
             ViewBag.LocType = _service.GetLocTypes();
             var loc = await _context.Locs.FindAsync(id);
             if (loc == null)
@@ -129,7 +132,8 @@ namespace NMVS.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewBag.Whs = _service.GetWhList();
+            var wp = HttpContext.Session.GetString("susersite");
+            ViewBag.Whs = _service.GetWhList(wp);
             ViewBag.LocType = _service.GetLocTypes();
             return View(loc);
         }

@@ -35,6 +35,8 @@ namespace NMVS.Common
 
         public const string WoReporter = "WoReporter";
 
+        public const string IssueUnplanned = "IssueUnplanned";
+
         public string GetItemHistory(string from, string to, int lastId, int newId, bool isAllocate, int orderNo)
         {
             string s = " **" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "Moved from " + from + " to " + to + "; " +

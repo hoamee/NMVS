@@ -117,6 +117,7 @@ namespace NMVS.Controllers
                     UserManagement = true,
                     WoCreation = true,
                     WoReporter = true,
+                    IssueUnplanned = true,
                     UserName = "nmvadmin"
                 };
 

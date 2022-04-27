@@ -35,5 +35,7 @@ namespace NMVS.Models.ViewModels
 
         public bool ArrangeInventory { set; get; }
         public bool MoveInv { set; get; }
+
+        public bool IssueUnplanned {set;get;}
     }
 }

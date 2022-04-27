@@ -33,7 +33,7 @@ function editRole(usrId) {
                 $('#u-active').prop('checked', obj.active);
                 $('#u-arrange').prop('checked', obj.arrangeInventory);
                 $('#u-moveinv').prop('checked', obj.moveInv);
-
+                $('#is-upln').prop('checked', obj.issueUnplanned);
                 $('#seeding-modal').modal('toggle');
             }
             else if (res.status === 0) {
@@ -62,6 +62,7 @@ function seedRole() {
         WoReporter: $('#u-wo').is(":checked"),
         WoCreation: $('#u-worp').is(":checked"),
         MoveInv: $('#u-moveinv').is(":checked"),
+        IssueUnplanned: $('#is-upln').is(":checked"),
         ArrangeInventory: $('#u-arrange').is(":checked")
     };
 

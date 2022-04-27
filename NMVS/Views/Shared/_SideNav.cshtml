@@ -213,6 +213,19 @@
                 </li>
             }
 
+            @if (User.IsInRole("IssueUnplanned"))
+            {
+                <li class="nav-item side-iup">
+                    <a class="nav-link side-iup" href="/issueunplanned/new">
+                        <div
+                        class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                            <span class="fa fa-plane-departure"></span>
+                        </div>
+                        <span class="nav-link-text ms-1">Issue - Unplanned</span>
+                    </a>
+                </li>
+            }
+
             @if (User.IsInRole("Receive inventory") || User.IsInRole("QC"))
             {
                 <li class="nav-item mt-3">

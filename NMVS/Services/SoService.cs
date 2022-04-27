@@ -50,7 +50,8 @@ namespace NMVS.Services
                              Closed = so.Closed,
                              ReqReported = so.ReqReported,
                              ReqReportedNote = so.ReqReportedNote,
-                             ApprovalNote = so.ApprovalNote
+                             ApprovalNote = so.ApprovalNote,
+                             Completed = so.Completed
                          }).ToList();
 
             return model;

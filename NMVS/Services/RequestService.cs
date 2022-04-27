@@ -95,6 +95,9 @@ namespace NMVS.Services
                         var itemCount = 1;
                         foreach (var line in noteDet.Where(x => x.RqId == so))
                         {
+                            if(line.PkgQty == 0){
+                                line.PkgQty = 1;
+                            }
                             var packCount = Convert.ToInt32(Math.Floor(line.Quantity / line.PkgQty));
                             double remainder = line.Quantity % line.PkgQty;
 

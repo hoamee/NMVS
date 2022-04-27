@@ -63,6 +63,8 @@ namespace NMVS.Models.ViewModels
         [Display(Name = "Updated On")]
         public DateTime UpdatedOn { set; get; }
 
+        public bool Completed { get; set; }
+
         public bool ReqReported { set; get; }
         public string ReqReportedNote { set; get; }
 

@@ -56,7 +56,7 @@ namespace NMVS.Controllers
                 var hold = _db.AllocateOrders.Where(x => x.LocCode == loc.LocCode).Sum(x => x.AlcOrdQty - x.MovedQty - x.Reported)
                     + _db.IssueOrders.Where(x => x.ToLoc == loc.LocCode).Sum(x => x.ExpOrdQty - x.MovedQty - x.Reported);
                 var outGo = _db.AllocateOrders.Where(x => x.AlcOrdFrom == loc.LocCode).Sum(x => x.AlcOrdQty - x.MovedQty - x.Reported)
-                    + _db.IssueOrders.Where(x => x.FromLoc == loc.LocCode).Sum(x => x.ExpOrdQty - x.MovedQty - x.Reported);
+                    + _db.IssueOrders.Where(x => x.LocCode == loc.LocCode).Sum(x => x.ExpOrdQty - x.MovedQty - x.Reported);
 
                 loc.LocRemain = loc.LocCap - used - hold;
                 loc.LocOutgo = outGo;
@@ -96,9 +96,18 @@ namespace NMVS.Controllers
         [Authorize(Roles = "Arrange inventory")]
         public async Task<ActionResult> ConfirmLoc(int id)
         {
+            
+            var workSpace = HttpContext.Session.GetString("susersite");
+            var whs = _db.Warehouses.Where(x => x.SiCode == workSpace).Select(s => s.WhCode);
             var ptmstr = await _db.ItemMasters.FindAsync(id);
             var locList = new List<LocationCapSelect>();
-            var whl = await _db.Locs.Where(x => x.LocCode != ptmstr.LocCode && x.LocType != "Unqualified" && x.LocStatus == true).ToListAsync();
+            var whl = await _db.Locs
+                .Where(
+                    x => x.LocCode != ptmstr.LocCode 
+                    && x.LocType != "Unqualified" 
+                    && x.LocStatus == true
+                    && whs.Contains(x.WhCode)
+                    ).ToListAsync();
 
             ViewBag.ptid = id;
 

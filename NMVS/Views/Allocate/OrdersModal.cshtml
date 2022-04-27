@@ -1,5 +1,6 @@
 ﻿<!-- Modal confirm -->
-<div class="modal fade modal-dialog-scrollable" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade modal-dialog-scrollable" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-body">
@@ -8,7 +9,7 @@
                 <table class="table table-striped" id="table2">
                     <thead>
                         <tr>
-                           
+
                             <th>Inventory Id</th>
                             <th>
                                 Item No.
@@ -71,7 +72,8 @@
 </div>
 
 <!-- Modal report -->
-<div class="modal fade modal-dialog-scrollable" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+<div class="modal fade modal-dialog-scrollable" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-body">
@@ -80,7 +82,7 @@
                 <table class="table table-striped" id="table3">
                     <thead>
                         <tr>
-                            
+
                             <th>Inventory Id</th>
                             <th>
                                 Item No.
@@ -132,7 +134,8 @@
                         </label>
                     </div>
                     <label class="form-label text-danger" for="report-input">Add a note</label>
-                    <textarea aria-multiline="true" cols="40" rows="5" class="form-control" id="report-input"></textarea>
+                    <textarea aria-multiline="true" cols="40" rows="5" class="form-control"
+                        id="report-input"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -252,15 +255,16 @@
             var desCode = $('#table2 .to-code').text().trim();
             var qty = $('#moved-qty').val();
             desInput = $('#loc-code').val().trim();
-            var oQty = parseFloat($('#table2 #t2-tr').children('.ord-qty').text().trim())
-                - parseFloat($('#table2 #t2-tr').children('.ord-moved').text().trim())
-                - parseFloat($('#table2 #t2-tr').children('.ord-reported').text().trim());
+            var oQty = parseFloat($('#table2 #t2-tr').find('.ord-qty').text().trim())
+                - parseFloat($('#table2 #t2-tr').find('.ord-moved').text().trim())
+                - parseFloat($('#table2 #t2-tr').find('.ord-reported').text().trim());
 
+            
             if (qty > oQty) {
-                $('#moved-qty').notify('Report quantity couldn\'t be larger than order quantity');
+                $('#moved-qty').notify('Quantity couldn\'t be larger than order quantity');
             }
             else if (qty <= 0) {
-                $('#moved-qty').notify('Report quantity couldn\'t be less than or equal to 0');
+                $('#moved-qty').notify('Quantity couldn\'t be less than or equal to 0');
             } else {
 
 

@@ -49,6 +49,5 @@ namespace NMVS.Models.DbModels
         [Display(Name = "Active")]
         public bool Active { get; set; }
 
-        public virtual ICollection<WorkOrder> WorkOrders { set; get; }
     }
 }

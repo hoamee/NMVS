@@ -84,12 +84,16 @@
                             </dt>
                             <dd class="col-sm-10">
                                 @Html.DisplayFor(model => model.SoVm.Comment)
-
-                                @if (!string.IsNullOrEmpty(Model.SoVm.ApprovalNote))
-                                {
-                                    <span>/ "@Model.SoVm.ApprovalNote"</span>
-                                }
                             </dd>
+                            @if (!string.IsNullOrEmpty(Model.SoVm.ApprovalNote))
+                            {
+                                <dt class="col-sm-2">
+                                    Completion Note
+                                </dt>
+                                <dd class="col-sm-10">
+                                    @Html.DisplayFor(model => model.SoVm.ApprovalNote)
+                                </dd>
+                            }
                             <dt class="col-sm-2">
                                 Approval
                             </dt>
@@ -103,11 +107,11 @@
                                 {
                                     if (Model.SoVm.Confirm == true)
                                     {
-                                        <span class="badge bg-success">Yes</span> 
+                                        <span class="badge bg-success">Yes</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-danger">Rejected</span> <span> "@Model.SoVm.ApprovalNote"  </span>
+                                        <span class="badge bg-danger">Rejected</span> <span> "@Model.SoVm.ApprovalNote" </span>
                                     }
                                 }
 
@@ -142,7 +146,8 @@
                                 {
                                     if (Model.SoVm.WhConfirmed == true)
                                     {
-                                        <span class="badge bg-success">Confirmed</span> <span>By @Model.SoVm.WhConfirmedBy</span>
+                                        <span class="badge bg-success">Confirmed</span> <span>By
+                                            @Model.SoVm.WhConfirmedBy</span>
                                     }
                                     else if (Model.SoVm.WhConfirmed == null)
                                     {
@@ -151,7 +156,8 @@
                                     else if (Model.SoVm.WhConfirmed == false)
                                     {
                                         <span class="badge bg-danger">Rejected</span>
-                                        <span class="text-danger">By @Model.SoVm.WhConfirmedBy: @Model.SoVm.ConfirmationNote</span>
+                                        <span class="text-danger">By @Model.SoVm.WhConfirmedBy:
+                                            @Model.SoVm.ConfirmationNote</span>
                                     }
                                 }
                             </dd>
@@ -163,7 +169,8 @@
                         {
                             if (!Model.SoVm.Closed)
                             {
-                                <span>| </span><a asp-action="Update" asp-route-id="@Model.SoVm.SoNbr" class="btn btn-outline-warning">Update</a>
+                                <span>| </span><a asp-action="Update" asp-route-id="@Model.SoVm.SoNbr"
+                            class="btn btn-outline-warning">Update</a>
                             }
                             @if (User.IsInRole("Approve SO") && Model.SoVm.Closed)
                             {
@@ -178,8 +185,10 @@
                         }
                         else
                         {
-                            if (Model.SoVm.SoType != 1) {
-                            <span>|</span> <span onclick="completeRequest()" class="btn btn-outline-warning">Mark as completed</span>
+                            if (Model.SoVm.SoType != 1 && !Model.SoVm.Completed)
+                            {
+                                <span>|</span> <span onclick="completeRequest()" class="btn btn-outline-warning">Mark as
+                                    completed</span>
                             }
                         }
                     </div>
@@ -240,7 +249,8 @@
                                     }
                                     else
                                     {
-                                        <a class="btn btn-outline-primary btn-sm" href="/SalesOrders/UpdateSodet/@item.SodId">@item.ItemNo</a>
+                                        <a class="btn btn-outline-primary btn-sm"
+                                    href="/SalesOrders/UpdateSodet/@item.SodId">@item.ItemNo</a>
                                     }
                                 </td>
                                 <td>
@@ -271,9 +281,9 @@
                         @* <tr>
                             <td colspan="6" class="text-center"><b>Total</b></td>
                             <td>
-                                @Model.SoVm.SoCurr
+                            @Model.SoVm.SoCurr
                             </td>
-                        </tr> *@
+                            </tr> *@
                         @if (!Model.SoVm.Closed && Model.SoVm.SoType != 1)
                         {
                             <tr class="hide-print">
@@ -311,71 +321,71 @@
     var routeURL = location.protocol + "//" + location.host;
     function submitSo() {
         Swal.fire({
-                title: 'Is all information correct?',
-                showDenyButton: true,
-                confirmButtonText: 'Yes, submit',
-                denyButtonText: `No`,
-                showLoaderOnConfirm: true,
-                preConfirm: () => {
-                    var rowCount = $('#dt-table > tbody  > tr').length;
-                    if (rowCount <= 0) {
-                        Swal.showValidationMessage(
-                            `There's no data to submit`
-                        )
-                    }
-                    return true;
-
-
-                },
-                allowOutsideClick: () => !Swal.isLoading()
-
-            }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result.value == true) {
-
-                    $.ajax({
-                        method: 'GET',
-                        url: routeURL + '/api/So/SoSubmit/@Model.SoVm.SoNbr',
-                        success: function (dt) {
-                            Swal.fire('Saved!', '', 'success')
-                                .then((r) => {
-                                    if (r.isConfirmed) {
-                                        window.location.reload();
-                                    }
-                                });
-                        }
-
-                    });
-
+            title: 'Is all information correct?',
+            showDenyButton: true,
+            confirmButtonText: 'Yes, submit',
+            denyButtonText: `No`,
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                var rowCount = $('#dt-table > tbody  > tr').length;
+                if (rowCount <= 0) {
+                    Swal.showValidationMessage(
+                        `There's no data to submit`
+                    )
                 }
-            })
+                return true;
+
+
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.value == true) {
+
+                $.ajax({
+                    method: 'GET',
+                    url: routeURL + '/api/So/SoSubmit/@Model.SoVm.SoNbr',
+                    success: function (dt) {
+                        Swal.fire('Saved!', '', 'success')
+                            .then((r) => {
+                                if (r.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            });
+                    }
+
+                });
+
+            }
+        })
     }
 
     function approveRequest() {
         Swal.fire({
-                title: 'Are you sure approve this SO?',
-                showDenyButton: true,
-                confirmButtonText: 'Yes, submit',
-                denyButtonText: `No`,
-                showLoaderOnConfirm: true,
+            title: 'Are you sure approve this SO?',
+            showDenyButton: true,
+            confirmButtonText: 'Yes, submit',
+            denyButtonText: `No`,
+            showLoaderOnConfirm: true,
 
-            }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
 
-                    if (result) {
-                        $.ajax({
-                            method: 'GET',
-                            url: routeURL + '/api/So/SoConfirm/@Model.SoVm.SoNbr/1',
-                            success: function () {
-                                window.location.href = window.location.href;
-                            }
-                        });
-
-                    }
+                if (result) {
+                    $.ajax({
+                        method: 'GET',
+                        url: routeURL + '/api/So/SoConfirm/@Model.SoVm.SoNbr/1',
+                        success: function () {
+                            window.location.href = window.location.href;
+                        }
+                    });
 
                 }
-            })
+
+            }
+        })
     }
 
     function rejectRequest() {
@@ -393,11 +403,11 @@
             showLoaderOnConfirm: true,
             preConfirm: (dt) => {
 
-                    if (dt.trim() == "") {
-                        Swal.showValidationMessage(
-                            `Please add some note`
-                        )
-                    }
+                if (dt.trim() == "") {
+                    Swal.showValidationMessage(
+                        `Please add some note`
+                    )
+                }
 
                 return { valid: true, mess: dt };
 
@@ -410,8 +420,8 @@
             if (result.value.valid == true) {
 
                 var shpr = {
-                        whcd: '@Html.Raw(Model.SoVm.SoNbr)',
-                        loc: result.value.mess
+                    whcd: '@Html.Raw(Model.SoVm.SoNbr)',
+                    loc: result.value.mess
                 };
                 var postData = JSON.stringify(shpr);
                 $.ajax({
@@ -458,11 +468,11 @@
             showLoaderOnConfirm: true,
             preConfirm: (dt) => {
 
-                    if (dt.trim() == "") {
-                        Swal.showValidationMessage(
-                            `Please add some note`
-                        )
-                    }
+                if (dt.trim() == "") {
+                    Swal.showValidationMessage(
+                        `Please add some note`
+                    )
+                }
 
                 return { valid: true, mess: dt };
 
@@ -475,8 +485,8 @@
             if (result.value.valid == true) {
 
                 var shpr = {
-                        whcd: '@Html.Raw(Model.SoVm.SoNbr)',
-                        loc: result.value.mess
+                    whcd: '@Html.Raw(Model.SoVm.SoNbr)',
+                    loc: result.value.mess
                 };
                 var postData = JSON.stringify(shpr);
                 $.ajax({

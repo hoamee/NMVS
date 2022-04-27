@@ -30,6 +30,7 @@
                             <th>Guard</th>
                             <th>Create WO</th>
                             <th>Wo reporter</th>
+                            <th>Issue Unplanned</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -173,6 +174,16 @@
                             </td>
                             <td class="text-sm font-weight-normal">
                                 @if (item.WoReporter)
+                                {
+                                    <p class="badge bg-success">Yes</p>
+                                }
+                                else
+                                {
+                                    <p class="badge bg-secondary">No</p>
+                                }
+                            </td>
+                            <td class="text-sm font-weight-normal">
+                                @if (item.IssueUnplanned)
                                 {
                                     <p class="badge bg-success">Yes</p>
                                 }

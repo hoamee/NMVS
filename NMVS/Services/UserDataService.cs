@@ -70,6 +70,7 @@ namespace NMVS.Services
                                       MoveInv = p.RoleNames.Contains(Helper.MoveInventory),
                                       WoReporter = p.RoleNames.Contains(Helper.WoReporter),
                                       WoCreation = p.RoleNames.Contains(Helper.WoCreation),
+                                      IssueUnplanned = p.RoleNames.Contains(Helper.IssueUnplanned),
                                       Active = p.UserLock
                                   }).ToList();
 
@@ -105,6 +106,7 @@ namespace NMVS.Services
                                       ArrangeInventory = p.RoleNames.Contains(Helper.ArrangeInventory),
                                       MoveInv = p.RoleNames.Contains(Helper.MoveInventory),
                                       WoReporter = p.RoleNames.Contains(Helper.WoReporter),
+                                      IssueUnplanned = p.RoleNames.Contains(Helper.IssueUnplanned),
                                       WoCreation = p.RoleNames.Contains(Helper.WoCreation),
                                       Active = p.UserLock
                                   }).FirstOrDefault();
@@ -183,6 +185,10 @@ namespace NMVS.Services
             if (!_roleManager.RoleExistsAsync("SuperUser").GetAwaiter().GetResult())
             {
                 await _roleManager.CreateAsync(new ApplicationRole("SuperUser"));
+            }
+            if (!_roleManager.RoleExistsAsync(Helper.IssueUnplanned).GetAwaiter().GetResult())
+            {
+                await _roleManager.CreateAsync(new ApplicationRole(Helper.IssueUnplanned));
             }
         }
 
@@ -396,6 +402,22 @@ namespace NMVS.Services
                 if (await _userManager.IsInRoleAsync(user, Helper.WoReporter))
                 {
                     await _userManager.RemoveFromRoleAsync(user, Helper.WoReporter);
+                }
+            }
+
+            //14. Issue Unplanned
+            if (usr.IssueUnplanned)
+            {
+                if (!await _userManager.IsInRoleAsync(user, Helper.IssueUnplanned))
+                {
+                    await _userManager.AddToRoleAsync(user, Helper.IssueUnplanned);
+                }
+            }
+            else
+            {
+                if (await _userManager.IsInRoleAsync(user, Helper.IssueUnplanned))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, Helper.IssueUnplanned);
                 }
             }
 
